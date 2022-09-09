@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ComputerGraphics
+namespace ComputerGraphics.Source
 {
     public class StripLine : ICloneable
     {
