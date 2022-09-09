@@ -1,4 +1,6 @@
-﻿namespace ComputerGraphics
+﻿using System.Drawing;
+
+namespace ComputerGraphics
 {
     partial class MainForm
     {
@@ -23,11 +25,12 @@
         #region Код, автоматически созданный конструктором форм Windows
 
         /// <summary>
-        /// Требуемый метод для поддержки конструктора — не изменяйте 
-        /// содержимое этого метода с помощью редактора кода.
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.GL = new SharpGL.OpenGLControl();
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.statusXPosName = new System.Windows.Forms.ToolStripStatusLabel();
@@ -65,9 +68,7 @@
             // 
             // GL
             // 
-            this.GL.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GL.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
             this.GL.DrawFPS = false;
             this.GL.Location = new System.Drawing.Point(0, 2);
             this.GL.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
@@ -86,14 +87,10 @@
             // statusBar
             // 
             this.statusBar.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusXPosName,
-            this.statusXPosValue,
-            this.statusYPosName,
-            this.statusYPosValue});
-            this.statusBar.Location = new System.Drawing.Point(0, 650);
+            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { this.statusXPosName, this.statusXPosValue, this.statusYPosName, this.statusYPosValue });
+            this.statusBar.Location = new System.Drawing.Point(0, 651);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(1309, 30);
+            this.statusBar.Size = new System.Drawing.Size(1309, 29);
             this.statusBar.TabIndex = 1;
             this.statusBar.Text = "statusStrip1";
             // 
@@ -105,9 +102,7 @@
             // 
             // statusXPosValue
             // 
-            this.statusXPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusXPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.statusXPosValue.Name = "statusXPosValue";
             this.statusXPosValue.Size = new System.Drawing.Size(45, 24);
             this.statusXPosValue.Text = "0000";
@@ -120,9 +115,7 @@
             // 
             // statusYPosValue
             // 
-            this.statusYPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusYPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.statusYPosValue.Name = "statusYPosValue";
             this.statusYPosValue.Size = new System.Drawing.Size(45, 24);
             this.statusYPosValue.Text = "0000";
@@ -130,11 +123,7 @@
             // ChangeSet
             // 
             this.ChangeSet.Location = new System.Drawing.Point(119, 26);
-            this.ChangeSet.Maximum = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
+            this.ChangeSet.Maximum = new decimal(new int[] { 0, 0, 0, 0 });
             this.ChangeSet.Name = "ChangeSet";
             this.ChangeSet.ReadOnly = true;
             this.ChangeSet.Size = new System.Drawing.Size(84, 22);
@@ -157,21 +146,21 @@
             // 
             // AddSet
             // 
-            this.AddSet.Location = new System.Drawing.Point(264, 25);
+            this.AddSet.Image = ((System.Drawing.Image)(resources.GetObject("AddSet.Image")));
+            this.AddSet.Location = new System.Drawing.Point(283, 26);
             this.AddSet.Name = "AddSet";
-            this.AddSet.Size = new System.Drawing.Size(49, 23);
+            this.AddSet.Size = new System.Drawing.Size(57, 27);
             this.AddSet.TabIndex = 8;
-            this.AddSet.Text = "Добавить";
             this.AddSet.UseVisualStyleBackColor = true;
             this.AddSet.Click += new System.EventHandler(this.AddSet_Click);
             // 
             // DeleteSet
             // 
-            this.DeleteSet.Location = new System.Drawing.Point(209, 25);
+            this.DeleteSet.Image = ((System.Drawing.Image)(resources.GetObject("DeleteSet.Image")));
+            this.DeleteSet.Location = new System.Drawing.Point(220, 26);
             this.DeleteSet.Name = "DeleteSet";
-            this.DeleteSet.Size = new System.Drawing.Size(49, 23);
+            this.DeleteSet.Size = new System.Drawing.Size(57, 27);
             this.DeleteSet.TabIndex = 6;
-            this.DeleteSet.Text = "Удалить";
             this.DeleteSet.UseVisualStyleBackColor = true;
             this.DeleteSet.Click += new System.EventHandler(this.DeleteSet_Click);
             // 
@@ -180,27 +169,23 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 28);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(107, 16);
+            this.label1.Size = new System.Drawing.Size(110, 17);
             this.label1.TabIndex = 3;
             this.label1.Text = "Текущий набор";
             // 
             // DeletePrimitive
             // 
-            this.DeletePrimitive.Location = new System.Drawing.Point(243, 26);
+            this.DeletePrimitive.Image = ((System.Drawing.Image)(resources.GetObject("DeletePrimitive.Image")));
+            this.DeletePrimitive.Location = new System.Drawing.Point(250, 26);
             this.DeletePrimitive.Name = "DeletePrimitive";
-            this.DeletePrimitive.Size = new System.Drawing.Size(75, 23);
+            this.DeletePrimitive.Size = new System.Drawing.Size(65, 28);
             this.DeletePrimitive.TabIndex = 10;
-            this.DeletePrimitive.Text = "Удалить";
             this.DeletePrimitive.UseVisualStyleBackColor = true;
             // 
             // ChangePrimitive
             // 
             this.ChangePrimitive.Location = new System.Drawing.Point(143, 26);
-            this.ChangePrimitive.Maximum = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
+            this.ChangePrimitive.Maximum = new decimal(new int[] { 0, 0, 0, 0 });
             this.ChangePrimitive.Name = "ChangePrimitive";
             this.ChangePrimitive.ReadOnly = true;
             this.ChangePrimitive.Size = new System.Drawing.Size(84, 22);
@@ -211,7 +196,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 28);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(131, 16);
+            this.label2.Size = new System.Drawing.Size(133, 17);
             this.label2.TabIndex = 8;
             this.label2.Text = "Текущий примитив";
             // 
@@ -233,43 +218,31 @@
             // 
             // SetColorP
             // 
-            this.SetColorP.Location = new System.Drawing.Point(243, 62);
+            this.SetColorP.Image = ((System.Drawing.Image)(resources.GetObject("SetColorP.Image")));
+            this.SetColorP.Location = new System.Drawing.Point(250, 62);
             this.SetColorP.Name = "SetColorP";
-            this.SetColorP.Size = new System.Drawing.Size(75, 46);
+            this.SetColorP.Size = new System.Drawing.Size(65, 28);
             this.SetColorP.TabIndex = 13;
-            this.SetColorP.Text = "Выбрать цвет";
             this.SetColorP.UseVisualStyleBackColor = true;
             this.SetColorP.Click += new System.EventHandler(this.SetColorP_Click);
             // 
             // ChangeWidthP
             // 
             this.ChangeWidthP.Location = new System.Drawing.Point(143, 62);
-            this.ChangeWidthP.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.ChangeWidthP.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.ChangeWidthP.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            this.ChangeWidthP.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.ChangeWidthP.Name = "ChangeWidthP";
             this.ChangeWidthP.ReadOnly = true;
             this.ChangeWidthP.Size = new System.Drawing.Size(84, 22);
             this.ChangeWidthP.TabIndex = 12;
-            this.ChangeWidthP.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.ChangeWidthP.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(6, 64);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(101, 16);
+            this.label4.Size = new System.Drawing.Size(103, 17);
             this.label4.TabIndex = 11;
             this.label4.Text = "Ширина линии";
             // 
@@ -290,51 +263,51 @@
             // 
             // ResetBtn
             // 
-            this.ResetBtn.Location = new System.Drawing.Point(153, 45);
+            this.ResetBtn.Image = ((System.Drawing.Image)(resources.GetObject("ResetBtn.Image")));
+            this.ResetBtn.Location = new System.Drawing.Point(159, 69);
             this.ResetBtn.Name = "ResetBtn";
-            this.ResetBtn.Size = new System.Drawing.Size(30, 23);
+            this.ResetBtn.Size = new System.Drawing.Size(34, 35);
             this.ResetBtn.TabIndex = 4;
-            this.ResetBtn.Text = "R";
             this.ResetBtn.UseVisualStyleBackColor = true;
             this.ResetBtn.Click += new System.EventHandler(this.ResetBtn_Click);
             // 
             // RightBtn
             // 
-            this.RightBtn.Location = new System.Drawing.Point(189, 45);
+            this.RightBtn.Image = ((System.Drawing.Image)(resources.GetObject("RightBtn.Image")));
+            this.RightBtn.Location = new System.Drawing.Point(199, 69);
             this.RightBtn.Name = "RightBtn";
-            this.RightBtn.Size = new System.Drawing.Size(30, 23);
+            this.RightBtn.Size = new System.Drawing.Size(34, 35);
             this.RightBtn.TabIndex = 3;
-            this.RightBtn.Text = "D";
             this.RightBtn.UseVisualStyleBackColor = true;
             this.RightBtn.Click += new System.EventHandler(this.RightBtn_Click);
             // 
             // DownBtn
             // 
-            this.DownBtn.Location = new System.Drawing.Point(153, 74);
+            this.DownBtn.Image = ((System.Drawing.Image)(resources.GetObject("DownBtn.Image")));
+            this.DownBtn.Location = new System.Drawing.Point(159, 110);
             this.DownBtn.Name = "DownBtn";
-            this.DownBtn.Size = new System.Drawing.Size(30, 23);
+            this.DownBtn.Size = new System.Drawing.Size(34, 35);
             this.DownBtn.TabIndex = 2;
-            this.DownBtn.Text = "S";
             this.DownBtn.UseVisualStyleBackColor = true;
             this.DownBtn.Click += new System.EventHandler(this.DownBtn_Click);
             // 
             // LeftBtn
             // 
-            this.LeftBtn.Location = new System.Drawing.Point(117, 45);
+            this.LeftBtn.Image = ((System.Drawing.Image)(resources.GetObject("LeftBtn.Image")));
+            this.LeftBtn.Location = new System.Drawing.Point(119, 69);
             this.LeftBtn.Name = "LeftBtn";
-            this.LeftBtn.Size = new System.Drawing.Size(30, 23);
+            this.LeftBtn.Size = new System.Drawing.Size(34, 35);
             this.LeftBtn.TabIndex = 1;
-            this.LeftBtn.Text = "A";
             this.LeftBtn.UseVisualStyleBackColor = true;
             this.LeftBtn.Click += new System.EventHandler(this.LeftBtn_Click);
             // 
             // UpBtn
             // 
-            this.UpBtn.Location = new System.Drawing.Point(153, 16);
+            this.UpBtn.Image = ((System.Drawing.Image)(resources.GetObject("UpBtn.Image")));
+            this.UpBtn.Location = new System.Drawing.Point(159, 28);
             this.UpBtn.Name = "UpBtn";
-            this.UpBtn.Size = new System.Drawing.Size(30, 23);
+            this.UpBtn.Size = new System.Drawing.Size(34, 35);
             this.UpBtn.TabIndex = 0;
-            this.UpBtn.Text = "W";
             this.UpBtn.UseVisualStyleBackColor = true;
             this.UpBtn.Click += new System.EventHandler(this.UpBtn_Click);
             // 
@@ -363,7 +336,6 @@
             this.Scene.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

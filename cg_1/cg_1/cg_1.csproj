@@ -96,6 +96,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Images\eraser.png" />
+    <Content Include="Resources\Images\left-arrow.png" />
+    <Content Include="Resources\Images\upper-arrow.png" />
+    <Content Include="Resources\Images\right-arrow.png" />
+    <Content Include="Resources\Images\down-arrow.png" />
+    <Content Include="Resources\Images\undo.png" />
+    <Content Include="Resources\Images\color-wheel.png" />
     <Content Include="SharpGL.ico" />
     <Content Include="SharpGL.png" />
   </ItemGroup>

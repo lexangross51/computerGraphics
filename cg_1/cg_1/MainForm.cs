@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using ComputerGraphics.Source;
 using SharpGL;
@@ -61,7 +62,6 @@ namespace ComputerGraphics
                     }
 
                     gl.End();
-                    gl.PopMatrix();
                 }
 
                 gl.LineWidth(line.Thickness);
