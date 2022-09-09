@@ -8,20 +8,20 @@ namespace ComputerGraphics.Source
         public List<Point2D> Points { get; set; }
         public Color Color { get; set; }
         public float Thickness { get; set; }
-        public byte SetNumber { get; set; }
+        public byte Set { get; set; }
 
         public StripLine()
         {
             Points = new List<Point2D>();
             Color = new Color();
             Thickness = 1.0f;
-            SetNumber = 0;
+            Set = 0;
         }
 
         public object Clone() => new StripLine {
             Points = new List<Point2D>(Points),
             Color = Color,
-            SetNumber = SetNumber
+            Set = Set
         };
     }
 
