@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using ComputerGraphics.Source;
 using SharpGL;
@@ -9,11 +8,11 @@ namespace ComputerGraphics
 {
     public partial class MainForm : Form
     {
-        private List<StripLine> _lines = new List<StripLine>();
+        private readonly List<StripLine> _lines = new List<StripLine>();
         private readonly StripLine _line = new StripLine();
-        private byte _currentSet = 0;
+        private byte _currentSet;
         private bool _isDrawingCurrent = true;
-        private short _shiftX = 0, _shiftY = 0;
+        private short _shiftX, _shiftY;
 
         public MainForm() => InitializeComponent();
 
@@ -190,6 +189,11 @@ namespace ComputerGraphics
         {
             ChangeSet.Value = ++ChangeSet.Maximum;
             _currentSet = (byte)ChangeSet.Value;
+
+            _lines.Add(_line.Clone() as StripLine);
+            _line.Points.Clear();
+
+            _isDrawingCurrent = false;
             _line.Set = _currentSet;
         }
 
