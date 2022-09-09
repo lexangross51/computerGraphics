@@ -12,6 +12,7 @@ namespace ComputerGraphics
         private readonly StripLine _line = new StripLine();
         private byte _currentSet = 0;
         private bool _isDrawingCurrent = true;
+        private short _shiftX = 0, _shiftY = 0;
 
 
         public MainForm() => InitializeComponent();
@@ -42,13 +43,15 @@ namespace ComputerGraphics
 
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT);
 
-
             foreach (var line in _lines)
             {
-                gl.Color(_lines[i].Color.R, _lines[i].Color.G, _lines[i].Color.B);
+                gl.Color(line.Color.R, line.Color.G, line.Color.B);
+                gl.PushMatrix();
 
                 if (line.Set == _currentSet)
                 {
+                    gl.Translate(_shiftX, _shiftY, 0);
+
                     gl.PointSize(10);
                     gl.Enable(OpenGL.GL_POINT_SMOOTH);
                     gl.Begin(OpenGL.GL_POINTS);
@@ -59,6 +62,7 @@ namespace ComputerGraphics
                     }
 
                     gl.End();
+                    gl.PopMatrix();
                 }
 
                 gl.LineWidth(line.Thickness);
@@ -155,9 +159,9 @@ namespace ComputerGraphics
             _shiftY = 0;
         }
 
-        private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
+        private void ChangeSet_ValueChanged(object sender, EventArgs e)
         {
-
+            _currentSet = (byte)ChangeSet.Value;
         }
 
         private void DeleteSet_Click(object sender, EventArgs e)
@@ -200,9 +204,6 @@ namespace ComputerGraphics
         {
 
         }
-
-
-        
 
     }
 }
