@@ -36,9 +36,6 @@
             this.statusYPosValue = new System.Windows.Forms.ToolStripStatusLabel();
             this.ChangeSet = new System.Windows.Forms.NumericUpDown();
             this.Sets = new System.Windows.Forms.GroupBox();
-            this.SetColorS = new System.Windows.Forms.Button();
-            this.ChangeWidthS = new System.Windows.Forms.NumericUpDown();
-            this.label3 = new System.Windows.Forms.Label();
             this.AddSet = new System.Windows.Forms.Button();
             this.DeleteSet = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -49,14 +46,20 @@
             this.SetColorP = new System.Windows.Forms.Button();
             this.ChangeWidthP = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
+            this.Scene = new System.Windows.Forms.GroupBox();
+            this.UpBtn = new System.Windows.Forms.Button();
+            this.LeftBtn = new System.Windows.Forms.Button();
+            this.DownBtn = new System.Windows.Forms.Button();
+            this.RightBtn = new System.Windows.Forms.Button();
+            this.ResetBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.GL)).BeginInit();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).BeginInit();
             this.Sets.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ChangeWidthS)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ChangePrimitive)).BeginInit();
             this.Primitives.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeWidthP)).BeginInit();
+            this.Scene.SuspendLayout();
             this.SuspendLayout();
             // 
             // GL
@@ -140,60 +143,16 @@
             // Sets
             // 
             this.Sets.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Sets.Controls.Add(this.SetColorS);
-            this.Sets.Controls.Add(this.ChangeWidthS);
-            this.Sets.Controls.Add(this.label3);
             this.Sets.Controls.Add(this.AddSet);
             this.Sets.Controls.Add(this.DeleteSet);
             this.Sets.Controls.Add(this.label1);
             this.Sets.Controls.Add(this.ChangeSet);
-            this.Sets.Location = new System.Drawing.Point(952, 2);
+            this.Sets.Location = new System.Drawing.Point(954, 213);
             this.Sets.Name = "Sets";
-            this.Sets.Size = new System.Drawing.Size(343, 124);
+            this.Sets.Size = new System.Drawing.Size(343, 71);
             this.Sets.TabIndex = 3;
             this.Sets.TabStop = false;
             this.Sets.Text = "Управление наборами";
-            // 
-            // SetColorS
-            // 
-            this.SetColorS.Location = new System.Drawing.Point(209, 64);
-            this.SetColorS.Name = "SetColorS";
-            this.SetColorS.Size = new System.Drawing.Size(104, 46);
-            this.SetColorS.TabIndex = 11;
-            this.SetColorS.Text = "Выбрать цвет";
-            this.SetColorS.UseVisualStyleBackColor = true;
-            // 
-            // ChangeWidthS
-            // 
-            this.ChangeWidthS.Location = new System.Drawing.Point(119, 62);
-            this.ChangeWidthS.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.ChangeWidthS.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.ChangeWidthS.Name = "ChangeWidthS";
-            this.ChangeWidthS.ReadOnly = true;
-            this.ChangeWidthS.Size = new System.Drawing.Size(84, 22);
-            this.ChangeWidthS.TabIndex = 10;
-            this.ChangeWidthS.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 64);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(101, 16);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Ширина линий";
             // 
             // AddSet
             // 
@@ -264,7 +223,7 @@
             this.Primitives.Controls.Add(this.label2);
             this.Primitives.Controls.Add(this.DeletePrimitive);
             this.Primitives.Controls.Add(this.ChangePrimitive);
-            this.Primitives.Location = new System.Drawing.Point(952, 151);
+            this.Primitives.Location = new System.Drawing.Point(954, 309);
             this.Primitives.Name = "Primitives";
             this.Primitives.Size = new System.Drawing.Size(343, 123);
             this.Primitives.TabIndex = 11;
@@ -312,11 +271,77 @@
             this.label4.TabIndex = 11;
             this.label4.Text = "Ширина линии";
             // 
+            // Scene
+            // 
+            this.Scene.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.Scene.Controls.Add(this.ResetBtn);
+            this.Scene.Controls.Add(this.RightBtn);
+            this.Scene.Controls.Add(this.DownBtn);
+            this.Scene.Controls.Add(this.LeftBtn);
+            this.Scene.Controls.Add(this.UpBtn);
+            this.Scene.Location = new System.Drawing.Point(954, 12);
+            this.Scene.Name = "Scene";
+            this.Scene.Size = new System.Drawing.Size(343, 180);
+            this.Scene.TabIndex = 12;
+            this.Scene.TabStop = false;
+            this.Scene.Text = "Сцена";
+            // 
+            // UpBtn
+            // 
+            this.UpBtn.Location = new System.Drawing.Point(153, 16);
+            this.UpBtn.Name = "UpBtn";
+            this.UpBtn.Size = new System.Drawing.Size(30, 23);
+            this.UpBtn.TabIndex = 0;
+            this.UpBtn.Text = "W";
+            this.UpBtn.UseVisualStyleBackColor = true;
+            this.UpBtn.Click += new System.EventHandler(this.UpBtn_Click);
+            // 
+            // LeftBtn
+            // 
+            this.LeftBtn.Location = new System.Drawing.Point(117, 45);
+            this.LeftBtn.Name = "LeftBtn";
+            this.LeftBtn.Size = new System.Drawing.Size(30, 23);
+            this.LeftBtn.TabIndex = 1;
+            this.LeftBtn.Text = "A";
+            this.LeftBtn.UseVisualStyleBackColor = true;
+            this.LeftBtn.Click += new System.EventHandler(this.LeftBtn_Click);
+            // 
+            // DownBtn
+            // 
+            this.DownBtn.Location = new System.Drawing.Point(153, 74);
+            this.DownBtn.Name = "DownBtn";
+            this.DownBtn.Size = new System.Drawing.Size(30, 23);
+            this.DownBtn.TabIndex = 2;
+            this.DownBtn.Text = "S";
+            this.DownBtn.UseVisualStyleBackColor = true;
+            this.DownBtn.Click += new System.EventHandler(this.DownBtn_Click);
+            // 
+            // RightBtn
+            // 
+            this.RightBtn.Location = new System.Drawing.Point(189, 45);
+            this.RightBtn.Name = "RightBtn";
+            this.RightBtn.Size = new System.Drawing.Size(30, 23);
+            this.RightBtn.TabIndex = 3;
+            this.RightBtn.Text = "D";
+            this.RightBtn.UseVisualStyleBackColor = true;
+            this.RightBtn.Click += new System.EventHandler(this.RightBtn_Click);
+            // 
+            // ResetBtn
+            // 
+            this.ResetBtn.Location = new System.Drawing.Point(153, 45);
+            this.ResetBtn.Name = "ResetBtn";
+            this.ResetBtn.Size = new System.Drawing.Size(30, 23);
+            this.ResetBtn.TabIndex = 4;
+            this.ResetBtn.Text = "R";
+            this.ResetBtn.UseVisualStyleBackColor = true;
+            this.ResetBtn.Click += new System.EventHandler(this.ResetBtn_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1309, 680);
+            this.Controls.Add(this.Scene);
             this.Controls.Add(this.Primitives);
             this.Controls.Add(this.Sets);
             this.Controls.Add(this.statusBar);
@@ -329,11 +354,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).EndInit();
             this.Sets.ResumeLayout(false);
             this.Sets.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ChangeWidthS)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ChangePrimitive)).EndInit();
             this.Primitives.ResumeLayout(false);
             this.Primitives.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeWidthP)).EndInit();
+            this.Scene.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -356,12 +381,15 @@
         private System.Windows.Forms.NumericUpDown ChangePrimitive;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox Primitives;
-        private System.Windows.Forms.Button SetColorS;
-        private System.Windows.Forms.NumericUpDown ChangeWidthS;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button SetColorP;
         private System.Windows.Forms.NumericUpDown ChangeWidthP;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox Scene;
+        private System.Windows.Forms.Button ResetBtn;
+        private System.Windows.Forms.Button RightBtn;
+        private System.Windows.Forms.Button DownBtn;
+        private System.Windows.Forms.Button LeftBtn;
+        private System.Windows.Forms.Button UpBtn;
     }
 }
 

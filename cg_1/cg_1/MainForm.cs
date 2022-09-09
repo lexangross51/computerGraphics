@@ -12,6 +12,7 @@ namespace ComputerGraphics
         private readonly StripLine _line = new StripLine();
         private byte _currentSet = 0;
         private bool _isDdrawingCurrent = true;
+        private short _shiftX = 0, _shiftY = 0;
 
 
         public MainForm()
@@ -48,6 +49,9 @@ namespace ComputerGraphics
 
             for (int i = 0; i < _lines.Count; i++)
             {
+                gl.PushMatrix();
+                gl.Translate(_shiftX, _shiftY, 0);
+
                 gl.Color(_lines[i].Color.R, _lines[i].Color.G, _lines[i].Color.B);
 
                 if (_lines[i].Set == _currentSet)
@@ -73,6 +77,7 @@ namespace ComputerGraphics
                 }
 
                 gl.End();
+                gl.PopMatrix();
             }
 
             if (_isDdrawingCurrent)
@@ -133,15 +138,35 @@ namespace ComputerGraphics
         }
 
 
-        // Панель управления
+        // Панель управления **********************************************
+        // Управление сценой
+        private void UpBtn_Click(object sender, EventArgs e)
+        {
+            _shiftY += 40;
+        }
+        private void RightBtn_Click(object sender, EventArgs e)
+        {
+            _shiftX += 40;
+        }
+        private void LeftBtn_Click(object sender, EventArgs e)
+        {
+            _shiftX -= 40;
+        }
+        private void DownBtn_Click(object sender, EventArgs e)
+        {
+            _shiftY -= 40;
+        }
+        private void ResetBtn_Click(object sender, EventArgs e)
+        {
+            _shiftX = 0;
+            _shiftY = 0;
+        }
+
+
+        // Управление наборами
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
         {
             _currentSet = (byte)ChangeSet.Value;
-        }
-
-        private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void DeleteSet_Click(object sender, EventArgs e)
@@ -155,7 +180,7 @@ namespace ComputerGraphics
                     _lines.RemoveAt(i);
                     i = i == 0 ? 0 : --i;
                 }
-                
+
                 if (_lines[i].Set > _currentSet)
                 {
                     _lines[i].Set--;
@@ -167,9 +192,26 @@ namespace ComputerGraphics
 
         private void AddSet_Click(object sender, EventArgs e)
         {
-            _line.Set = ++_currentSet;
-            ChangeSet.Maximum++;
-            ChangeSet.Value = _currentSet;
+            ChangeSet.Value = ++ChangeSet.Maximum;
+            _currentSet = (byte)ChangeSet.Value;
+            _line.Set = _currentSet;
         }
+
+
+
+
+
+
+
+
+        // Управление примитивами
+        private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
+        
+
     }
 }
