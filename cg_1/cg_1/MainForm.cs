@@ -8,16 +8,13 @@ namespace ComputerGraphics
 {
     public partial class MainForm : Form
     {
-        private List<StripLine> _lines = new List<StripLine> ();
+        private readonly List<StripLine> _lines = new List<StripLine>();
         private readonly StripLine _line = new StripLine();
         private byte _currentSet = 0;
-        private bool _isDdrawingCurrent = true;
+        private bool _isDrawingCurrent = true;
 
 
-        public MainForm()
-        {
-            InitializeComponent();
-        }
+        public MainForm() => InitializeComponent();
 
         private void GL_OpenGLInitialized(object sender, EventArgs e)
         {
@@ -46,17 +43,17 @@ namespace ComputerGraphics
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT);
 
 
-            for (int i = 0; i < _lines.Count; i++)
+            foreach (var line in _lines)
             {
-                gl.Color(_lines[i].Color.R, _lines[i].Color.G, _lines[i].Color.B);
+                gl.Color(line.Color.R, line.Color.G, line.Color.B);
 
-                if (_lines[i].Set == _currentSet)
+                if (line.Set == _currentSet)
                 {
                     gl.PointSize(10);
                     gl.Enable(OpenGL.GL_POINT_SMOOTH);
                     gl.Begin(OpenGL.GL_POINTS);
 
-                    foreach (var p in _lines[i].Points)
+                    foreach (var p in line.Points)
                     {
                         gl.Vertex(p.X, p.Y);
                     }
@@ -64,18 +61,18 @@ namespace ComputerGraphics
                     gl.End();
                 }
 
-                gl.LineWidth(_lines[i].Thickness);
+                gl.LineWidth(line.Thickness);
                 gl.Begin(OpenGL.GL_LINE_STRIP);
 
-                for (int j = 0; j < _lines[i].Points.Count; j++)
+                foreach (var p in line.Points)
                 {
-                    gl.Vertex(_lines[i].Points[j].X, _lines[i].Points[j].Y);
+                    gl.Vertex(p.X, p.Y);
                 }
 
                 gl.End();
             }
 
-            if (_isDdrawingCurrent)
+            if (_isDrawingCurrent)
             {
                 gl.PointSize(10);
                 gl.Color(_line.Color.R, _line.Color.G, _line.Color.B);
@@ -107,7 +104,7 @@ namespace ComputerGraphics
         {
             if (e.Button == MouseButtons.Left)
             {
-                _isDdrawingCurrent = true;
+                _isDrawingCurrent = true;
 
                 short mouseX = (short)e.X;
                 short mouseY = (short)(GL.Height - (short)e.Y);
@@ -119,7 +116,7 @@ namespace ComputerGraphics
             {
                 _lines.Add(_line.Clone() as StripLine);
                 _line.Points.Clear();
-                _isDdrawingCurrent = false;
+                _isDrawingCurrent = false;
             }
         }
 
@@ -141,7 +138,6 @@ namespace ComputerGraphics
 
         private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
         {
-
         }
 
         private void DeleteSet_Click(object sender, EventArgs e)
@@ -155,7 +151,7 @@ namespace ComputerGraphics
                     _lines.RemoveAt(i);
                     i = i == 0 ? 0 : --i;
                 }
-                
+
                 if (_lines[i].Set > _currentSet)
                 {
                     _lines[i].Set--;
