@@ -1,4 +1,4 @@
-﻿namespace ComputerGraphics
+﻿namespace ComputerGraphics.Source
 {
     public struct Point2D
     {
