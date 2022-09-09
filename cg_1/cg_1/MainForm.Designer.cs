@@ -49,6 +49,7 @@
             this.GL.OpenGLInitialized += new System.EventHandler(this.GL_OpenGLInitialized);
             this.GL.OpenGLDraw += new SharpGL.RenderEventHandler(this.GL_OpenGLDraw);
             this.GL.Resized += new System.EventHandler(this.GL_Resized);
+            this.GL.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GL_MouseClick);
             // 
             // MainForm
             // 
