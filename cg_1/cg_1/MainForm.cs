@@ -50,7 +50,7 @@ namespace ComputerGraphics
             {
                 gl.Color(_lines[i].Color.R, _lines[i].Color.G, _lines[i].Color.B);
 
-                if (_lines[i].SetNumber == _currentSet)
+                if (_lines[i].Set == _currentSet)
                 {
                     gl.PointSize(10);
                     gl.Enable(OpenGL.GL_POINT_SMOOTH);
@@ -105,27 +105,21 @@ namespace ComputerGraphics
 
         private void GL_MouseClick(object sender, MouseEventArgs e)
         {
-            _isDdrawingCurrent = true;
+            if (e.Button == MouseButtons.Left)
+            {
+                _isDdrawingCurrent = true;
 
-            short mouseX = (short)e.X;
-            short mouseY = (short)(GL.Height - (short)e.Y);
+                short mouseX = (short)e.X;
+                short mouseY = (short)(GL.Height - (short)e.Y);
 
-            _line.Points.Add(new Point2D(mouseX, mouseY));
-        }
+                _line.Points.Add(new Point2D(mouseX, mouseY));
+            }
 
-        private void GL_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Space)
+            if (e.Button == MouseButtons.Right)
             {
                 _lines.Add(_line.Clone() as StripLine);
                 _line.Points.Clear();
                 _isDdrawingCurrent = false;
-            }
-            if (e.KeyCode == Keys.Z)
-            {
-                _line.SetNumber = ++_currentSet;
-                ChangeSet.Maximum = _currentSet;
-                ChangeSet.Value++;
             }
         }
 
@@ -139,7 +133,7 @@ namespace ComputerGraphics
         }
 
 
-        // Панель управление
+        // Панель управления
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
         {
             _currentSet = (byte)ChangeSet.Value;
@@ -156,17 +150,26 @@ namespace ComputerGraphics
 
             for (int i = 0; i < _lines.Count; i++)
             {
-                if (_lines[i].SetNumber == _currentSet)
+                if (_lines[i].Set == _currentSet)
                 {
                     _lines.RemoveAt(i);
-                    i = i == 0 ? 0 : i--;
+                    i = i == 0 ? 0 : --i;
                 }
                 
-                if (_lines[i].SetNumber > _currentSet)
+                if (_lines[i].Set > _currentSet)
                 {
-                    _lines[i].SetNumber--;
+                    _lines[i].Set--;
                 }
             }
+
+            ChangeSet.Maximum--;
+        }
+
+        private void AddSet_Click(object sender, EventArgs e)
+        {
+            _line.Set = ++_currentSet;
+            ChangeSet.Maximum++;
+            ChangeSet.Value = _currentSet;
         }
     }
 }
