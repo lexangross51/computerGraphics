@@ -19,8 +19,6 @@ namespace cg_1.src
         }
     }
 
-
-
     public struct Color
     {
         byte R { get; set; }
