@@ -8,8 +8,8 @@ namespace cg_1.src
 {
     public struct Point2D
     {
-        short X { get; set; }
-        short Y { get; set; }
+        public short X { get; set; }
+        public short Y { get; set; }
 
         public Point2D(short x, short y) => (X, Y) = (x, y);
     }
