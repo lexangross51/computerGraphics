@@ -30,12 +30,27 @@ namespace ComputerGraphics
             gl.LoadIdentity();
         }
 
-        private void GL_OpenGLDraw(object sender, SharpGL.RenderEventArgs args)
+        private void GL_OpenGLDraw(object sender, RenderEventArgs args)
         {
             OpenGL gl = GL.OpenGL;
 
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT);
             gl.Color(0, 0, 0);
+
+
+
+            for (int i = 0; i < _lines.Count; i++)
+            {
+                gl.Begin(OpenGL.GL_LINE_STRIP);
+
+                for (int j = 0; j < _lines[i].Points.Count; j++)
+                {
+                    gl.Vertex(_lines[i].Points[j].X, _lines[i].Points[j].Y);
+                }
+
+                gl.End();
+            }
+
 
 
             gl.Begin(OpenGL.GL_LINE_STRIP);
@@ -44,6 +59,8 @@ namespace ComputerGraphics
                 gl.Vertex(p.X, p.Y);
             }
             gl.End();
+
+
 
             gl.Finish();
 
@@ -60,6 +77,21 @@ namespace ComputerGraphics
             short mouseY = (short)(GL.Height - (short)e.Y);
 
             _line.Points.Add(new Point2D(mouseX, mouseY));
+        }
+
+        private void GL_KeyDown(object sender, KeyEventArgs e)
+        {
+            _lines.Add(_line.Clone() as StripLine);
+            _line.Points.Clear();
+        }
+
+        private void GL_MouseMove(object sender, MouseEventArgs e)
+        {
+            short xPos = (short)e.X;
+            short yPos = (short)e.Y;
+
+            statusXPosValue.Text = xPos.ToString();
+            statusYPosValue.Text = yPos.ToString();
         }
     }
 }
