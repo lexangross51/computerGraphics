@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ComputerGraphics
 {
-    public class StripLine
+    public class StripLine : ICloneable
     {
-        public List<Point2D> Points { get; set; }
+        public List<Point2D> Points { get; set; } = new List<Point2D>();
         public Color Color { get; set; }
 
         public StripLine()
@@ -12,6 +13,11 @@ namespace ComputerGraphics
             Points = new List<Point2D>();
             Color = new Color();
         }
+
+        public object Clone() => new StripLine {
+            Points = new List<Point2D>(Points),
+            Color = Color
+        };
     }
 
     public struct Color
