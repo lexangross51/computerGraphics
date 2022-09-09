@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpGL;
+﻿using System.Collections.Generic;
 
-namespace cg_1.src
+namespace ComputerGraphics
 {
     public class StripLine
     {
@@ -21,9 +16,9 @@ namespace cg_1.src
 
     public struct Color
     {
-        byte R { get; set; }
-        byte G { get; set; }
-        byte B { get; set; }
+        public byte R { get; set; }
+        public byte G { get; set; }
+        public byte B { get; set; }
 
         public Color(byte r = 0, byte g = 0, byte b = 0) 
             => (R, G, B) = (r, g, b);

@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpGL;
-using cg_1.src;
 
-namespace cg_1
+namespace ComputerGraphics
 {
     public partial class MainForm : Form
     {
         private List<StripLine> _lines = new List<StripLine> ();
-        private StripLine _line = new StripLine();
-
-
+        private readonly StripLine _line = new StripLine();
 
         public MainForm()
         {
@@ -48,9 +39,9 @@ namespace cg_1
 
 
             gl.Begin(OpenGL.GL_LINE_STRIP);
-            for (int i = 0; i < _line.Points.Count; i++)
+            foreach (var p in _line.Points)
             {
-                gl.Vertex(_line.Points[i].X, _line.Points[i].Y);
+                gl.Vertex(p.X, p.Y);
             }
             gl.End();
 

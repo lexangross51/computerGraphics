@@ -1,4 +1,4 @@
-﻿namespace cg_1
+﻿namespace ComputerGraphics
 {
     partial class MainForm
     {

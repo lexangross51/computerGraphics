@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace cg_1.Properties
+namespace ComputerGraphics.Properties
 {
 
 

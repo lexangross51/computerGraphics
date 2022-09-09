@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D0683C50-2B0E-4E40-A69B-B0E4A027B18A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>cg_1</RootNamespace>
-    <AssemblyName>cg_1</AssemblyName>
+    <RootNamespace>ComputerGraphics</RootNamespace>
+    <AssemblyName>ComputerGraphics</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -67,8 +67,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Point2D.cs" />
-    <Compile Include="src\Primitive.cs" />
+    <Compile Include="Source\Point2D.cs" />
+    <Compile Include="Source\Primitive.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

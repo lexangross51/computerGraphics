@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace cg_1.src
+﻿namespace ComputerGraphics
 {
     public struct Point2D
     {
