@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using ComputerGraphics.Source;
 using SharpGL;
@@ -8,12 +9,11 @@ namespace ComputerGraphics
 {
     public partial class MainForm : Form
     {
-        private readonly List<StripLine> _lines = new List<StripLine>();
+        private List<StripLine> _lines = new List<StripLine>();
         private readonly StripLine _line = new StripLine();
         private byte _currentSet = 0;
         private bool _isDrawingCurrent = true;
         private short _shiftX = 0, _shiftY = 0;
-
 
         public MainForm() => InitializeComponent();
 
@@ -141,18 +141,22 @@ namespace ComputerGraphics
         {
             _shiftY += 40;
         }
+
         private void RightBtn_Click(object sender, EventArgs e)
         {
             _shiftX += 40;
         }
+
         private void LeftBtn_Click(object sender, EventArgs e)
         {
             _shiftX -= 40;
         }
+
         private void DownBtn_Click(object sender, EventArgs e)
         {
             _shiftY -= 40;
         }
+
         private void ResetBtn_Click(object sender, EventArgs e)
         {
             _shiftX = 0;
@@ -169,21 +173,17 @@ namespace ComputerGraphics
         {
             _currentSet = (byte)ChangeSet.Value;
 
-            for (int i = 0; i < _lines.Count; i++)
-            {
-                if (_lines[i].Set == _currentSet)
-                {
-                    _lines.RemoveAt(i);
-                    i = i == 0 ? 0 : --i;
-                }
+            _lines.RemoveAll(line => line.Set == _currentSet);
 
-                if (_lines[i].Set > _currentSet)
+            foreach (var line in _lines)
+            {
+                if (line.Set > _currentSet)
                 {
-                    _lines[i].Set--;
+                    line.Set--;
                 }
             }
 
-            ChangeSet.Maximum--;
+            ChangeSet.Maximum = ChangeSet.Maximum == 0 ? 0 : --ChangeSet.Maximum;
         }
 
         private void AddSet_Click(object sender, EventArgs e)
@@ -202,8 +202,6 @@ namespace ComputerGraphics
         // Управление примитивами
         private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
         {
-
         }
-
     }
 }
