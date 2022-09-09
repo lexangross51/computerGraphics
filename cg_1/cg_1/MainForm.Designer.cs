@@ -47,11 +47,12 @@
             this.ChangeWidthP = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.Scene = new System.Windows.Forms.GroupBox();
-            this.UpBtn = new System.Windows.Forms.Button();
-            this.LeftBtn = new System.Windows.Forms.Button();
-            this.DownBtn = new System.Windows.Forms.Button();
-            this.RightBtn = new System.Windows.Forms.Button();
             this.ResetBtn = new System.Windows.Forms.Button();
+            this.RightBtn = new System.Windows.Forms.Button();
+            this.DownBtn = new System.Windows.Forms.Button();
+            this.LeftBtn = new System.Windows.Forms.Button();
+            this.UpBtn = new System.Windows.Forms.Button();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             ((System.ComponentModel.ISupportInitialize)(this.GL)).BeginInit();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).BeginInit();
@@ -238,6 +239,7 @@
             this.SetColorP.TabIndex = 13;
             this.SetColorP.Text = "Выбрать цвет";
             this.SetColorP.UseVisualStyleBackColor = true;
+            this.SetColorP.Click += new System.EventHandler(this.SetColorP_Click);
             // 
             // ChangeWidthP
             // 
@@ -286,35 +288,15 @@
             this.Scene.TabStop = false;
             this.Scene.Text = "Сцена";
             // 
-            // UpBtn
+            // ResetBtn
             // 
-            this.UpBtn.Location = new System.Drawing.Point(153, 16);
-            this.UpBtn.Name = "UpBtn";
-            this.UpBtn.Size = new System.Drawing.Size(30, 23);
-            this.UpBtn.TabIndex = 0;
-            this.UpBtn.Text = "W";
-            this.UpBtn.UseVisualStyleBackColor = true;
-            this.UpBtn.Click += new System.EventHandler(this.UpBtn_Click);
-            // 
-            // LeftBtn
-            // 
-            this.LeftBtn.Location = new System.Drawing.Point(117, 45);
-            this.LeftBtn.Name = "LeftBtn";
-            this.LeftBtn.Size = new System.Drawing.Size(30, 23);
-            this.LeftBtn.TabIndex = 1;
-            this.LeftBtn.Text = "A";
-            this.LeftBtn.UseVisualStyleBackColor = true;
-            this.LeftBtn.Click += new System.EventHandler(this.LeftBtn_Click);
-            // 
-            // DownBtn
-            // 
-            this.DownBtn.Location = new System.Drawing.Point(153, 74);
-            this.DownBtn.Name = "DownBtn";
-            this.DownBtn.Size = new System.Drawing.Size(30, 23);
-            this.DownBtn.TabIndex = 2;
-            this.DownBtn.Text = "S";
-            this.DownBtn.UseVisualStyleBackColor = true;
-            this.DownBtn.Click += new System.EventHandler(this.DownBtn_Click);
+            this.ResetBtn.Location = new System.Drawing.Point(153, 45);
+            this.ResetBtn.Name = "ResetBtn";
+            this.ResetBtn.Size = new System.Drawing.Size(30, 23);
+            this.ResetBtn.TabIndex = 4;
+            this.ResetBtn.Text = "R";
+            this.ResetBtn.UseVisualStyleBackColor = true;
+            this.ResetBtn.Click += new System.EventHandler(this.ResetBtn_Click);
             // 
             // RightBtn
             // 
@@ -326,15 +308,35 @@
             this.RightBtn.UseVisualStyleBackColor = true;
             this.RightBtn.Click += new System.EventHandler(this.RightBtn_Click);
             // 
-            // ResetBtn
+            // DownBtn
             // 
-            this.ResetBtn.Location = new System.Drawing.Point(153, 45);
-            this.ResetBtn.Name = "ResetBtn";
-            this.ResetBtn.Size = new System.Drawing.Size(30, 23);
-            this.ResetBtn.TabIndex = 4;
-            this.ResetBtn.Text = "R";
-            this.ResetBtn.UseVisualStyleBackColor = true;
-            this.ResetBtn.Click += new System.EventHandler(this.ResetBtn_Click);
+            this.DownBtn.Location = new System.Drawing.Point(153, 74);
+            this.DownBtn.Name = "DownBtn";
+            this.DownBtn.Size = new System.Drawing.Size(30, 23);
+            this.DownBtn.TabIndex = 2;
+            this.DownBtn.Text = "S";
+            this.DownBtn.UseVisualStyleBackColor = true;
+            this.DownBtn.Click += new System.EventHandler(this.DownBtn_Click);
+            // 
+            // LeftBtn
+            // 
+            this.LeftBtn.Location = new System.Drawing.Point(117, 45);
+            this.LeftBtn.Name = "LeftBtn";
+            this.LeftBtn.Size = new System.Drawing.Size(30, 23);
+            this.LeftBtn.TabIndex = 1;
+            this.LeftBtn.Text = "A";
+            this.LeftBtn.UseVisualStyleBackColor = true;
+            this.LeftBtn.Click += new System.EventHandler(this.LeftBtn_Click);
+            // 
+            // UpBtn
+            // 
+            this.UpBtn.Location = new System.Drawing.Point(153, 16);
+            this.UpBtn.Name = "UpBtn";
+            this.UpBtn.Size = new System.Drawing.Size(30, 23);
+            this.UpBtn.TabIndex = 0;
+            this.UpBtn.Text = "W";
+            this.UpBtn.UseVisualStyleBackColor = true;
+            this.UpBtn.Click += new System.EventHandler(this.UpBtn_Click);
             // 
             // MainForm
             // 
@@ -390,6 +392,7 @@
         private System.Windows.Forms.Button DownBtn;
         private System.Windows.Forms.Button LeftBtn;
         private System.Windows.Forms.Button UpBtn;
+        private System.Windows.Forms.ColorDialog colorDialog1;
     }
 }
 

@@ -159,6 +159,7 @@ namespace ComputerGraphics
             _shiftY = 0;
         }
 
+        // Управление наборами
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
         {
             _currentSet = (byte)ChangeSet.Value;
@@ -192,11 +193,10 @@ namespace ComputerGraphics
             _line.Set = _currentSet;
         }
 
-
-
-
-
-
+        private void SetColorP_Click(object sender, EventArgs e)
+        {
+            colorDialog1.ShowDialog();
+        }
 
 
         // Управление примитивами
