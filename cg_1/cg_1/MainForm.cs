@@ -13,7 +13,7 @@ namespace ComputerGraphics
         private readonly StripLine _line = new StripLine();
         private byte _currentSet;
         private bool _isDrawingCurrent = true;
-        private short _shiftX, _shiftY;
+        private List<Point2D> _shifts = new List<Point2D>();   // Сдвиги для каждого набора
 
         public MainForm() => InitializeComponent();
 
@@ -43,15 +43,16 @@ namespace ComputerGraphics
 
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT);
 
-            foreach (var line in _lines)
+            for (int i = 0; i < _lines.Count; i++)
             {
+                var line = _lines[i];
+
                 gl.Color(line.Color.R, line.Color.G, line.Color.B);
                 gl.PushMatrix();
+                gl.Translate(_shifts[line.Set].X, _shifts[line.Set].Y, 0);
 
                 if (line.Set == _currentSet)
                 {
-                    gl.Translate(_shiftX, _shiftY, 0);
-
                     gl.PointSize(10);
                     gl.Enable(OpenGL.GL_POINT_SMOOTH);
                     gl.Begin(OpenGL.GL_POINTS);
@@ -114,6 +115,11 @@ namespace ComputerGraphics
                 short mouseY = (short)(GL.Height - (short)e.Y);
 
                 _line.Points.Add(new Point2D(mouseX, mouseY));
+
+                if (_shifts.Count == 0)
+                {
+                    _shifts.Add(new Point2D());
+                }
             }
 
             if (e.Button == MouseButtons.Right)
@@ -138,29 +144,29 @@ namespace ComputerGraphics
         // Управление сценой
         private void UpBtn_Click(object sender, EventArgs e)
         {
-            _shiftY += 40;
+            _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (short)(_shifts[_currentSet].Y + 40));
         }
 
         private void RightBtn_Click(object sender, EventArgs e)
         {
-            _shiftX += 40;
+            _shifts[_currentSet] = new Point2D((short)(_shifts[_currentSet].X + 40), _shifts[_currentSet].Y);
         }
 
         private void LeftBtn_Click(object sender, EventArgs e)
         {
-            _shiftX -= 40;
+            _shifts[_currentSet] = new Point2D((short)(_shifts[_currentSet].X - 40), _shifts[_currentSet].Y);
         }
 
         private void DownBtn_Click(object sender, EventArgs e)
         {
-            _shiftY -= 40;
+            _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (short)(_shifts[_currentSet].Y - 40));
         }
 
         private void ResetBtn_Click(object sender, EventArgs e)
         {
-            _shiftX = 0;
-            _shiftY = 0;
+            _shifts[_currentSet] = new Point2D();
         }
+
 
         // Управление наборами
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
@@ -173,6 +179,7 @@ namespace ComputerGraphics
             _currentSet = (byte)ChangeSet.Value;
 
             _lines.RemoveAll(line => line.Set == _currentSet);
+            _shifts.RemoveAt(_currentSet);
 
             foreach (var line in _lines)
             {
@@ -195,6 +202,8 @@ namespace ComputerGraphics
 
             _isDrawingCurrent = false;
             _line.Set = _currentSet;
+
+            _shifts.Add(new Point2D());
         }
 
         private void SetColorP_Click(object sender, EventArgs e)
