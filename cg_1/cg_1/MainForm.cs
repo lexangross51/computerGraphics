@@ -12,15 +12,15 @@ namespace ComputerGraphics
         private readonly List<List<StripLine>> _lines = new List<List<StripLine>>();
         private readonly List<Point2D> _shifts = new List<Point2D>();
         private readonly StripLine _line = new StripLine();
-        private byte _currentSet = 0;
-        private byte _currentLine = 0;
-        private bool _isDrawingCurrent = false;
-        
+        private byte _currentSet;
+        private byte _currentLine;
+        private bool _isDrawingCurrent;
+
         public MainForm() => InitializeComponent();
 
         private void GL_OpenGLInitialized(object sender, EventArgs e)
         {
-            OpenGL gl = GL.OpenGL;
+            var gl = GL.OpenGL;
 
             gl.Disable(OpenGL.GL_DEPTH_TEST);
             gl.ClearColor(1f, 1f, 1f, 1f);
@@ -32,10 +32,12 @@ namespace ComputerGraphics
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
             gl.LoadIdentity();
         }
+
         private void GL_Resized(object sender, EventArgs e)
         {
             GL_OpenGLInitialized(sender, e);
         }
+
         private void GL_OpenGLDraw(object sender, RenderEventArgs args)
         {
             OpenGL gl = GL.OpenGL;
@@ -124,6 +126,7 @@ namespace ComputerGraphics
 
             gl.Finish();
         }
+
         private void GL_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -166,6 +169,7 @@ namespace ComputerGraphics
                 _isDrawingCurrent = false;
             }
         }
+
         private void GL_MouseMove(object sender, MouseEventArgs e)
         {
             short xPos = (short)e.X;
@@ -180,13 +184,14 @@ namespace ComputerGraphics
         // Управление сценой **********************************************
         private void UpBtn_Click(object sender, EventArgs e)
         {
-            if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty()) 
+            if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
                 _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (short)(_shifts[_currentSet].Y + 40));
                 statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void RightBtn_Click(object sender, EventArgs e)
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
@@ -196,6 +201,7 @@ namespace ComputerGraphics
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void LeftBtn_Click(object sender, EventArgs e)
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
@@ -205,6 +211,7 @@ namespace ComputerGraphics
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void DownBtn_Click(object sender, EventArgs e)
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
@@ -214,6 +221,7 @@ namespace ComputerGraphics
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void ResetBtn_Click(object sender, EventArgs e)
         {
             _shifts[_currentSet] = new Point2D();
@@ -234,8 +242,9 @@ namespace ComputerGraphics
             else
             {
                 ChangePrimitive.Maximum = _lines[_currentSet].Count - 1;
-            }            
+            }
         }
+
         private void ChangeWidthS_ValueChanged(object sender, EventArgs e)
         {
             _line.Thickness = (float)ChangeWidthS.Value;
@@ -248,6 +257,7 @@ namespace ComputerGraphics
                 }
             }
         }
+
         private void DeleteSet_Click(object sender, EventArgs e)
         {
             // Удалять можно только если не рисуется примитив
@@ -263,7 +273,7 @@ namespace ComputerGraphics
                 ChangeSet.Maximum = _lines.Count == 0 ? 0 : _lines.Count - 1;
                 ChangeSet.Value = ChangeSet.Maximum;
             }
-            
+
             // Не отображаем "Текущий набор", если их нет
             if (_lines.IsEmpty())
             {
@@ -271,6 +281,7 @@ namespace ComputerGraphics
                 ChangePrimitive.Enabled = false;
             }
         }
+
         private void AddSet_Click(object sender, EventArgs e)
         {
             // Если кнопка "Создать новый набор" нажата до завершения рисования
@@ -308,6 +319,7 @@ namespace ComputerGraphics
                 ChangePrimitive.Maximum = 0;
             }
         }
+
         private void ChangeColorS_Click(object sender, EventArgs e)
         {
             colorDialog1.ShowDialog();
@@ -336,6 +348,7 @@ namespace ComputerGraphics
                 _lines[_currentSet][_currentLine].Color = colorDialog1.Color;
             }
         }
+
         private void DeletePrimitive_Click(object sender, EventArgs e)
         {
             if (!_lines.IsEmpty())
@@ -351,10 +364,12 @@ namespace ComputerGraphics
                 DeleteSet_Click(sender, e);
             }
         }
+
         private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
         {
             _currentLine = (byte)ChangePrimitive.Value;
         }
+
         private void ChangeWidthP_ValueChanged(object sender, EventArgs e)
         {
             _line.Thickness = (float)ChangeWidthP.Value;
