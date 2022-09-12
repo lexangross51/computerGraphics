@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Extensions.cs" />
     <Compile Include="Source\Point2D.cs" />
     <Compile Include="Source\Primitive.cs" />
     <EmbeddedResource Include="MainForm.resx">
