@@ -6,7 +6,7 @@ namespace ComputerGraphics.Source
 {
     public class StripLine : ICloneable
     {
-        public List<Point2D> Points { get; set; }
+        public List<Point2D> Points { get; private set; }
         public Color Color { get; set; }
         public float Thickness { get; set; }
 
@@ -17,7 +17,8 @@ namespace ComputerGraphics.Source
             Thickness = 1.0f;
         }
 
-        public object Clone() => new StripLine {
+        public object Clone() => new StripLine
+        {
             Points = new List<Point2D>(Points),
             Color = Color,
             Thickness = Thickness
