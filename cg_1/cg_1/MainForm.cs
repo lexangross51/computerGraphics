@@ -144,7 +144,7 @@ namespace ComputerGraphics
                 {
                     if (_lines[_currentSet].IsEmpty())
                     {
-                        _currentLine = (byte)ChangePrimitive.Value;
+                        _currentLine = 0;
                     }
                     else
                     {
@@ -227,48 +227,16 @@ namespace ComputerGraphics
         {
             _currentSet = (byte)ChangeSet.Value;
 
-            if (_lines[_currentSet].IsEmpty())
-            {
-                ChangePrimitive.Maximum = 0;
-            }
-            else
-            {
-                ChangePrimitive.Maximum = _lines[_currentSet].Count - 1;
-            }            
-        }
-        private void ChangeWidthS_ValueChanged(object sender, EventArgs e)
-        {
-            _line.Thickness = (float)ChangeWidthS.Value;
-
             if (!_lines.IsEmpty())
             {
-                foreach (var line in _lines[_currentSet])
+                if (_lines[_currentSet].IsEmpty())
                 {
-                    line.Thickness = _line.Thickness;
+                    ChangePrimitive.Maximum = 0;
                 }
-            }
-        }
-        private void DeleteSet_Click(object sender, EventArgs e)
-        {
-            // Удалять можно только если не рисуется примитив
-            // либо если есть хотя бы один набор
-            if (!_isDrawingCurrent && !_lines.IsEmpty())
-            {
-                _currentSet = (byte)ChangeSet.Value;
-
-                _lines.RemoveAt(_currentSet);
-                _shifts.RemoveAt(_currentSet);
-
-                ChangeSet_ValueChanged(sender, e);
-                ChangeSet.Maximum = _lines.Count == 0 ? 0 : _lines.Count - 1;
-                ChangeSet.Value = ChangeSet.Maximum;
-            }
-            
-            // Не отображаем "Текущий набор", если их нет
-            if (_lines.IsEmpty())
-            {
-                ChangeSet.Enabled = false;
-                ChangePrimitive.Enabled = false;
+                else
+                {
+                    ChangePrimitive.Maximum = _lines[_currentSet].Count - 1;
+                }
             }
         }
         private void AddSet_Click(object sender, EventArgs e)
@@ -288,6 +256,7 @@ namespace ComputerGraphics
                 ChangeSet.Enabled = true;
                 _lines.Add(new List<StripLine>());
                 _shifts.Add(new Point2D());
+                return;
             }
 
             // Создать новый набор можно только в том случае, если предшествующий
@@ -301,11 +270,46 @@ namespace ComputerGraphics
 
                 ChangeSet.Maximum = _lines.Count - 1;
                 ChangeSet.Value = ChangeSet.Maximum;
-                //_currentSet = (byte)ChangeSet.Value;
 
                 ChangeWidthS.Value = 1;
                 ChangePrimitive.Value = 0;
                 ChangePrimitive.Maximum = 0;
+            }
+        }
+        private void DeleteSet_Click(object sender, EventArgs e)
+        {
+            // Удалять можно только если не рисуется примитив
+            // либо если есть хотя бы один набор
+            if (!_isDrawingCurrent && !_lines.IsEmpty())
+            {
+                _currentSet = (byte)ChangeSet.Value;
+
+                _lines.RemoveAt(_currentSet);
+                _shifts.RemoveAt(_currentSet);
+
+                ChangeSet_ValueChanged(sender, e);
+
+                ChangeSet.Maximum = _lines.Count == 0 ? 0 : _lines.Count - 1;
+                ChangeSet.Value = ChangeSet.Maximum;
+            }
+            
+            // Не отображаем "Текущий набор", если их нет
+            if (_lines.IsEmpty())
+            {
+                ChangeSet.Enabled = false;
+                ChangePrimitive.Enabled = false;
+            }
+        }
+        private void ChangeWidthS_ValueChanged(object sender, EventArgs e)
+        {
+            _line.Thickness = (float)ChangeWidthS.Value;
+
+            if (!_lines.IsEmpty())
+            {
+                foreach (var line in _lines[_currentSet])
+                {
+                    line.Thickness = _line.Thickness;
+                }
             }
         }
         private void ChangeColorS_Click(object sender, EventArgs e)
