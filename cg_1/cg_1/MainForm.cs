@@ -12,11 +12,15 @@ namespace ComputerGraphics
         private readonly List<List<StripLine>> _lines = new List<List<StripLine>>();
         private readonly List<Point2D> _shifts = new List<Point2D>();
         private readonly StripLine _line = new StripLine();
-        private byte _currentSet = 0;
-        private byte _currentLine = 0;
-        private bool _isDrawingCurrent = false;
+        private byte _currentSet;
+        private byte _currentLine;
+        private bool _isDrawingCurrent;
 
-        public MainForm() => InitializeComponent();
+        public MainForm()
+        {
+            InitializeComponent();
+            comboBoxLine.SelectedIndex = 0;
+        }
 
         private void GL_OpenGLInitialized(object sender, EventArgs e)
         {
@@ -32,10 +36,12 @@ namespace ComputerGraphics
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
             gl.LoadIdentity();
         }
+
         private void GL_Resized(object sender, EventArgs e)
         {
             GL_OpenGLInitialized(sender, e);
         }
+
         private void GL_OpenGLDraw(object sender, RenderEventArgs args)
         {
             OpenGL gl = GL.OpenGL;
@@ -51,6 +57,8 @@ namespace ComputerGraphics
                     gl.PushMatrix();
                     gl.Translate(_shifts[iset].X, _shifts[iset].Y, 0);
                     gl.Color(line.Color.R, line.Color.G, line.Color.B);
+                    gl.Enable(OpenGL.GL_LINE_STIPPLE);
+                    gl.LineStipple(1, line.Stipple);
                     gl.LineWidth(line.Thickness);
                     gl.Begin(OpenGL.GL_LINE_STRIP);
 
@@ -59,6 +67,7 @@ namespace ComputerGraphics
                         gl.Vertex(p.X, p.Y);
                     }
 
+                    gl.Disable(OpenGL.GL_LINE_STIPPLE);
                     gl.End();
 
                     // Текущий набор выделяем точками
@@ -100,6 +109,8 @@ namespace ComputerGraphics
             {
                 gl.Color(_line.Color.R, _line.Color.G, _line.Color.B);
                 gl.LineWidth(_line.Thickness);
+                gl.Enable(OpenGL.GL_LINE_STIPPLE);
+                gl.LineStipple(1, _line.Stipple);
                 gl.Begin(OpenGL.GL_LINE_STRIP);
 
                 foreach (var p in _line.Points)
@@ -107,6 +118,7 @@ namespace ComputerGraphics
                     gl.Vertex(p.X, p.Y);
                 }
 
+                gl.Disable(OpenGL.GL_LINE_STIPPLE);
                 gl.End();
 
                 // Сразу выделяем линию точками
@@ -124,6 +136,7 @@ namespace ComputerGraphics
 
             gl.Finish();
         }
+
         private void GL_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -166,6 +179,7 @@ namespace ComputerGraphics
                 _isDrawingCurrent = false;
             }
         }
+
         private void GL_MouseMove(object sender, MouseEventArgs e)
         {
             short xPos = (short)e.X;
@@ -187,6 +201,7 @@ namespace ComputerGraphics
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void RightBtn_Click(object sender, EventArgs e)
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
@@ -196,6 +211,7 @@ namespace ComputerGraphics
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void LeftBtn_Click(object sender, EventArgs e)
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
@@ -205,6 +221,7 @@ namespace ComputerGraphics
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void DownBtn_Click(object sender, EventArgs e)
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
@@ -214,6 +231,7 @@ namespace ComputerGraphics
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
         }
+
         private void ResetBtn_Click(object sender, EventArgs e)
         {
             _shifts[_currentSet] = new Point2D();
@@ -239,6 +257,7 @@ namespace ComputerGraphics
                 }
             }
         }
+
         private void AddSet_Click(object sender, EventArgs e)
         {
             // Если кнопка "Создать новый набор" нажата до завершения рисования
@@ -276,6 +295,7 @@ namespace ComputerGraphics
                 ChangePrimitive.Maximum = 0;
             }
         }
+
         private void DeleteSet_Click(object sender, EventArgs e)
         {
             // Удалять можно только если не рисуется примитив
@@ -300,6 +320,7 @@ namespace ComputerGraphics
                 ChangePrimitive.Enabled = false;
             }
         }
+
         private void ChangeWidthS_ValueChanged(object sender, EventArgs e)
         {
             _line.Thickness = (float)ChangeWidthS.Value;
@@ -312,6 +333,7 @@ namespace ComputerGraphics
                 }
             }
         }
+
         private void ChangeColorS_Click(object sender, EventArgs e)
         {
             colorDialog1.ShowDialog();
@@ -340,6 +362,7 @@ namespace ComputerGraphics
                 _lines[_currentSet][_currentLine].Color = colorDialog1.Color;
             }
         }
+
         private void DeletePrimitive_Click(object sender, EventArgs e)
         {
             if (!_lines.IsEmpty())
@@ -355,10 +378,12 @@ namespace ComputerGraphics
                 DeleteSet_Click(sender, e);
             }
         }
+
         private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
         {
             _currentLine = (byte)ChangePrimitive.Value;
         }
+
         private void ChangeWidthP_ValueChanged(object sender, EventArgs e)
         {
             _line.Thickness = (float)ChangeWidthP.Value;
@@ -366,6 +391,25 @@ namespace ComputerGraphics
             if (!_lines.IsEmpty() && !_lines[_currentSet].IsEmpty())
             {
                 _lines[_currentSet][_currentLine].Thickness = (float)ChangeWidthP.Value;
+            }
+        }
+
+        private void comboBoxLine_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBoxLine.SelectedIndex)
+            {
+                case 0:
+                    _line.Stipple = 0xFFFF;
+                    break;
+                case 1:
+                    _line.Stipple = 0x0101;
+                    break;
+                case 2:
+                    _line.Stipple = 0x00F0;
+                    break;
+                case 3:
+                    _line.Stipple = 0x1C47;
+                    break;
             }
         }
     }
