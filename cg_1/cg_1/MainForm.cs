@@ -11,6 +11,7 @@ namespace ComputerGraphics
     {
         private readonly List<List<StripLine>> _lines = new List<List<StripLine>>();
         private readonly List<Point2D> _shifts = new List<Point2D>();
+        private readonly List<ushort> _stipples = new List<ushort>();
         private readonly StripLine _line = new StripLine();
         private byte _currentSet;
         private byte _currentLine;
@@ -20,6 +21,7 @@ namespace ComputerGraphics
         {
             InitializeComponent();
             comboBoxLine.SelectedIndex = 0;
+            comboBoxSet.SelectedIndex = 0;
         }
 
         private void GL_OpenGLInitialized(object sender, EventArgs e)
@@ -275,6 +277,7 @@ namespace ComputerGraphics
                 ChangeSet.Enabled = true;
                 _lines.Add(new List<StripLine>());
                 _shifts.Add(new Point2D());
+                _stipples.Add(0xFFFF);
                 return;
             }
 
@@ -286,6 +289,7 @@ namespace ComputerGraphics
 
                 _lines.Add(new List<StripLine>());
                 _shifts.Add(new Point2D());
+                _stipples.Add(0xFFFF);
 
                 ChangeSet.Maximum = _lines.Count - 1;
                 ChangeSet.Value = ChangeSet.Maximum;
@@ -306,6 +310,7 @@ namespace ComputerGraphics
 
                 _lines.RemoveAt(_currentSet);
                 _shifts.RemoveAt(_currentSet);
+                _stipples.RemoveAt(_currentSet);
 
                 ChangeSet_ValueChanged(sender, e);
 
@@ -345,6 +350,33 @@ namespace ComputerGraphics
                 foreach (var line in _lines[_currentSet])
                 {
                     line.Color = _line.Color;
+                }
+            }
+        }
+
+        private void comboBoxSet_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBoxSet.SelectedIndex)
+            {
+                case 0:
+                    _line.Stipple = 0xFFFF;
+                    break;
+                case 1:
+                    _line.Stipple = 0x0101;
+                    break;
+                case 2:
+                    _line.Stipple = 0x00F0;
+                    break;
+                case 3:
+                    _line.Stipple = 0x1C47;
+                    break;
+            }
+
+            if (!_lines.IsEmpty())
+            {
+                foreach (var line in _lines[_currentSet])
+                {
+                    line.Stipple = _line.Stipple;
                 }
             }
         }
@@ -410,6 +442,11 @@ namespace ComputerGraphics
                 case 3:
                     _line.Stipple = 0x1C47;
                     break;
+            }
+
+            if (!_lines.IsEmpty() && !_lines[_currentSet].IsEmpty())
+            {
+                _lines[_currentSet][_currentLine].Stipple = _line.Stipple;
             }
         }
     }
