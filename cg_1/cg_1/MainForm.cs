@@ -405,7 +405,7 @@ namespace ComputerGraphics
 
         private void DeletePrimitive_Click(object sender, EventArgs e)
         {
-            if (!_lines.IsEmpty())
+            if (!_isDrawingCurrent && !_lines.IsEmpty())
             {
                 _lines[_currentSet].RemoveAt(_currentLine);
                 ChangePrimitive.Value = ChangePrimitive.Value == 0 ? 0 : --ChangePrimitive.Value;
