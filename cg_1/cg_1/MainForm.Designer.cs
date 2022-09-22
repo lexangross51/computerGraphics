@@ -81,9 +81,7 @@ namespace ComputerGraphics
             // 
             // GL
             // 
-            this.GL.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GL.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
             this.GL.DrawFPS = false;
             this.GL.Location = new System.Drawing.Point(0, 2);
             this.GL.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
@@ -102,19 +100,10 @@ namespace ComputerGraphics
             // statusBar
             // 
             this.statusBar.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusXPosName,
-            this.statusXPosValue,
-            this.statusYPosName,
-            this.statusYPosValue,
-            this.toolStripStatusLabel1,
-            this.statusXShiftName,
-            this.statusXShiftValue,
-            this.statusYShiftName,
-            this.statusYShiftValue});
-            this.statusBar.Location = new System.Drawing.Point(0, 717);
+            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { this.statusXPosName, this.statusXPosValue, this.statusYPosName, this.statusYPosValue, this.toolStripStatusLabel1, this.statusXShiftName, this.statusXShiftValue, this.statusYShiftName, this.statusYShiftValue });
+            this.statusBar.Location = new System.Drawing.Point(0, 718);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(1606, 30);
+            this.statusBar.Size = new System.Drawing.Size(1606, 29);
             this.statusBar.TabIndex = 1;
             this.statusBar.Text = " ";
             // 
@@ -126,9 +115,7 @@ namespace ComputerGraphics
             // 
             // statusXPosValue
             // 
-            this.statusXPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusXPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.statusXPosValue.Name = "statusXPosValue";
             this.statusXPosValue.Size = new System.Drawing.Size(45, 24);
             this.statusXPosValue.Text = "0000";
@@ -141,9 +128,7 @@ namespace ComputerGraphics
             // 
             // statusYPosValue
             // 
-            this.statusYPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusYPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.statusYPosValue.Name = "statusYPosValue";
             this.statusYPosValue.Size = new System.Drawing.Size(45, 24);
             this.statusYPosValue.Text = "0000";
@@ -163,9 +148,7 @@ namespace ComputerGraphics
             // 
             // statusXShiftValue
             // 
-            this.statusXShiftValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusXShiftValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.statusXShiftValue.Name = "statusXShiftValue";
             this.statusXShiftValue.Size = new System.Drawing.Size(21, 24);
             this.statusXShiftValue.Text = "0";
@@ -178,9 +161,7 @@ namespace ComputerGraphics
             // 
             // statusYShiftValue
             // 
-            this.statusYShiftValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusYShiftValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.statusYShiftValue.Name = "statusYShiftValue";
             this.statusYShiftValue.Size = new System.Drawing.Size(21, 24);
             this.statusYShiftValue.Text = "0";
@@ -189,11 +170,7 @@ namespace ComputerGraphics
             // 
             this.ChangeSet.Enabled = false;
             this.ChangeSet.Location = new System.Drawing.Point(119, 26);
-            this.ChangeSet.Maximum = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
+            this.ChangeSet.Maximum = new decimal(new int[] { 0, 0, 0, 0 });
             this.ChangeSet.Name = "ChangeSet";
             this.ChangeSet.ReadOnly = true;
             this.ChangeSet.Size = new System.Drawing.Size(84, 22);
@@ -223,11 +200,7 @@ namespace ComputerGraphics
             // 
             this.comboBoxSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSet.FormattingEnabled = true;
-            this.comboBoxSet.Items.AddRange(new object[] {
-            "Сплошной",
-            "Точечный",
-            "Штриховой",
-            "Штрихпунктирный"});
+            this.comboBoxSet.Items.AddRange(new object[] { "Сплошной", "Точечный", "Штриховой", "Штрихпунктирный" });
             this.comboBoxSet.Location = new System.Drawing.Point(119, 95);
             this.comboBoxSet.Name = "comboBoxSet";
             this.comboBoxSet.Size = new System.Drawing.Size(121, 24);
@@ -255,25 +228,13 @@ namespace ComputerGraphics
             // ChangeWidthS
             // 
             this.ChangeWidthS.Location = new System.Drawing.Point(119, 61);
-            this.ChangeWidthS.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.ChangeWidthS.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.ChangeWidthS.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            this.ChangeWidthS.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.ChangeWidthS.Name = "ChangeWidthS";
             this.ChangeWidthS.ReadOnly = true;
             this.ChangeWidthS.Size = new System.Drawing.Size(84, 22);
             this.ChangeWidthS.TabIndex = 15;
-            this.ChangeWidthS.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.ChangeWidthS.Value = new decimal(new int[] { 1, 0, 0, 0 });
             this.ChangeWidthS.ValueChanged += new System.EventHandler(this.ChangeWidthS_ValueChanged);
             // 
             // label3
@@ -281,9 +242,9 @@ namespace ComputerGraphics
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(6, 63);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(109, 16);
+            this.label3.Size = new System.Drawing.Size(103, 17);
             this.label3.TabIndex = 14;
-            this.label3.Text = "Ширина линиий";
+            this.label3.Text = "Ширина линий";
             // 
             // AddSet
             // 
@@ -310,7 +271,7 @@ namespace ComputerGraphics
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 28);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(107, 16);
+            this.label1.Size = new System.Drawing.Size(110, 17);
             this.label1.TabIndex = 3;
             this.label1.Text = "Текущий набор";
             // 
@@ -329,7 +290,7 @@ namespace ComputerGraphics
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 28);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(131, 16);
+            this.label2.Size = new System.Drawing.Size(133, 17);
             this.label2.TabIndex = 8;
             this.label2.Text = "Текущий примитив";
             // 
@@ -363,11 +324,7 @@ namespace ComputerGraphics
             // 
             this.comboBoxLine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxLine.FormattingEnabled = true;
-            this.comboBoxLine.Items.AddRange(new object[] {
-            "Сплошной",
-            "Точечный",
-            "Штриховой",
-            "Штрихпунктирный"});
+            this.comboBoxLine.Items.AddRange(new object[] { "Сплошной", "Точечный", "Штриховой", "Штрихпунктирный" });
             this.comboBoxLine.Location = new System.Drawing.Point(143, 93);
             this.comboBoxLine.Name = "comboBoxLine";
             this.comboBoxLine.Size = new System.Drawing.Size(121, 24);
@@ -378,11 +335,7 @@ namespace ComputerGraphics
             // 
             this.ChangePrimitive.Enabled = false;
             this.ChangePrimitive.Location = new System.Drawing.Point(143, 27);
-            this.ChangePrimitive.Maximum = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
+            this.ChangePrimitive.Maximum = new decimal(new int[] { 0, 0, 0, 0 });
             this.ChangePrimitive.Name = "ChangePrimitive";
             this.ChangePrimitive.ReadOnly = true;
             this.ChangePrimitive.Size = new System.Drawing.Size(84, 22);
@@ -402,25 +355,13 @@ namespace ComputerGraphics
             // ChangeWidthP
             // 
             this.ChangeWidthP.Location = new System.Drawing.Point(143, 62);
-            this.ChangeWidthP.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.ChangeWidthP.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.ChangeWidthP.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            this.ChangeWidthP.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.ChangeWidthP.Name = "ChangeWidthP";
             this.ChangeWidthP.ReadOnly = true;
             this.ChangeWidthP.Size = new System.Drawing.Size(84, 22);
             this.ChangeWidthP.TabIndex = 12;
-            this.ChangeWidthP.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.ChangeWidthP.Value = new decimal(new int[] { 1, 0, 0, 0 });
             this.ChangeWidthP.ValueChanged += new System.EventHandler(this.ChangeWidthP_ValueChanged);
             // 
             // label4
@@ -428,7 +369,7 @@ namespace ComputerGraphics
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(6, 64);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(101, 16);
+            this.label4.Size = new System.Drawing.Size(103, 17);
             this.label4.TabIndex = 11;
             this.label4.Text = "Ширина линии";
             // 
@@ -524,7 +465,6 @@ namespace ComputerGraphics
             this.Scene.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         private System.Windows.Forms.ComboBox comboBoxLine;
