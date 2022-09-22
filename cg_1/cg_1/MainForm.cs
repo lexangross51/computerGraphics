@@ -109,6 +109,8 @@ namespace ComputerGraphics
 
             if (_isDrawingCurrent)
             {
+                ChangeSet.Enabled = false;
+                ChangePrimitive.Enabled = false;
                 gl.Color(_line.Color.R, _line.Color.G, _line.Color.B);
                 gl.LineWidth(_line.Thickness);
                 gl.Enable(OpenGL.GL_LINE_STIPPLE);
@@ -134,6 +136,11 @@ namespace ComputerGraphics
                 }
 
                 gl.End();
+            }
+            else
+            {
+                ChangeSet.Enabled = true;
+                ChangePrimitive.Enabled = true;
             }
 
             gl.Finish();
@@ -246,7 +253,7 @@ namespace ComputerGraphics
         // Управление наборами ********************************************
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
         {
-            if (ChangeSet.Value != 0 && ChangeSet.Value == _lines.Count) 
+            if (ChangeSet.Value != 0 && ChangeSet.Value == _lines.Count)
             {
                 ChangeSet.Value--;
             }
@@ -256,7 +263,7 @@ namespace ComputerGraphics
             if (!_lines.IsEmpty())
             {
                 if (_lines[_currentSet].IsEmpty())
-                {   
+                {
                     ChangePrimitive.Maximum = 0;
                 }
                 else
@@ -421,7 +428,7 @@ namespace ComputerGraphics
 
         private void ChangePrimitive_ValueChanged(object sender, EventArgs e)
         {
-            _currentLine = (byte)ChangePrimitive.Value;
+            if (!_isDrawingCurrent) _currentLine = (byte)ChangePrimitive.Value;
         }
 
         private void ChangeWidthP_ValueChanged(object sender, EventArgs e)
