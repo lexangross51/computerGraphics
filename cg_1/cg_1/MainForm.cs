@@ -335,8 +335,8 @@ namespace ComputerGraphics
             // Не отображаем "Текущий набор", если их нет
             if (_lines.IsEmpty())
             {
-                ChangeSet.Enabled = false;
-                ChangePrimitive.Enabled = false;
+                //ChangeSet.Enabled = false;
+                //ChangePrimitive.Enabled = false;
                 Scene.Enabled = false;
             }
         }
