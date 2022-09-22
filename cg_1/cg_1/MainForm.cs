@@ -428,7 +428,7 @@ namespace ComputerGraphics
         {
             _line.Thickness = (float)ChangeWidthP.Value;
 
-            if (!_lines.IsEmpty() && !_lines[_currentSet].IsEmpty())
+            if (!_isDrawingCurrent && !_lines.IsEmpty() && !_lines[_currentSet].IsEmpty())
             {
                 _lines[_currentSet][_currentLine].Thickness = (float)ChangeWidthP.Value;
             }
