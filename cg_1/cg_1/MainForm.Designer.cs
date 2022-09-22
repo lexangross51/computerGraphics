@@ -44,6 +44,8 @@ namespace ComputerGraphics
             this.statusYShiftValue = new System.Windows.Forms.ToolStripStatusLabel();
             this.ChangeSet = new System.Windows.Forms.NumericUpDown();
             this.Sets = new System.Windows.Forms.GroupBox();
+            this.comboBoxSet = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.ChangeColorS = new System.Windows.Forms.Button();
             this.ChangeWidthS = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
@@ -66,8 +68,6 @@ namespace ComputerGraphics
             this.LeftBtn = new System.Windows.Forms.Button();
             this.UpBtn = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.label6 = new System.Windows.Forms.Label();
-            this.comboBoxSet = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.GL)).BeginInit();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).BeginInit();
@@ -218,6 +218,29 @@ namespace ComputerGraphics
             this.Sets.TabIndex = 3;
             this.Sets.TabStop = false;
             this.Sets.Text = "Управление наборами";
+            // 
+            // comboBoxSet
+            // 
+            this.comboBoxSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxSet.FormattingEnabled = true;
+            this.comboBoxSet.Items.AddRange(new object[] {
+            "Сплошной",
+            "Точечный",
+            "Штриховой",
+            "Штрихпунктирный"});
+            this.comboBoxSet.Location = new System.Drawing.Point(119, 95);
+            this.comboBoxSet.Name = "comboBoxSet";
+            this.comboBoxSet.Size = new System.Drawing.Size(121, 24);
+            this.comboBoxSet.TabIndex = 18;
+            this.comboBoxSet.SelectedIndexChanged += new System.EventHandler(this.comboBoxSet_SelectedIndexChanged);
+            // 
+            // label6
+            // 
+            this.label6.Location = new System.Drawing.Point(6, 96);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(107, 23);
+            this.label6.TabIndex = 17;
+            this.label6.Text = "Тип линиий";
             // 
             // ChangeColorS
             // 
@@ -417,6 +440,7 @@ namespace ComputerGraphics
             this.Scene.Controls.Add(this.DownBtn);
             this.Scene.Controls.Add(this.LeftBtn);
             this.Scene.Controls.Add(this.UpBtn);
+            this.Scene.Enabled = false;
             this.Scene.Location = new System.Drawing.Point(1248, 12);
             this.Scene.Name = "Scene";
             this.Scene.Size = new System.Drawing.Size(343, 180);
@@ -473,29 +497,6 @@ namespace ComputerGraphics
             this.UpBtn.TabIndex = 0;
             this.UpBtn.UseVisualStyleBackColor = true;
             this.UpBtn.Click += new System.EventHandler(this.UpBtn_Click);
-            // 
-            // label6
-            // 
-            this.label6.Location = new System.Drawing.Point(6, 96);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(107, 23);
-            this.label6.TabIndex = 17;
-            this.label6.Text = "Тип линиий";
-            // 
-            // comboBoxSet
-            // 
-            this.comboBoxSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSet.FormattingEnabled = true;
-            this.comboBoxSet.Items.AddRange(new object[] {
-            "Сплошной",
-            "Точечный",
-            "Штриховой",
-            "Штрихпунктирный"});
-            this.comboBoxSet.Location = new System.Drawing.Point(119, 95);
-            this.comboBoxSet.Name = "comboBoxSet";
-            this.comboBoxSet.Size = new System.Drawing.Size(121, 24);
-            this.comboBoxSet.TabIndex = 18;
-            this.comboBoxSet.SelectedIndexChanged += new System.EventHandler(this.comboBoxSet_SelectedIndexChanged);
             // 
             // MainForm
             // 

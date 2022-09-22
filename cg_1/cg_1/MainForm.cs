@@ -179,6 +179,7 @@ namespace ComputerGraphics
                 _lines[_currentSet].Add(_line.Clone() as StripLine);
                 _line.Points.Clear();
                 _isDrawingCurrent = false;
+                Scene.Enabled = true;
             }
         }
 
@@ -323,6 +324,7 @@ namespace ComputerGraphics
             {
                 ChangeSet.Enabled = false;
                 ChangePrimitive.Enabled = false;
+                Scene.Enabled = false;
             }
         }
 
