@@ -275,6 +275,7 @@ namespace ComputerGraphics
                 _lines[_currentSet].Add(_line.Clone() as StripLine);
                 _line.Reset();
                 _isDrawingCurrent = false;
+                Scene.Enabled = true;
             }
 
             // Если нет еще ни одного набора -> создаем его
