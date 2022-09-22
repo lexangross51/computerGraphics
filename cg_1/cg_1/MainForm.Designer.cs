@@ -247,7 +247,7 @@ namespace ComputerGraphics
             this.ChangeColorS.Image = ((System.Drawing.Image)(resources.GetObject("ChangeColorS.Image")));
             this.ChangeColorS.Location = new System.Drawing.Point(220, 58);
             this.ChangeColorS.Name = "ChangeColorS";
-            this.ChangeColorS.Size = new System.Drawing.Size(65, 28);
+            this.ChangeColorS.Size = new System.Drawing.Size(57, 28);
             this.ChangeColorS.TabIndex = 16;
             this.ChangeColorS.UseVisualStyleBackColor = true;
             this.ChangeColorS.Click += new System.EventHandler(this.ChangeColorS_Click);
