@@ -246,12 +246,17 @@ namespace ComputerGraphics
         // Управление наборами ********************************************
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
         {
+            if (ChangeSet.Value != 0 && ChangeSet.Value == _lines.Count) 
+            {
+                ChangeSet.Value--;
+            }
+
             _currentSet = (byte)ChangeSet.Value;
 
             if (!_lines.IsEmpty())
             {
                 if (_lines[_currentSet].IsEmpty())
-                {
+                {   
                     ChangePrimitive.Maximum = 0;
                 }
                 else
