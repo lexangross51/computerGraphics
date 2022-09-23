@@ -24,7 +24,6 @@ namespace ComputerGraphics
             InitializeComponent();
             comboBoxLine.SelectedIndex = 0;
             comboBoxSet.SelectedIndex = 0;
-            textBox1.Text = "Просмотр";
             _scaleXY = 1.0f;
         }
 
@@ -161,9 +160,9 @@ namespace ComputerGraphics
 
                 _isDrawingCurrent = true;
 
-                textBox1.Text = "Рисование";
+                reg.Text = "Рисование";
 
-                if (_isEdit) textBox1.Text = "Редактирование";
+                if (_isEdit) reg.Text = "Редактирование";
 
                 short mouseX = (short)e.X;
                 short mouseY = (short)(GL.Height - (short)e.Y);
@@ -203,7 +202,7 @@ namespace ComputerGraphics
 
                 _isDrawingCurrent = false;
                 Scene.Enabled = true;
-                textBox1.Text = "Просмотр";
+                reg.Text = "Просмотр";
                 checkBox1.Checked = false;
                 _isEdit = false;
             }
@@ -218,11 +217,10 @@ namespace ComputerGraphics
             statusYPosValue.Text = yPos.ToString();
         }
 
-        private void MainForm_Scroll(object sender, ScrollEventArgs e)
+        private void GL_MouseScroll(object sender, MouseEventArgs e)
         {
-            _scaleXY +
-        }
 
+        }
 
         // Панель управления **********************************************
         // Управление сценой **********************************************
@@ -497,18 +495,17 @@ namespace ComputerGraphics
             {
                 _line = _lines[_currentSet][_currentLine];
                 _isDrawingCurrent = true;
-                textBox1.Text = "Редактирование";
+                reg.Text = "Редактирование";
             }
             else if (!_isEdit)
             {
                 _line = new StripLine();
                 _isDrawingCurrent = false;
                 Scene.Enabled = true;
-                textBox1.Text = "Просмотр";
+                reg.Text = "Просмотр";
                 checkBox1.Checked = false;
                 _isEdit = false;
             }
         }
-
     }
 }

@@ -70,10 +70,10 @@ namespace ComputerGraphics
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.regLabel = new System.Windows.Forms.Label();
             this.infoBox = new System.Windows.Forms.GroupBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.reg = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.GL)).BeginInit();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).BeginInit();
@@ -106,6 +106,7 @@ namespace ComputerGraphics
             this.GL.Resized += new System.EventHandler(this.GL_Resized);
             this.GL.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GL_MouseClick);
             this.GL.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GL_MouseMove);
+            this.GL.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.GL_MouseScroll);
             // 
             // statusBar
             // 
@@ -510,8 +511,8 @@ namespace ComputerGraphics
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.reg);
             this.groupBox1.Controls.Add(this.checkBox1);
-            this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Controls.Add(this.regLabel);
             this.groupBox1.Location = new System.Drawing.Point(1251, 438);
             this.groupBox1.Name = "groupBox1";
@@ -531,14 +532,6 @@ namespace ComputerGraphics
             this.checkBox1.Text = "Редактировать";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(119, 26);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(121, 22);
-            this.textBox1.TabIndex = 1;
             // 
             // regLabel
             // 
@@ -569,6 +562,15 @@ namespace ComputerGraphics
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
+            // reg
+            // 
+            this.reg.AutoSize = true;
+            this.reg.Location = new System.Drawing.Point(116, 29);
+            this.reg.Name = "reg";
+            this.reg.Size = new System.Drawing.Size(72, 16);
+            this.reg.TabIndex = 4;
+            this.reg.Text = "Просмотр";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -582,7 +584,6 @@ namespace ComputerGraphics
             this.Controls.Add(this.GL);
             this.Name = "MainForm";
             this.Text = "Отрисовка примитивов";
-            this.Scroll += new System.Windows.Forms.ScrollEventHandler(this.MainForm_Scroll);
             ((System.ComponentModel.ISupportInitialize)(this.GL)).EndInit();
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
@@ -644,11 +645,11 @@ namespace ComputerGraphics
         private System.Windows.Forms.Button LeftBtn;
         private System.Windows.Forms.Button UpBtn;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label regLabel;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.GroupBox infoBox;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Label reg;
     }
 }
 
