@@ -12,16 +12,20 @@ namespace ComputerGraphics
         private readonly List<List<StripLine>> _lines = new List<List<StripLine>>();
         private readonly List<Point2D> _shifts = new List<Point2D>();
         private readonly List<ushort> _stipples = new List<ushort>();
-        private readonly StripLine _line = new StripLine();
+        private StripLine _line = new StripLine();
         private byte _currentSet;
         private byte _currentLine;
         private bool _isDrawingCurrent;
+        private bool _isEdit;
+        private float _scaleXY;
 
         public MainForm()
         {
             InitializeComponent();
             comboBoxLine.SelectedIndex = 0;
             comboBoxSet.SelectedIndex = 0;
+            textBox1.Text = "Просмотр";
+            _scaleXY = 1.0f;
         }
 
         private void GL_OpenGLInitialized(object sender, EventArgs e)
@@ -109,8 +113,8 @@ namespace ComputerGraphics
 
             if (_isDrawingCurrent)
             {
-                ChangeSet.Enabled = false;
-                ChangePrimitive.Enabled = false;
+                //ChangeSet.Enabled = false;
+                //ChangePrimitive.Enabled = false;
                 gl.Color(_line.Color.R, _line.Color.G, _line.Color.B);
                 gl.LineWidth(_line.Thickness);
                 gl.Enable(OpenGL.GL_LINE_STIPPLE);
@@ -157,6 +161,10 @@ namespace ComputerGraphics
 
                 _isDrawingCurrent = true;
 
+                textBox1.Text = "Рисование";
+
+                if (_isEdit) textBox1.Text = "Редактирование";
+
                 short mouseX = (short)e.X;
                 short mouseY = (short)(GL.Height - (short)e.Y);
 
@@ -183,10 +191,21 @@ namespace ComputerGraphics
             {
                 if (_line.Points.Count == 0) return;
 
-                _lines[_currentSet].Add(_line.Clone() as StripLine);
-                _line.Points.Clear();
+                if (!_isEdit)
+                {
+                    _lines[_currentSet].Add(_line.Clone() as StripLine);
+                    _line.Points.Clear();
+                } 
+                else
+                {
+                    _line = new StripLine();
+                }
+
                 _isDrawingCurrent = false;
                 Scene.Enabled = true;
+                textBox1.Text = "Просмотр";
+                checkBox1.Checked = false;
+                _isEdit = false;
             }
         }
 
@@ -197,6 +216,11 @@ namespace ComputerGraphics
 
             statusXPosValue.Text = xPos.ToString();
             statusYPosValue.Text = yPos.ToString();
+        }
+
+        private void MainForm_Scroll(object sender, ScrollEventArgs e)
+        {
+            _scaleXY +
         }
 
 
@@ -464,5 +488,27 @@ namespace ComputerGraphics
                 _lines[_currentSet][_currentLine].Stipple = _line.Stipple;
             }
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            _isEdit = checkBox1.Checked;
+
+            if (!_isDrawingCurrent && !_lines.IsEmpty() && !_lines[_currentSet].IsEmpty() && _isEdit)
+            {
+                _line = _lines[_currentSet][_currentLine];
+                _isDrawingCurrent = true;
+                textBox1.Text = "Редактирование";
+            }
+            else if (!_isEdit)
+            {
+                _line = new StripLine();
+                _isDrawingCurrent = false;
+                Scene.Enabled = true;
+                textBox1.Text = "Просмотр";
+                checkBox1.Checked = false;
+                _isEdit = false;
+            }
+        }
+
     }
 }
