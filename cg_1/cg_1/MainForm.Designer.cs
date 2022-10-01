@@ -44,7 +44,7 @@ namespace ComputerGraphics
             this.statusYShiftValue = new System.Windows.Forms.ToolStripStatusLabel();
             this.ChangeSet = new System.Windows.Forms.NumericUpDown();
             this.Sets = new System.Windows.Forms.GroupBox();
-            this.Scene = new System.Windows.Forms.GroupBox();
+            this.SetMove = new System.Windows.Forms.GroupBox();
             this.ResetBtn = new System.Windows.Forms.Button();
             this.RightBtn = new System.Windows.Forms.Button();
             this.DownBtn = new System.Windows.Forms.Button();
@@ -61,6 +61,9 @@ namespace ComputerGraphics
             this.DeletePrimitive = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.Primitives = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.RotateRight = new System.Windows.Forms.Button();
+            this.RotateLeft = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.comboBoxLine = new System.Windows.Forms.ComboBox();
             this.ChangePrimitive = new System.Windows.Forms.NumericUpDown();
@@ -69,16 +72,16 @@ namespace ComputerGraphics
             this.label4 = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.reg = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.regLabel = new System.Windows.Forms.Label();
             this.infoBox = new System.Windows.Forms.GroupBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.reg = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.GL)).BeginInit();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).BeginInit();
             this.Sets.SuspendLayout();
-            this.Scene.SuspendLayout();
+            this.SetMove.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeWidthS)).BeginInit();
             this.Primitives.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangePrimitive)).BeginInit();
@@ -99,7 +102,7 @@ namespace ComputerGraphics
             this.GL.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
             this.GL.RenderContextType = SharpGL.RenderContextType.DIBSection;
             this.GL.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
-            this.GL.Size = new System.Drawing.Size(1230, 711);
+            this.GL.Size = new System.Drawing.Size(1259, 836);
             this.GL.TabIndex = 0;
             this.GL.OpenGLInitialized += new System.EventHandler(this.GL_OpenGLInitialized);
             this.GL.OpenGLDraw += new SharpGL.RenderEventHandler(this.GL_OpenGLDraw);
@@ -121,9 +124,9 @@ namespace ComputerGraphics
             this.statusXShiftValue,
             this.statusYShiftName,
             this.statusYShiftValue});
-            this.statusBar.Location = new System.Drawing.Point(0, 717);
+            this.statusBar.Location = new System.Drawing.Point(0, 842);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(1606, 30);
+            this.statusBar.Size = new System.Drawing.Size(1635, 30);
             this.statusBar.TabIndex = 1;
             this.statusBar.Text = " ";
             // 
@@ -135,6 +138,7 @@ namespace ComputerGraphics
             // 
             // statusXPosValue
             // 
+            this.statusXPosValue.AutoSize = false;
             this.statusXPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
@@ -150,6 +154,7 @@ namespace ComputerGraphics
             // 
             // statusYPosValue
             // 
+            this.statusYPosValue.AutoSize = false;
             this.statusYPosValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
@@ -212,7 +217,7 @@ namespace ComputerGraphics
             // Sets
             // 
             this.Sets.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Sets.Controls.Add(this.Scene);
+            this.Sets.Controls.Add(this.SetMove);
             this.Sets.Controls.Add(this.comboBoxSet);
             this.Sets.Controls.Add(this.label6);
             this.Sets.Controls.Add(this.ChangeColorS);
@@ -222,33 +227,33 @@ namespace ComputerGraphics
             this.Sets.Controls.Add(this.DeleteSet);
             this.Sets.Controls.Add(this.label1);
             this.Sets.Controls.Add(this.ChangeSet);
-            this.Sets.Location = new System.Drawing.Point(1251, 12);
+            this.Sets.Location = new System.Drawing.Point(1280, 12);
             this.Sets.Name = "Sets";
             this.Sets.Size = new System.Drawing.Size(343, 269);
             this.Sets.TabIndex = 3;
             this.Sets.TabStop = false;
             this.Sets.Text = "Управление наборами";
             // 
-            // Scene
+            // SetMove
             // 
-            this.Scene.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Scene.Controls.Add(this.ResetBtn);
-            this.Scene.Controls.Add(this.RightBtn);
-            this.Scene.Controls.Add(this.DownBtn);
-            this.Scene.Controls.Add(this.LeftBtn);
-            this.Scene.Controls.Add(this.UpBtn);
-            this.Scene.Enabled = false;
-            this.Scene.Location = new System.Drawing.Point(25, 125);
-            this.Scene.Name = "Scene";
-            this.Scene.Size = new System.Drawing.Size(291, 135);
-            this.Scene.TabIndex = 19;
-            this.Scene.TabStop = false;
-            this.Scene.Text = "Перемещение";
+            this.SetMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SetMove.Controls.Add(this.ResetBtn);
+            this.SetMove.Controls.Add(this.RightBtn);
+            this.SetMove.Controls.Add(this.DownBtn);
+            this.SetMove.Controls.Add(this.LeftBtn);
+            this.SetMove.Controls.Add(this.UpBtn);
+            this.SetMove.Enabled = false;
+            this.SetMove.Location = new System.Drawing.Point(38, 125);
+            this.SetMove.Name = "SetMove";
+            this.SetMove.Size = new System.Drawing.Size(265, 138);
+            this.SetMove.TabIndex = 19;
+            this.SetMove.TabStop = false;
+            this.SetMove.Text = "Перемещение";
             // 
             // ResetBtn
             // 
             this.ResetBtn.Image = ((System.Drawing.Image)(resources.GetObject("ResetBtn.Image")));
-            this.ResetBtn.Location = new System.Drawing.Point(129, 52);
+            this.ResetBtn.Location = new System.Drawing.Point(115, 55);
             this.ResetBtn.Name = "ResetBtn";
             this.ResetBtn.Size = new System.Drawing.Size(34, 35);
             this.ResetBtn.TabIndex = 4;
@@ -258,7 +263,7 @@ namespace ComputerGraphics
             // RightBtn
             // 
             this.RightBtn.Image = ((System.Drawing.Image)(resources.GetObject("RightBtn.Image")));
-            this.RightBtn.Location = new System.Drawing.Point(169, 52);
+            this.RightBtn.Location = new System.Drawing.Point(155, 55);
             this.RightBtn.Name = "RightBtn";
             this.RightBtn.Size = new System.Drawing.Size(34, 35);
             this.RightBtn.TabIndex = 3;
@@ -268,7 +273,7 @@ namespace ComputerGraphics
             // DownBtn
             // 
             this.DownBtn.Image = ((System.Drawing.Image)(resources.GetObject("DownBtn.Image")));
-            this.DownBtn.Location = new System.Drawing.Point(129, 93);
+            this.DownBtn.Location = new System.Drawing.Point(115, 96);
             this.DownBtn.Name = "DownBtn";
             this.DownBtn.Size = new System.Drawing.Size(34, 35);
             this.DownBtn.TabIndex = 2;
@@ -278,7 +283,7 @@ namespace ComputerGraphics
             // LeftBtn
             // 
             this.LeftBtn.Image = ((System.Drawing.Image)(resources.GetObject("LeftBtn.Image")));
-            this.LeftBtn.Location = new System.Drawing.Point(89, 52);
+            this.LeftBtn.Location = new System.Drawing.Point(75, 55);
             this.LeftBtn.Name = "LeftBtn";
             this.LeftBtn.Size = new System.Drawing.Size(34, 35);
             this.LeftBtn.TabIndex = 1;
@@ -288,7 +293,7 @@ namespace ComputerGraphics
             // UpBtn
             // 
             this.UpBtn.Image = ((System.Drawing.Image)(resources.GetObject("UpBtn.Image")));
-            this.UpBtn.Location = new System.Drawing.Point(129, 11);
+            this.UpBtn.Location = new System.Drawing.Point(115, 14);
             this.UpBtn.Name = "UpBtn";
             this.UpBtn.Size = new System.Drawing.Size(34, 35);
             this.UpBtn.TabIndex = 0;
@@ -412,6 +417,9 @@ namespace ComputerGraphics
             // Primitives
             // 
             this.Primitives.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.Primitives.Controls.Add(this.label7);
+            this.Primitives.Controls.Add(this.RotateRight);
+            this.Primitives.Controls.Add(this.RotateLeft);
             this.Primitives.Controls.Add(this.label5);
             this.Primitives.Controls.Add(this.comboBoxLine);
             this.Primitives.Controls.Add(this.ChangePrimitive);
@@ -420,18 +428,48 @@ namespace ComputerGraphics
             this.Primitives.Controls.Add(this.label4);
             this.Primitives.Controls.Add(this.label2);
             this.Primitives.Controls.Add(this.DeletePrimitive);
-            this.Primitives.Location = new System.Drawing.Point(1251, 298);
+            this.Primitives.Location = new System.Drawing.Point(1280, 298);
             this.Primitives.Name = "Primitives";
-            this.Primitives.Size = new System.Drawing.Size(343, 123);
+            this.Primitives.Size = new System.Drawing.Size(343, 165);
             this.Primitives.TabIndex = 11;
             this.Primitives.TabStop = false;
             this.Primitives.Text = "Управление примитивами";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(8, 132);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(73, 16);
+            this.label7.TabIndex = 19;
+            this.label7.Text = "Вращение";
+            // 
+            // RotateRight
+            // 
+            this.RotateRight.Location = new System.Drawing.Point(183, 123);
+            this.RotateRight.Name = "RotateRight";
+            this.RotateRight.Size = new System.Drawing.Size(34, 35);
+            this.RotateRight.TabIndex = 18;
+            this.RotateRight.Text = "R";
+            this.RotateRight.UseVisualStyleBackColor = true;
+            this.RotateRight.Click += new System.EventHandler(this.RotateRight_Click);
+            // 
+            // RotateLeft
+            // 
+            this.RotateLeft.Location = new System.Drawing.Point(143, 123);
+            this.RotateLeft.Name = "RotateLeft";
+            this.RotateLeft.Size = new System.Drawing.Size(34, 35);
+            this.RotateLeft.TabIndex = 17;
+            this.RotateLeft.Text = "L";
+            this.RotateLeft.UseVisualStyleBackColor = true;
+            this.RotateLeft.Click += new System.EventHandler(this.RotateLeft_Click);
+            // 
             // label5
             // 
+            this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(6, 96);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(107, 23);
+            this.label5.Size = new System.Drawing.Size(75, 16);
             this.label5.TabIndex = 16;
             this.label5.Text = "Тип линии";
             // 
@@ -514,18 +552,27 @@ namespace ComputerGraphics
             this.groupBox1.Controls.Add(this.reg);
             this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Controls.Add(this.regLabel);
-            this.groupBox1.Location = new System.Drawing.Point(1251, 438);
+            this.groupBox1.Location = new System.Drawing.Point(1280, 479);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(343, 98);
+            this.groupBox1.Size = new System.Drawing.Size(343, 88);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Режимы";
+            // 
+            // reg
+            // 
+            this.reg.AutoSize = true;
+            this.reg.Location = new System.Drawing.Point(116, 29);
+            this.reg.Name = "reg";
+            this.reg.Size = new System.Drawing.Size(72, 16);
+            this.reg.TabIndex = 4;
+            this.reg.Text = "Просмотр";
             // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.checkBox1.Location = new System.Drawing.Point(6, 67);
+            this.checkBox1.Location = new System.Drawing.Point(7, 57);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(130, 20);
             this.checkBox1.TabIndex = 3;
@@ -546,36 +593,27 @@ namespace ComputerGraphics
             // 
             this.infoBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.infoBox.Controls.Add(this.richTextBox1);
-            this.infoBox.Location = new System.Drawing.Point(1251, 552);
+            this.infoBox.Location = new System.Drawing.Point(1280, 583);
             this.infoBox.Name = "infoBox";
-            this.infoBox.Size = new System.Drawing.Size(343, 150);
+            this.infoBox.Size = new System.Drawing.Size(343, 199);
             this.infoBox.TabIndex = 13;
             this.infoBox.TabStop = false;
             this.infoBox.Text = "Информация";
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(9, 22);
+            this.richTextBox1.Location = new System.Drawing.Point(6, 22);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(328, 122);
+            this.richTextBox1.Size = new System.Drawing.Size(331, 171);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
-            // 
-            // reg
-            // 
-            this.reg.AutoSize = true;
-            this.reg.Location = new System.Drawing.Point(116, 29);
-            this.reg.Name = "reg";
-            this.reg.Size = new System.Drawing.Size(72, 16);
-            this.reg.TabIndex = 4;
-            this.reg.Text = "Просмотр";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1606, 747);
+            this.ClientSize = new System.Drawing.Size(1635, 872);
             this.Controls.Add(this.infoBox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.Primitives);
@@ -590,7 +628,7 @@ namespace ComputerGraphics
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).EndInit();
             this.Sets.ResumeLayout(false);
             this.Sets.PerformLayout();
-            this.Scene.ResumeLayout(false);
+            this.SetMove.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ChangeWidthS)).EndInit();
             this.Primitives.ResumeLayout(false);
             this.Primitives.PerformLayout();
@@ -638,7 +676,7 @@ namespace ComputerGraphics
         private System.Windows.Forms.NumericUpDown ChangePrimitive;
         private System.Windows.Forms.ComboBox comboBoxSet;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.GroupBox Scene;
+        private System.Windows.Forms.GroupBox SetMove;
         private System.Windows.Forms.Button ResetBtn;
         private System.Windows.Forms.Button RightBtn;
         private System.Windows.Forms.Button DownBtn;
@@ -650,6 +688,9 @@ namespace ComputerGraphics
         private System.Windows.Forms.GroupBox infoBox;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label reg;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button RotateRight;
+        private System.Windows.Forms.Button RotateLeft;
     }
 }
 

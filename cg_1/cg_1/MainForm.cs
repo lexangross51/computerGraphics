@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using ComputerGraphics.Source;
 using SharpGL;
@@ -17,14 +17,12 @@ namespace ComputerGraphics
         private byte _currentLine;
         private bool _isDrawingCurrent;
         private bool _isEdit;
-        private float _scaleXY;
 
         public MainForm()
         {
             InitializeComponent();
             comboBoxLine.SelectedIndex = 0;
             comboBoxSet.SelectedIndex = 0;
-            _scaleXY = 1.0f;
         }
 
         private void GL_OpenGLInitialized(object sender, EventArgs e)
@@ -55,12 +53,13 @@ namespace ComputerGraphics
 
             for (int iset = 0; iset < _lines.Count; iset++)
             {
+                gl.PushMatrix();
+                gl.Translate(_shifts[iset].X, _shifts[iset].Y, 0);
+
                 for (int iline = 0; iline < _lines[iset].Count; iline++)
                 {
                     var line = _lines[iset][iline];
 
-                    gl.PushMatrix();
-                    gl.Translate(_shifts[iset].X, _shifts[iset].Y, 0);
                     gl.Color(line.Color.R, line.Color.G, line.Color.B);
                     gl.Enable(OpenGL.GL_LINE_STIPPLE);
                     gl.LineStipple(1, line.Stipple);
@@ -105,45 +104,43 @@ namespace ComputerGraphics
                             gl.Disable(OpenGL.GL_POINT_SMOOTH);
                         }
                     }
-
-                    gl.PopMatrix();
                 }
-            }
 
-            if (_isDrawingCurrent)
-            {
-                //ChangeSet.Enabled = false;
-                //ChangePrimitive.Enabled = false;
-                gl.Color(_line.Color.R, _line.Color.G, _line.Color.B);
-                gl.LineWidth(_line.Thickness);
-                gl.Enable(OpenGL.GL_LINE_STIPPLE);
-                gl.LineStipple(1, _line.Stipple);
-                gl.Begin(OpenGL.GL_LINE_STRIP);
-
-                foreach (var p in _line.Points)
+                if (_isDrawingCurrent && !_isEdit)
                 {
-                    gl.Vertex(p.X, p.Y);
+                    gl.Color(_line.Color.R, _line.Color.G, _line.Color.B);
+                    gl.LineWidth(_line.Thickness);
+                    gl.Enable(OpenGL.GL_LINE_STIPPLE);
+                    gl.LineStipple(1, _line.Stipple);
+                    gl.Begin(OpenGL.GL_LINE_STRIP);
+
+                    foreach (var p in _line.Points)
+                    {
+                        gl.Vertex(p.X, p.Y);
+                    }
+
+                    gl.Disable(OpenGL.GL_LINE_STIPPLE);
+                    gl.End();
+
+                    // Сразу выделяем линию точками
+                    gl.PointSize(10);
+                    gl.Color(1.0f, 0.0f, 0.0f);
+                    gl.Begin(OpenGL.GL_POINTS);
+
+                    foreach (var p in _line.Points)
+                    {
+                        gl.Vertex(p.X, p.Y);
+                    }
+
+                    gl.End();
                 }
-
-                gl.Disable(OpenGL.GL_LINE_STIPPLE);
-                gl.End();
-
-                // Сразу выделяем линию точками
-                gl.PointSize(10);
-                gl.Color(1.0f, 0.0f, 0.0f);
-                gl.Begin(OpenGL.GL_POINTS);
-
-                foreach (var p in _line.Points)
+                else
                 {
-                    gl.Vertex(p.X, p.Y);
+                    ChangeSet.Enabled = true;
+                    ChangePrimitive.Enabled = true;
                 }
 
-                gl.End();
-            }
-            else
-            {
-                ChangeSet.Enabled = true;
-                ChangePrimitive.Enabled = true;
+                gl.PopMatrix();
             }
 
             gl.Finish();
@@ -153,6 +150,7 @@ namespace ComputerGraphics
         {
             if (e.Button == MouseButtons.Left)
             {
+                // Если наборов еще нет -> добавляем
                 if (_lines.IsEmpty())
                 {
                     AddSet_Click(sender, e);
@@ -164,8 +162,8 @@ namespace ComputerGraphics
 
                 if (_isEdit) reg.Text = "Редактирование";
 
-                short mouseX = (short)e.X;
-                short mouseY = (short)(GL.Height - (short)e.Y);
+                float mouseX = e.X - _shifts[_currentSet].X;
+                float mouseY = GL.Height - e.Y - _shifts[_currentSet].Y;
 
                 _line.Points.Add(new Point2D(mouseX, mouseY));
 
@@ -201,10 +199,26 @@ namespace ComputerGraphics
                 }
 
                 _isDrawingCurrent = false;
-                Scene.Enabled = true;
+                SetMove.Enabled = true;
                 reg.Text = "Просмотр";
                 checkBox1.Checked = false;
                 _isEdit = false;
+            }
+
+            if (e.Button == MouseButtons.Middle)
+            {
+                if (_line.Points.Count == 0) return;
+
+                _line.Points.RemoveAt(_line.Points.Count - 1);
+
+                if (_line.Points.Count == 0)
+                {
+                    _isDrawingCurrent = false;
+                    _isEdit = false;
+                    reg.Text = "Просмотр";
+                    checkBox1.Checked = false;
+                    DeletePrimitive_Click(sender, e);
+                }
             }
         }
 
@@ -219,16 +233,29 @@ namespace ComputerGraphics
 
         private void GL_MouseScroll(object sender, MouseEventArgs e)
         {
+            if (_lines.IsEmpty()) return;
 
+            if (_isDrawingCurrent || _isEdit) return;
+
+            var center = _lines[_currentSet][_currentLine].MassCenter();
+
+            if (Math.Sign(e.Delta) == 1)
+            {
+                _lines[_currentSet][_currentLine].Scale(center, 1.1f);
+            }
+            else
+            {
+                _lines[_currentSet][_currentLine].Scale(center, 0.9f);
+            }
         }
 
         // Панель управления **********************************************
-        // Управление сценой **********************************************
+        // Управление наборами ********************************************
         private void UpBtn_Click(object sender, EventArgs e)
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
-                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (short)(_shifts[_currentSet].Y + 40));
+                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (_shifts[_currentSet].Y + 40));
                 statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
@@ -238,7 +265,7 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
-                _shifts[_currentSet] = new Point2D((short)(_shifts[_currentSet].X + 40), _shifts[_currentSet].Y);
+                _shifts[_currentSet] = new Point2D((_shifts[_currentSet].X + 40), _shifts[_currentSet].Y);
                 statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
@@ -248,7 +275,7 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
-                _shifts[_currentSet] = new Point2D((short)(_shifts[_currentSet].X - 40), _shifts[_currentSet].Y);
+                _shifts[_currentSet] = new Point2D((_shifts[_currentSet].X - 40), _shifts[_currentSet].Y);
                 statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
@@ -258,7 +285,7 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
-                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (short)(_shifts[_currentSet].Y - 40));
+                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (_shifts[_currentSet].Y - 40));
                 statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
                 statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
             }
@@ -271,8 +298,6 @@ namespace ComputerGraphics
             statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
         }
 
-
-        // Управление наборами ********************************************
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
         {
             if (ChangeSet.Value != 0 && ChangeSet.Value == _lines.Count)
@@ -304,7 +329,7 @@ namespace ComputerGraphics
                 _lines[_currentSet].Add(_line.Clone() as StripLine);
                 _line.Reset();
                 _isDrawingCurrent = false;
-                Scene.Enabled = true;
+                SetMove.Enabled = true;
             }
 
             // Если нет еще ни одного набора -> создаем его
@@ -357,9 +382,7 @@ namespace ComputerGraphics
             // Не отображаем "Текущий набор", если их нет
             if (_lines.IsEmpty())
             {
-                //ChangeSet.Enabled = false;
-                //ChangePrimitive.Enabled = false;
-                Scene.Enabled = false;
+                SetMove.Enabled = false;
             }
         }
 
@@ -487,6 +510,32 @@ namespace ComputerGraphics
             }
         }
 
+        private void RotateLeft_Click(object sender, EventArgs e)
+        {
+            if (_lines.IsEmpty()) return;
+
+            if (_lines[_currentSet].IsEmpty()) return;
+
+            if (_isDrawingCurrent || _isEdit) return;
+
+            var center = _lines[_currentSet][_currentLine].MassCenter();
+
+            _lines[_currentSet][_currentLine].Rotate(center, -10);
+        }
+
+        private void RotateRight_Click(object sender, EventArgs e)
+        {
+            if (_lines.IsEmpty()) return;
+
+            if (_lines[_currentSet].IsEmpty()) return;
+
+            if (_isDrawingCurrent || _isEdit) return;
+
+            var center = _lines[_currentSet][_currentLine].MassCenter();
+
+            _lines[_currentSet][_currentLine].Rotate(center, 10);
+        }
+
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             _isEdit = checkBox1.Checked;
@@ -499,12 +548,12 @@ namespace ComputerGraphics
             }
             else if (!_isEdit)
             {
-                _line = new StripLine();
                 _isDrawingCurrent = false;
-                Scene.Enabled = true;
-                reg.Text = "Просмотр";
-                checkBox1.Checked = false;
                 _isEdit = false;
+                _line = new StripLine();
+                SetMove.Enabled = true;
+                checkBox1.Checked = false;
+                reg.Text = "Просмотр";
             }
         }
     }

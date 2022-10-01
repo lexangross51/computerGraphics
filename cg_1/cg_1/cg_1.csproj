@@ -81,6 +81,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -99,6 +100,7 @@
   <ItemGroup>
     <Content Include="Resources\Images\eraser.png" />
     <Content Include="Resources\Images\left-arrow.png" />
+    <None Include="Resources\Images\left.png.jpg" />
     <Content Include="Resources\Images\upper-arrow.png" />
     <Content Include="Resources\Images\right-arrow.png" />
     <Content Include="Resources\Images\down-arrow.png" />
