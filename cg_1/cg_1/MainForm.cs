@@ -192,7 +192,7 @@ namespace ComputerGraphics
                 {
                     _lines[_currentSet].Add(_line.Clone() as StripLine);
                     _line.Points.Clear();
-                } 
+                }
                 else
                 {
                     _line = new StripLine();
@@ -459,7 +459,7 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines.IsEmpty())
             {
-                _lines[_currentSet].RemoveAt(_currentLine);
+                _lines[_currentSet].Clear();
                 ChangePrimitive.Value = ChangePrimitive.Value == 0 ? 0 : --ChangePrimitive.Value;
                 ChangePrimitive.Maximum = ChangePrimitive.Maximum == 0 ? 0 : --ChangePrimitive.Maximum;
             }
