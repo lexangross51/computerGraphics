@@ -192,7 +192,7 @@ namespace ComputerGraphics
                 {
                     _lines[_currentSet].Add(_line.Clone() as StripLine);
                     _line.Points.Clear();
-                } 
+                }
                 else
                 {
                     _line = new StripLine();
@@ -459,16 +459,14 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines.IsEmpty())
             {
-                _lines[_currentSet].RemoveAt(_currentLine);
+                if (!_lines[_currentSet].IsEmpty()) _lines[_currentSet].RemoveAt(_currentLine);
+
                 ChangePrimitive.Value = ChangePrimitive.Value == 0 ? 0 : --ChangePrimitive.Value;
                 ChangePrimitive.Maximum = ChangePrimitive.Maximum == 0 ? 0 : --ChangePrimitive.Maximum;
             }
             else return;
 
-            if (_lines[_currentSet].IsEmpty())
-            {
-                DeleteSet_Click(sender, e);
-            }
+            if (_lines[_currentSet].IsEmpty()) DeleteSet_Click(sender, e);
         }
 
         private void ChangePrimitive_ValueChanged(object sender, EventArgs e)

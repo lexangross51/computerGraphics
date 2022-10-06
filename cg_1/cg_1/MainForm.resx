@@ -229,6 +229,28 @@
         jZWV9QtQ8yYgXoCE5wCxEBD3ALEUENf+//+fAQBhZ0k9+YROtwAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="RotateRight.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAAAHYAAAB2AU57JggAAAAZdEVYdFNvZnR3YXJlAHd3dy5pbmtzY2FwZS5vcmeb7jwa
+        AAAA2UlEQVQ4T73Rr2uCQRzH8QvD4IJGq1FwaFmxuG7xnxAxmgXrHC5bXF0dg4nFajSYBMWoYBo6EUHx
+        x/tz59QghgN9w4vnvhce7nnO3KpHZFBGBSVkof3/4si55akgXjHFDlv8Hp6aF6gijDfMcSyKPjb4RBoB
+        qAekUMcaQ3xjCVsEI0zwoo0rPWMMnWilDdXEHxJ2ulwMDbTQhV6g09qjaihquNIT2uic0aeaD8ygH+jV
+        AF9u6Zf+pK7EO93lu1v61cOPW/pVg64wZCePktA1FuzkWR6653tnzB49Qi/2QRGZ6AAAAABJRU5ErkJg
+        gg==
+</value>
+  </data>
+  <data name="RotateLeft.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAAAHYAAAB2AU57JggAAAAZdEVYdFNvZnR3YXJlAHd3dy5pbmtzY2FwZS5vcmeb7jwa
+        AAAA20lEQVQ4T63SrWtCURyH8VsU1DKTfdXBDDYtZpP/hGi1yuqYqMkimLVq2YrVuCBYRLBZLJsgIjh8
+        eb7nyBCmVzzzgQ/8zuV67pvePcrjyY6mCHIo4w0vyCKMsy1RQRQ1rLDHDl/HWb7xij8brdHDFD9oIYUA
+        VBAZdLDFBI/4bQNdYYakDvikjebQuTEdUNpVGwzRxzviuFQCemydZ2rj88QAz/CrBF00bVYOhaCX2jQr
+        x7oY29GtKvQunKtjYUe3PjCy4+09QLffMCuHitBf/drnvph+WLDjv/K8A+/gL/bdCW0WAAAAAElFTkSu
+        QmCC
+</value>
+  </data>
   <data name="ChangeColorP.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAA
