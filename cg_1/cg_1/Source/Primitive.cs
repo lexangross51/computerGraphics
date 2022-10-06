@@ -10,8 +10,8 @@ namespace ComputerGraphics.Source
         public Color Color { get; set; }
         public float Thickness { get; set; }
         public ushort Stipple { get; set; }
-        public float ScaleXY { get; private set; }
-        public float Angle { get; private set; }
+        public float ScaleXY { get; set; }
+        public float Angle { get; set; }
 
         public Point2D MassCenter()
         {

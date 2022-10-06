@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using ComputerGraphics.Source;
 using SharpGL;
@@ -247,6 +246,8 @@ namespace ComputerGraphics
             {
                 _lines[_currentSet][_currentLine].Scale(center, 0.9f);
             }
+
+            PrimitiveScale.Text = _lines[_currentSet][_currentLine].ScaleXY.ToString("F1");
         }
 
         // Панель управления **********************************************
@@ -519,6 +520,8 @@ namespace ComputerGraphics
             var center = _lines[_currentSet][_currentLine].MassCenter();
 
             _lines[_currentSet][_currentLine].Rotate(center, -10);
+
+            PrimitiveAngle.Text = _lines[_currentSet][_currentLine].Angle.ToString();
         }
 
         private void RotateRight_Click(object sender, EventArgs e)
@@ -532,6 +535,8 @@ namespace ComputerGraphics
             var center = _lines[_currentSet][_currentLine].MassCenter();
 
             _lines[_currentSet][_currentLine].Rotate(center, 10);
+
+            PrimitiveAngle.Text = _lines[_currentSet][_currentLine].Angle.ToString();
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -553,6 +558,38 @@ namespace ComputerGraphics
                 checkBox1.Checked = false;
                 reg.Text = "Просмотр";
             }
+        }
+
+        private void RotateResetBtn_Click(object sender, EventArgs e)
+        {
+            if (_lines.IsEmpty()) return;
+
+            if (_lines[_currentSet].IsEmpty()) return;
+
+            if (_isDrawingCurrent || _isEdit) return;
+
+            var angle = _lines[_currentSet][_currentLine].Angle;
+            var center = _lines[_currentSet][_currentLine].MassCenter();
+
+            _lines[_currentSet][_currentLine].Rotate(center, -angle);
+
+            PrimitiveAngle.Text = "0";
+        }
+
+        private void ScaleResetBtn_Click(object sender, EventArgs e)
+        {
+            if (_lines.IsEmpty()) return;
+
+            if (_lines[_currentSet].IsEmpty()) return;
+
+            if (_isDrawingCurrent || _isEdit) return;
+
+            PrimitiveScale.Text = "1";
+
+            var scaleXY = _lines[_currentSet][_currentLine].ScaleXY;
+            var center = _lines[_currentSet][_currentLine].MassCenter();
+
+            _lines[_currentSet][_currentLine].Scale(center, (float)(1.0 / scaleXY));
         }
     }
 }
