@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using ComputerGraphics.Source;
 using SharpGL;
@@ -238,16 +240,9 @@ namespace ComputerGraphics
 
             var center = _lines[_currentSet][_currentLine].MassCenter();
 
-            if (Math.Sign(e.Delta) == 1)
-            {
-                _lines[_currentSet][_currentLine].Scale(center, 1.1f);
-            }
-            else
-            {
-                _lines[_currentSet][_currentLine].Scale(center, 0.9f);
-            }
+            _lines[_currentSet][_currentLine].Scale(center, Math.Sign(e.Delta) == 1 ? 1.1f : 0.9f);
 
-            PrimitiveScale.Text = _lines[_currentSet][_currentLine].ScaleXY.ToString("F1");
+            PrimitiveScale.Text = _lines[_currentSet][_currentLine].ScaleXY.ToString("F1") + "x";
         }
 
         // Панель управления **********************************************
@@ -257,8 +252,8 @@ namespace ComputerGraphics
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
                 _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (_shifts[_currentSet].Y + 40));
-                statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
-                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
+                statusXShiftValue.Text = _shifts[_currentSet].X.ToString(CultureInfo.InvariantCulture);
+                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -266,9 +261,9 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
-                _shifts[_currentSet] = new Point2D((_shifts[_currentSet].X + 40), _shifts[_currentSet].Y);
-                statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
-                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
+                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X + 40, _shifts[_currentSet].Y);
+                statusXShiftValue.Text = _shifts[_currentSet].X.ToString(CultureInfo.InvariantCulture);
+                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -276,9 +271,9 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
-                _shifts[_currentSet] = new Point2D((_shifts[_currentSet].X - 40), _shifts[_currentSet].Y);
-                statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
-                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
+                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X - 40, _shifts[_currentSet].Y);
+                statusXShiftValue.Text = _shifts[_currentSet].X.ToString(CultureInfo.InvariantCulture);
+                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -286,17 +281,17 @@ namespace ComputerGraphics
         {
             if (!_isDrawingCurrent && !_lines[_currentSet].IsEmpty())
             {
-                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, (_shifts[_currentSet].Y - 40));
-                statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
-                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
+                _shifts[_currentSet] = new Point2D(_shifts[_currentSet].X, _shifts[_currentSet].Y - 40);
+                statusXShiftValue.Text = _shifts[_currentSet].X.ToString(CultureInfo.InvariantCulture);
+                statusYShiftValue.Text = _shifts[_currentSet].Y.ToString(CultureInfo.InvariantCulture);
             }
         }
 
         private void ResetBtn_Click(object sender, EventArgs e)
         {
             _shifts[_currentSet] = new Point2D();
-            statusXShiftValue.Text = _shifts[_currentSet].X.ToString();
-            statusYShiftValue.Text = _shifts[_currentSet].Y.ToString();
+            statusXShiftValue.Text = _shifts[_currentSet].X.ToString(CultureInfo.InvariantCulture);
+            statusYShiftValue.Text = _shifts[_currentSet].Y.ToString(CultureInfo.InvariantCulture);
         }
 
         private void ChangeSet_ValueChanged(object sender, EventArgs e)
@@ -536,7 +531,7 @@ namespace ComputerGraphics
 
             _lines[_currentSet][_currentLine].Rotate(center, 10);
 
-            PrimitiveAngle.Text = _lines[_currentSet][_currentLine].Angle.ToString();
+            PrimitiveAngle.Text = _lines[_currentSet][_currentLine].Angle.ToString(CultureInfo.InvariantCulture);
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
