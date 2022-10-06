@@ -42,6 +42,10 @@ namespace ComputerGraphics
             this.statusXShiftValue = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusYShiftName = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusYShiftValue = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.PrimitiveScale = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.PrimitiveAngle = new System.Windows.Forms.ToolStripStatusLabel();
             this.ChangeSet = new System.Windows.Forms.NumericUpDown();
             this.Sets = new System.Windows.Forms.GroupBox();
             this.SetMove = new System.Windows.Forms.GroupBox();
@@ -61,6 +65,9 @@ namespace ComputerGraphics
             this.DeletePrimitive = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.Primitives = new System.Windows.Forms.GroupBox();
+            this.ScaleResetBtn = new System.Windows.Forms.Button();
+            this.label8 = new System.Windows.Forms.Label();
+            this.RotateResetBtn = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
             this.RotateRight = new System.Windows.Forms.Button();
             this.RotateLeft = new System.Windows.Forms.Button();
@@ -77,13 +84,6 @@ namespace ComputerGraphics
             this.regLabel = new System.Windows.Forms.Label();
             this.infoBox = new System.Windows.Forms.GroupBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.RotateResetBtn = new System.Windows.Forms.Button();
-            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.PrimitiveScale = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.PrimitiveAngle = new System.Windows.Forms.ToolStripStatusLabel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.ScaleResetBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.GL)).BeginInit();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).BeginInit();
@@ -209,6 +209,38 @@ namespace ComputerGraphics
             this.statusYShiftValue.Name = "statusYShiftValue";
             this.statusYShiftValue.Size = new System.Drawing.Size(21, 24);
             this.statusYShiftValue.Text = "0";
+            // 
+            // toolStripStatusLabel2
+            // 
+            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            this.toolStripStatusLabel2.Size = new System.Drawing.Size(222, 24);
+            this.toolStripStatusLabel2.Text = "               Масшаб примитива: x";
+            // 
+            // PrimitiveScale
+            // 
+            this.PrimitiveScale.AutoSize = false;
+            this.PrimitiveScale.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.PrimitiveScale.Name = "PrimitiveScale";
+            this.PrimitiveScale.Size = new System.Drawing.Size(30, 24);
+            this.PrimitiveScale.Text = "1";
+            // 
+            // toolStripStatusLabel3
+            // 
+            this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
+            this.toolStripStatusLabel3.Size = new System.Drawing.Size(257, 24);
+            this.toolStripStatusLabel3.Text = "               Угол поворота примитива:";
+            // 
+            // PrimitiveAngle
+            // 
+            this.PrimitiveAngle.AutoSize = false;
+            this.PrimitiveAngle.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.PrimitiveAngle.Name = "PrimitiveAngle";
+            this.PrimitiveAngle.Size = new System.Drawing.Size(30, 24);
+            this.PrimitiveAngle.Text = "0";
             // 
             // ChangeSet
             // 
@@ -449,6 +481,35 @@ namespace ComputerGraphics
             this.Primitives.TabStop = false;
             this.Primitives.Text = "Управление примитивами";
             // 
+            // ScaleResetBtn
+            // 
+            this.ScaleResetBtn.Image = ((System.Drawing.Image)(resources.GetObject("ScaleResetBtn.Image")));
+            this.ScaleResetBtn.Location = new System.Drawing.Point(143, 165);
+            this.ScaleResetBtn.Name = "ScaleResetBtn";
+            this.ScaleResetBtn.Size = new System.Drawing.Size(34, 35);
+            this.ScaleResetBtn.TabIndex = 22;
+            this.ScaleResetBtn.UseVisualStyleBackColor = true;
+            this.ScaleResetBtn.Click += new System.EventHandler(this.ScaleResetBtn_Click);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 174);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(114, 16);
+            this.label8.TabIndex = 21;
+            this.label8.Text = "Сброс масштаба";
+            // 
+            // RotateResetBtn
+            // 
+            this.RotateResetBtn.Image = ((System.Drawing.Image)(resources.GetObject("RotateResetBtn.Image")));
+            this.RotateResetBtn.Location = new System.Drawing.Point(183, 123);
+            this.RotateResetBtn.Name = "RotateResetBtn";
+            this.RotateResetBtn.Size = new System.Drawing.Size(34, 35);
+            this.RotateResetBtn.TabIndex = 20;
+            this.RotateResetBtn.UseVisualStyleBackColor = true;
+            this.RotateResetBtn.Click += new System.EventHandler(this.RotateResetBtn_Click);
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -622,67 +683,6 @@ namespace ComputerGraphics
             this.richTextBox1.Size = new System.Drawing.Size(331, 171);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
-            // 
-            // RotateResetBtn
-            // 
-            this.RotateResetBtn.Image = ((System.Drawing.Image)(resources.GetObject("RotateResetBtn.Image")));
-            this.RotateResetBtn.Location = new System.Drawing.Point(183, 123);
-            this.RotateResetBtn.Name = "RotateResetBtn";
-            this.RotateResetBtn.Size = new System.Drawing.Size(34, 35);
-            this.RotateResetBtn.TabIndex = 20;
-            this.RotateResetBtn.UseVisualStyleBackColor = true;
-            this.RotateResetBtn.Click += new System.EventHandler(this.RotateResetBtn_Click);
-            // 
-            // toolStripStatusLabel2
-            // 
-            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(274, 24);
-            this.toolStripStatusLabel2.Text = "                            Масшаб примитива: x";
-            // 
-            // PrimitiveScale
-            // 
-            this.PrimitiveScale.AutoSize = false;
-            this.PrimitiveScale.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.PrimitiveScale.Name = "PrimitiveScale";
-            this.PrimitiveScale.Size = new System.Drawing.Size(30, 24);
-            this.PrimitiveScale.Text = "1";
-            // 
-            // toolStripStatusLabel3
-            // 
-            this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
-            this.toolStripStatusLabel3.Size = new System.Drawing.Size(297, 24);
-            this.toolStripStatusLabel3.Text = "                         Угол поворота примитива:";
-            // 
-            // PrimitiveAngle
-            // 
-            this.PrimitiveAngle.AutoSize = false;
-            this.PrimitiveAngle.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.PrimitiveAngle.Name = "PrimitiveAngle";
-            this.PrimitiveAngle.Size = new System.Drawing.Size(30, 24);
-            this.PrimitiveAngle.Text = "0";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 174);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(114, 16);
-            this.label8.TabIndex = 21;
-            this.label8.Text = "Сброс масштаба";
-            // 
-            // ScaleResetBtn
-            // 
-            this.ScaleResetBtn.Image = ((System.Drawing.Image)(resources.GetObject("ScaleResetBtn.Image")));
-            this.ScaleResetBtn.Location = new System.Drawing.Point(143, 165);
-            this.ScaleResetBtn.Name = "ScaleResetBtn";
-            this.ScaleResetBtn.Size = new System.Drawing.Size(34, 35);
-            this.ScaleResetBtn.TabIndex = 22;
-            this.ScaleResetBtn.UseVisualStyleBackColor = true;
-            this.ScaleResetBtn.Click += new System.EventHandler(this.ScaleResetBtn_Click);
             // 
             // MainForm
             // 
