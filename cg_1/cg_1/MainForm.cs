@@ -18,12 +18,14 @@ namespace ComputerGraphics
         private byte _currentLine;
         private bool _isDrawingCurrent;
         private bool _isEdit;
+        private float _scaleXY;
 
         public MainForm()
         {
             InitializeComponent();
             comboBoxLine.SelectedIndex = 0;
             comboBoxSet.SelectedIndex = 0;
+            _scaleXY = 1f;
         }
 
         private void GL_OpenGLInitialized(object sender, EventArgs e)
@@ -240,7 +242,7 @@ namespace ComputerGraphics
 
             var center = _lines[_currentSet][_currentLine].MassCenter();
 
-            _lines[_currentSet][_currentLine].Scale(center, Math.Sign(e.Delta) == 1 ? 1.1f : 0.9f);
+            _lines[_currentSet][_currentLine].Scale(center, Math.Sign(e.Delta) == 1 ? _scaleXY : 1.0f / _scaleXY);
 
             PrimitiveScale.Text = _lines[_currentSet][_currentLine].ScaleXY.ToString("F1") + "x";
         }
@@ -585,6 +587,11 @@ namespace ComputerGraphics
             var center = _lines[_currentSet][_currentLine].MassCenter();
 
             _lines[_currentSet][_currentLine].Scale(center, (float)(1.0 / scaleXY));
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            _scaleXY = (float)numericUpDown1.Value;
         }
     }
 }

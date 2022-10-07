@@ -84,6 +84,7 @@ namespace ComputerGraphics
             this.regLabel = new System.Windows.Forms.Label();
             this.infoBox = new System.Windows.Forms.GroupBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.GL)).BeginInit();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChangeSet)).BeginInit();
@@ -95,6 +96,7 @@ namespace ComputerGraphics
             ((System.ComponentModel.ISupportInitialize)(this.ChangeWidthP)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.infoBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // GL
@@ -460,6 +462,7 @@ namespace ComputerGraphics
             // Primitives
             // 
             this.Primitives.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.Primitives.Controls.Add(this.numericUpDown1);
             this.Primitives.Controls.Add(this.ScaleResetBtn);
             this.Primitives.Controls.Add(this.label8);
             this.Primitives.Controls.Add(this.RotateResetBtn);
@@ -484,9 +487,9 @@ namespace ComputerGraphics
             // ScaleResetBtn
             // 
             this.ScaleResetBtn.Image = ((System.Drawing.Image)(resources.GetObject("ScaleResetBtn.Image")));
-            this.ScaleResetBtn.Location = new System.Drawing.Point(143, 165);
+            this.ScaleResetBtn.Location = new System.Drawing.Point(143, 170);
             this.ScaleResetBtn.Name = "ScaleResetBtn";
-            this.ScaleResetBtn.Size = new System.Drawing.Size(34, 35);
+            this.ScaleResetBtn.Size = new System.Drawing.Size(34, 22);
             this.ScaleResetBtn.TabIndex = 22;
             this.ScaleResetBtn.UseVisualStyleBackColor = true;
             this.ScaleResetBtn.Click += new System.EventHandler(this.ScaleResetBtn_Click);
@@ -637,7 +640,7 @@ namespace ComputerGraphics
             // reg
             // 
             this.reg.AutoSize = true;
-            this.reg.Location = new System.Drawing.Point(116, 29);
+            this.reg.Location = new System.Drawing.Point(57, 29);
             this.reg.Name = "reg";
             this.reg.Size = new System.Drawing.Size(72, 16);
             this.reg.TabIndex = 4;
@@ -646,8 +649,8 @@ namespace ComputerGraphics
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.checkBox1.Location = new System.Drawing.Point(7, 57);
+            this.checkBox1.CheckAlign = System.Drawing.ContentAlignment.BottomLeft;
+            this.checkBox1.Location = new System.Drawing.Point(9, 62);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(130, 20);
             this.checkBox1.TabIndex = 3;
@@ -666,7 +669,8 @@ namespace ComputerGraphics
             // 
             // infoBox
             // 
-            this.infoBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.infoBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.infoBox.Controls.Add(this.richTextBox1);
             this.infoBox.Location = new System.Drawing.Point(1280, 617);
             this.infoBox.Name = "infoBox";
@@ -677,12 +681,38 @@ namespace ComputerGraphics
             // 
             // richTextBox1
             // 
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1.Location = new System.Drawing.Point(6, 22);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
             this.richTextBox1.Size = new System.Drawing.Size(331, 171);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(183, 170);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(74, 22);
+            this.numericUpDown1.TabIndex = 23;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // MainForm
             // 
@@ -712,6 +742,7 @@ namespace ComputerGraphics
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.infoBox.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -773,6 +804,7 @@ namespace ComputerGraphics
         private System.Windows.Forms.ToolStripStatusLabel PrimitiveAngle;
         private System.Windows.Forms.Button ScaleResetBtn;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
     }
 }
 
