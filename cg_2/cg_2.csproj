@@ -23,6 +23,8 @@
 	<Using Include="System.Collections.Generic" />
 	<Using Include="System.Collections.Immutable" />
 	<Using Include="Newtonsoft.Json" />
+	<Using Include="SharpGL" />
+	<Using Include="cg_2.Source" />
   </ItemGroup>
 
 </Project>
