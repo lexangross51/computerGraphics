@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\lexan\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.ico" />
+    <Content Remove="C:\Users\lexan\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	<PackageReference Include="SharpGL" Version="3.1.1" />
+	<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
+	<PackageReference Include="SharpGL.WinForms" Version="3.1.1" />
+	<Using Include="System" />
+	<Using Include="System.Linq" />
+	<Using Include="System.Collections.Generic" />
+	<Using Include="System.Collections.Immutable" />
+	<Using Include="Newtonsoft.Json" />
+  </ItemGroup>
+
+</Project>
