@@ -54,8 +54,13 @@
             this.GL.OpenGLInitialized += new System.EventHandler(this.GL_OpenGLInitialized);
             this.GL.OpenGLDraw += new SharpGL.RenderEventHandler(this.GL_OpenGLDraw);
             this.GL.Resized += new System.EventHandler(this.GL_Resized);
+            this.GL.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.GL_KeyPress);
             this.GL.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GL_MouseClick);
+            this.GL.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GL_MouseDown);
+            this.GL.MouseEnter += new System.EventHandler(this.GL_MouseEnter);
+            this.GL.MouseLeave += new System.EventHandler(this.GL_MouseLeave);
             this.GL.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GL_MouseMove);
+            this.GL.MouseUp += new System.Windows.Forms.MouseEventHandler(this.GL_MouseUp);
             // 
             // statusStrip1
             // 

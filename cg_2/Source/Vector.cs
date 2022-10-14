@@ -1,8 +1,14 @@
 ﻿namespace cg_2.Source;
 
-public readonly record struct Vector3(float X, float Y, float Z)
+public struct Vector3
 {
+    public float X { get; set; }
+    public float Y { get; set; }
+    public float Z { get; set; }
     [JsonIgnore] public int Size => 3;
+
+    public Vector3(float x, float y, float z) =>
+        (X, Y, Z) = (x, y, z);
 
     public float Norm() => (float)Math.Sqrt(X * X + Y * Y + Z * Z);
     public Vector3 Normalize() => this / Norm();
