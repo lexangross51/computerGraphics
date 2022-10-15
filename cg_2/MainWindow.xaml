@@ -1,0 +1,15 @@
+﻿<Window x:Class="cg_2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sharpGL="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" KeyDown="MainWindow_OnKeyDown"
+                                                    MouseMove="MainWindow_OnMouseMove">
+    <DockPanel>
+        <sharpGL:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
+                               OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
+                               RenderContextType="FBO" RenderTransformOrigin="0.496,0.499" />
+    </DockPanel>
+</Window>

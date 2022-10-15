@@ -1,30 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="C:\Users\lexan\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.ico" />
-    <Content Remove="C:\Users\lexan\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="GlmNet" Version="0.7.0" />
+		<PackageReference Include="SharpGL" Version="3.1.1" />
+		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
+		<PackageReference Include="SharpGL.WPF" Version="3.1.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	<PackageReference Include="SharpGL" Version="3.1.1" />
-	<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
-	<PackageReference Include="SharpGL.WinForms" Version="3.1.1" />
-	<Using Include="System" />
-	<Using Include="System.Linq" />
-	<Using Include="System.Collections.Generic" />
-	<Using Include="System.Collections.Immutable" />
-	<Using Include="Newtonsoft.Json" />
-	<Using Include="SharpGL" />
-	<Using Include="cg_2.Source" />
-  </ItemGroup>
+	<ItemGroup>
+		<Using Include="System" />
+		<Using Include="System.Windows" />
+		<Using Include="System.Diagnostics" />
+		<Using Include="System.Windows.Input" />
+		<Using Include="GlmNet" />
+		<Using Include="SharpGL" />
+		<Using Include="SharpGL.WPF" />
+		<Using Include="SharpGL.SceneGraph.Shaders" />
+		<Using Include="SharpGL.VertexBuffers" />
+		<Using Include="cg_2.Source.Camera" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Source\Shaders\shader.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\shader.vert">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 
 </Project>
