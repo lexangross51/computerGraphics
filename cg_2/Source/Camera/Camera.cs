@@ -69,9 +69,9 @@ public class Camera
         UpdateVectors();
     }
 
-    public void Move(TranslateDirection direction, double deltaTime)
-    {
-        var velocity = (float)(Speed * deltaTime);
+    public void Move(TranslateDirection direction, float deltaTime)
+    { 
+        var velocity = Speed * deltaTime;
 
         switch (direction)
         {
@@ -108,7 +108,7 @@ public class Camera
             y = sinPitch,
             z = sinYaw * cosPitch
         };
-
+        
         Front = glm.normalize(front);
         _right = glm.normalize(glm.cross(Front, _worldUp));
         Up = glm.normalize(glm.cross(_right, Front));
