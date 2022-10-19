@@ -3,64 +3,37 @@
 public partial class MainWindow
 {
     private readonly Camera _mainCamera;
-    private readonly VertexBuffer _vbo = new();
-    private readonly VertexBufferArray _vao = new();
-    private readonly ShaderProgram _shaderProgram = new();
-    private vec3[] _cubePositions = default!;
-    private readonly Stopwatch _stopWatch;
-    private double _deltaTime, _lastFrame;
+    private readonly VertexBufferArray _vao;
+    private readonly VertexBuffer _vbo;
+    private readonly IndexBuffer _ibo;
+    private readonly ShaderProgram _shaderProgram;
+    private mat4 _projectionMatrix;
+    private mat4 _viewMatrix;
+    private mat4 _modelMatrix;
+    private DateTime _lastFrame;
+    private float _deltaTime;
+    private readonly List<PolygonSection> _sections;
+    private readonly List<Transform> _transforms;
 
     public MainWindow()
     {
         InitializeComponent();
         _mainCamera = new Camera();
+
+        _shaderProgram = new ShaderProgram();
+        _vao = new VertexBufferArray();
+        _vbo = new VertexBuffer();
+        _ibo = new IndexBuffer();
+
+        _projectionMatrix = mat4.identity();
+        _viewMatrix = mat4.identity();
+        _modelMatrix = mat4.identity();
+        
+        _lastFrame = DateTime.Now;
         _deltaTime = 0.0f;
-        _lastFrame = 0.0f;
-        _stopWatch = new Stopwatch();
-        _stopWatch.Start();
-    }
 
-    private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
-    {
-        var currentFrame = _stopWatch.ElapsedMilliseconds;
-        _deltaTime = (currentFrame - _lastFrame) / 1000.0;
-        _lastFrame = currentFrame;
-
-        var gl = args.OpenGL;
-        var width = gl.RenderContextProvider.Width;
-        var height = gl.RenderContextProvider.Height;
-
-        gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
-
-        _shaderProgram.Push(gl, null);
-
-        var projection = glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f);
-        var view = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
-
-        var modelLoc = _shaderProgram.GetUniformLocation("model");
-        var viewLoc = _shaderProgram.GetUniformLocation("view");
-        var projectionLoc = _shaderProgram.GetUniformLocation("projection");
-
-        gl.UniformMatrix4(viewLoc, 1, false, view.to_array());
-        gl.UniformMatrix4(projectionLoc, 1, false, projection.to_array());
-
-        _vao.Bind(gl);
-
-        for (var i = 0; i < 10; i++)
-        {
-            var model = mat4.identity();
-            model = glm.translate(model, _cubePositions[i]);
-
-            var angle = 20.0f * i;
-            model = glm.rotate(model, angle, new vec3(1.0f, 0.3f, 0.5f));
-            gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
-
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
-        }
-
-        _shaderProgram.Pop(gl, null);
-        _vao.Unbind(gl);
+        _sections = new List<PolygonSection> { PolygonSection.ReadJson("Input/Section.json") };
+        _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     }
 
     private void OpenGLControl_OnOpenGLInitialized(object sender, OpenGLRoutedEventArgs args)
@@ -68,6 +41,7 @@ public partial class MainWindow
         var gl = args.OpenGL;
 
         gl.Enable(OpenGL.GL_DEPTH_TEST);
+        gl.Enable(OpenGL.GL_DOUBLEBUFFER);
 
         VertexShader vertexShader = new();
         vertexShader.CreateInContext(gl);
@@ -88,66 +62,50 @@ public partial class MainWindow
         fragmentShader.DestroyInContext(gl);
         vertexShader.DestroyInContext(gl);
 
-        #region Вершины примитива
+        MakeReplication();
 
-        float[] vertices =
+        #region Формируем массив вершин и индексов
+
+        var sectionsCount = _sections.Count;
+        var verticesCount = _sections[0].VertexCount;
+        var ivertex = (ushort)0;
+        
+        var vertices = new float[sectionsCount * verticesCount * 3];
+        var indices = new ushort[sectionsCount * verticesCount];
+        var facesIndices = new ushort[(sectionsCount - 1) * verticesCount * 4];
+        
+        foreach (var vertex in _sections.SelectMany(section => section.Vertices))
         {
-            -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-            0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+            vertices[3 * ivertex] = vertex.x;
+            vertices[3 * ivertex + 1] = vertex.y;
+            vertices[3 * ivertex + 2] = vertex.z;
+            ivertex++;
+        }
 
-            -0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-            0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+        for (ushort i = 0; i < sectionsCount * verticesCount; i++) indices[i] = i;
 
-            -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-
-            0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
-            0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-
-            -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-            0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-            0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-        };
-
-        _cubePositions = new vec3[]
+        ivertex = 0;
+        
+        for (var i = 0; i < (sectionsCount - 1) * verticesCount; i += verticesCount)
         {
-            new( 0.0f,  0.0f,  0.0f),
-            new( 2.0f,  5.0f, -15.0f),
-            new(-1.5f, -2.2f, -2.5f),
-            new(-3.8f, -2.0f, -12.3f),
-            new( 2.4f, -0.4f, -3.5f),
-            new(-1.7f,  3.0f, -7.5f),
-            new( 1.3f, -2.0f, -2.5f),
-            new( 1.5f,  2.0f, -2.5f),
-            new( 1.5f,  0.2f, -1.5f),
-            new(-1.3f,  1.0f, -1.5f)
-        };
+            for (var j = 0; j < verticesCount; j++)
+            {
+                if (j == verticesCount - 1)
+                {
+                    facesIndices[ivertex++] = indices[i];
+                    facesIndices[ivertex++] = indices[i + verticesCount];
+                    facesIndices[ivertex++] = indices[i + j + verticesCount];
+                    facesIndices[ivertex++] = indices[i + j];
+                }
+                else
+                {
+                    facesIndices[ivertex++] = indices[i + j];
+                    facesIndices[ivertex++] = indices[i + j + verticesCount];
+                    facesIndices[ivertex++] = indices[i + j + verticesCount + 1];
+                    facesIndices[ivertex++] = indices[i + j + 1];   
+                }
+            }
+        }
 
         #endregion
 
@@ -157,12 +115,62 @@ public partial class MainWindow
         _vbo.Create(gl);
         _vbo.Bind(gl);
         gl.BufferData(OpenGL.GL_ARRAY_BUFFER, vertices, OpenGL.GL_STATIC_DRAW);
-        gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), IntPtr.Zero);
+        gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 3 * sizeof(float), IntPtr.Zero);
         gl.EnableVertexAttribArray(0);
-        gl.VertexAttribPointer(1, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), (IntPtr)(3 * sizeof(float)));
-        gl.EnableVertexAttribArray(1);
         _vbo.Unbind(gl);
+        
+        _ibo.Create(gl);
+        _ibo.Bind(gl);
+        _ibo.SetData(gl, facesIndices);
 
+        _vao.Unbind(gl);
+    }
+    
+    private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
+    {
+        #region Считаем deltaTime
+
+        var currentFrame = DateTime.Now;
+        _deltaTime = (currentFrame.Ticks - _lastFrame.Ticks) / 10000000f;
+        _lastFrame = currentFrame;
+
+        #endregion
+
+        var gl = args.OpenGL;
+        var width = gl.RenderContextProvider.Width;
+        var height = gl.RenderContextProvider.Height;
+            
+        //gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_LINE);
+        gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+
+        _shaderProgram.Push(gl, null);
+        _projectionMatrix = glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f);
+        _viewMatrix = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
+
+        var modelLoc = _shaderProgram.GetUniformLocation("model");
+        var viewLoc = _shaderProgram.GetUniformLocation("view");
+        var projectionLoc = _shaderProgram.GetUniformLocation("projection");
+
+        gl.UniformMatrix4(viewLoc, 1, false, _viewMatrix.to_array());
+        gl.UniformMatrix4(projectionLoc, 1, false, _projectionMatrix.to_array());
+
+        _vao.Bind(gl);
+
+        gl.UniformMatrix4(modelLoc, 1, false, _modelMatrix.to_array());
+
+        var vertexCount = _sections[0].VertexCount;
+        var sectionsCount = _sections.Count;
+
+        for (var i = 0; i < _sections.Count; i++)
+        {
+            gl.DrawArrays(OpenGL.GL_POLYGON, vertexCount * i, vertexCount);   
+        }
+        
+        _ibo.Bind(gl);
+        gl.DrawElements(OpenGL.GL_QUADS, (sectionsCount - 1) * vertexCount * 4, OpenGL.GL_UNSIGNED_SHORT, IntPtr.Zero);
+
+        _shaderProgram.Pop(gl, null);
         _vao.Unbind(gl);
     }
 
@@ -196,6 +204,89 @@ public partial class MainWindow
         else
         {
             _mainCamera.FirstMouse = true;
+        }
+    }
+
+    private void MakeReplication()
+    {
+        for (var i = 0; i < _transforms.Count - 1; i++)
+        {
+            PolygonSection newSection = new();
+            
+            var sectionV = _sections[i].Vertices;
+            var scale = _transforms[i].Scale;
+            var angle = _transforms[i].Angle;
+            var currTraj = _transforms[i].Trajectory;
+            var nextTraj = _transforms[i + 1].Trajectory;
+
+            // Перенесем сечение в начало координат
+            var toCenter = new vec3() - sectionV.MassCenter();
+            var translateMatrix = glm.translate(mat4.identity(), toCenter);
+            var vertices4 = sectionV.Select(vertex => translateMatrix * new vec4(vertex, 1.0f)).ToList();
+
+            // Выполняем преобразования
+            var rotateMatrix = glm.rotate(glm.radians(angle), currTraj);
+            vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
+
+            var dotProduct = glm.dot(currTraj, nextTraj);
+            var rotAngle = glm.acos(dotProduct / (currTraj.Norm() * nextTraj.Norm())) ;
+            var axis = glm.cross(nextTraj, currTraj);
+            rotateMatrix = axis.Norm() != 0.0f ? glm.rotate(-rotAngle, axis) : mat4.identity();
+            var scaleMatrix = glm.scale(mat4.identity(), new vec3(scale));
+
+            vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
+            vertices4 = vertices4.Select(vertex => scaleMatrix * vertex).ToList();
+            
+            // Возвращаем в исходное положение в мировом пространстве
+            translateMatrix = glm.translate(mat4.identity(), sectionV.MassCenter());
+            vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
+            
+            translateMatrix = glm.translate(mat4.identity(), currTraj);
+           
+            foreach (var vertex in vertices4)
+            {
+                newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));       
+            }
+
+            _sections.Add(newSection);
+            
+            // Обработка последней трансформации
+            if (i == _transforms.Count - 2)
+            {
+                newSection = new PolygonSection();
+                
+                sectionV = _sections[^1].Vertices;
+                currTraj = _transforms[^1].Trajectory;
+                scale = _transforms[^1].Scale;
+                angle = _transforms[^1].Angle;
+                
+                rotateMatrix = glm.rotate(glm.radians(angle), currTraj);
+                scaleMatrix = glm.scale(mat4.identity(), new vec3(scale));
+                
+                // Переносим сечение в начало координат
+                toCenter = new vec3() - sectionV.MassCenter();
+                translateMatrix = glm.translate(mat4.identity(), toCenter);
+                vertices4 = sectionV.Select(vertex => translateMatrix * new vec4(vertex, 1.0f)).ToList();
+                
+                // Выполняем преобразования
+                vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
+                vertices4 = vertices4.Select(vertex => scaleMatrix * vertex).ToList();
+                
+                // Возвращаем в исходное положение в мировом пространстве
+                translateMatrix = glm.translate(mat4.identity(), sectionV.MassCenter());
+                vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
+
+                translateMatrix = glm.translate(mat4.identity(), currTraj);
+           
+                foreach (var vertex in vertices4)
+                {
+                    newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));       
+                }
+                
+                _sections.Add(newSection);
+
+                break;
+            }
         }
     }
 }
