@@ -17,8 +17,8 @@ public class Camera
     private vec3 _right;
 
     public bool FirstMouse { get; set; }
-    public float Sensitivity { get; }
-    public float Speed { get; }
+    public float Sensitivity { get; set; }
+    public float Speed { get; set; }
 
     public vec3 Position { get; private set; }
     public vec3 Front { get; private set; }
