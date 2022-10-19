@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="GlmNet" Version="0.7.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
 		<PackageReference Include="SharpGL" Version="3.1.1" />
 		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
 		<PackageReference Include="SharpGL.WPF" Version="3.1.1" />
@@ -16,15 +17,21 @@
 
 	<ItemGroup>
 		<Using Include="System" />
+		<Using Include="System.Linq" />
+		<Using Include="System.IO" />
 		<Using Include="System.Windows" />
 		<Using Include="System.Diagnostics" />
 		<Using Include="System.Windows.Input" />
+		<Using Include="System.Collections.Generic" />
 		<Using Include="GlmNet" />
 		<Using Include="SharpGL" />
 		<Using Include="SharpGL.WPF" />
 		<Using Include="SharpGL.SceneGraph.Shaders" />
 		<Using Include="SharpGL.VertexBuffers" />
+		<Using Include="Newtonsoft.Json" />
 		<Using Include="cg_2.Source.Camera" />
+		<Using Include="cg_2.Source.Polygon" />
+		<Using Include="cg_2.Source.Extensions" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -32,6 +39,12 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Source\Shaders\shader.vert">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Input\Section.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Input\Transform.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
