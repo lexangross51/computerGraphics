@@ -5,11 +5,98 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sharpGL="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" KeyDown="MainWindow_OnKeyDown"
-                                                    MouseMove="MainWindow_OnMouseMove">
-    <DockPanel>
-        <sharpGL:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
+        Title="MainWindow" Height="720" Width="1280" KeyDown="MainWindow_OnKeyDown">
+    <Grid Name="MainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <sharpGL:OpenGLControl Grid.Column="0" OpenGLDraw="OpenGLControl_OnOpenGLDraw"
                                OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
+                               MouseMove="OpenGLControl_OnMouseMove"
                                RenderContextType="FBO" RenderTransformOrigin="0.496,0.499" />
-    </DockPanel>
+
+        <StackPanel Grid.Column="1">
+            <GroupBox
+                FontSize="11"
+                Header="Отображение"
+                Padding="4"
+                Margin="5, 0, 5, 0"
+                Width="{Binding ElementName=MainGrid }" Height="130"
+                VerticalAlignment="Top">
+                <StackPanel>
+                    <TextBlock>Режим</TextBlock>
+                    <RadioButton
+                        GroupName="View"
+                        Name="WireframeMode"
+                        IsChecked="false"
+                        Content="Каркас"
+                        Checked="RadioButtonChecked" />
+                    <RadioButton
+                        GroupName="View"
+                        Name="LayoutMode"
+                        IsChecked="true"
+                        Content="Макет"
+                        Checked="RadioButtonChecked" />
+
+                    <TextBlock Margin="0, 15, 0, 0">Вид</TextBlock>
+                    <RadioButton
+                        GroupName="Projection"
+                        Name="PerspectiveMode"
+                        IsChecked="true"
+                        Content="Перспективная проекция"
+                        Checked="RadioButtonChecked" />
+                    <RadioButton
+                        GroupName="Projection"
+                        Name="OrthographicMode"
+                        IsChecked="false"
+                        Content="Ортографическая проекция"
+                        Checked="RadioButtonChecked" />
+
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox
+                FontSize="11"
+                Header="Настройки камеры"
+                Margin="5, 5, 5, 0"
+                Padding="4">
+                
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Margin="-5, 0,0, 0" Content="Скорость" />
+                        <Slider Name="CameraSpeed"
+                                Minimum="1"
+                                Maximum="10" 
+                                TickPlacement="BottomRight" 
+                                TickFrequency="1" 
+                                IsSnapToTickEnabled="True"
+                                Margin="0, 3, 0, 0" 
+                                Width="178"
+                                ValueChanged="SliderValueChanged"/>
+                    </StackPanel>
+                
+                    <StackPanel Orientation="Horizontal">
+                        <Label Margin="-5, 0,0, 0" Content="Чувствительность" />
+                        <Slider Name="CameraSensitivity"
+                                Minimum="0.1"
+                                Maximum="0.3" 
+                                TickPlacement="BottomRight" 
+                                TickFrequency="0.01" 
+                                Margin="0, 3, 0, 0" 
+                                Width="135" 
+                                ValueChanged="SliderValueChanged"/>
+                    </StackPanel>
+                </StackPanel>
+                
+            </GroupBox>
+            
+            <GroupBox
+                FontSize="11"
+                Header="Текстурирование"
+                Margin="5, 5, 5, 0"
+                Padding="4">
+            </GroupBox>
+        </StackPanel>
+    </Grid>
 </Window>
