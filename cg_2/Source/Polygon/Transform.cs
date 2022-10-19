@@ -15,16 +15,16 @@ public class Transform
         {
             if (!File.Exists(path))
             {
-                throw new Exception("File doesn't exist\n");
+                throw new Exception("File doesn't exist");
             }
 
             using var sr = new StreamReader(path);
             return JsonConvert.DeserializeObject<Transform[]>(sr.ReadToEnd()) ??
-                   throw new NullReferenceException("Fill in the file correctly\n");
+                   throw new NullReferenceException("Fill in the file correctly");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine($"Exception: " + e.Message);
+            Console.WriteLine($"Exception: {ex.Message}");
             throw;
         }
     }

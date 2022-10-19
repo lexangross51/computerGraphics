@@ -13,6 +13,7 @@ public static class GlmVectorExtensions
         float x = 0, y = 0, z = 0;
 
         var enumerable = collection as vec3[] ?? collection.ToArray();
+
         foreach (var p in enumerable)
         {
             x += p.x;
@@ -24,25 +25,6 @@ public static class GlmVectorExtensions
         y /= enumerable.Length;
         z /= enumerable.Length;
 
-        return new vec3(x, y, z);
-    }
-    
-    public static vec3 MassCenter(this IEnumerable<vec4> collection)
-    {
-        float x = 0, y = 0, z = 0;
-
-        var enumerable = collection as vec4[] ?? collection.ToArray();
-        foreach (var p in enumerable)
-        {
-            x += p.x;
-            y += p.y;
-            z += p.z;
-        }
-
-        x /= enumerable.Length;
-        y /= enumerable.Length;
-        z /= enumerable.Length;
-
-        return new vec3(x, y, z);
+        return new(x, y, z);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace cg_2.Source.Camera;
 
-public enum TranslateDirection : byte
+public enum TranslateDirection
 {
     Left,
     Right,
@@ -17,8 +17,8 @@ public class Camera
     private vec3 _right;
 
     public bool FirstMouse { get; set; }
-    public float Sensitivity { get; set; }
-    public float Speed { get; set; }
+    public float Sensitivity { get; }
+    public float Speed { get; }
 
     public vec3 Position { get; private set; }
     public vec3 Front { get; private set; }
@@ -70,26 +70,18 @@ public class Camera
     }
 
     public void Move(TranslateDirection direction, float deltaTime)
-    { 
+    {
         var velocity = Speed * deltaTime;
 
-        switch (direction)
+        Position += direction switch
         {
-            case TranslateDirection.Forward:
-                Position += Front * velocity;
-                break;
-            case TranslateDirection.Back:
-                Position -= Front * velocity;
-                break;
-            case TranslateDirection.Right:
-                Position += _right * velocity;
-                break;
-            case TranslateDirection.Left:
-                Position -= _right * velocity;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
-        }
+            TranslateDirection.Forward => Front * velocity,
+            TranslateDirection.Back => -1.0f * (Front * velocity),
+            TranslateDirection.Right => _right * velocity,
+            TranslateDirection.Left => -1.0f * (_right * velocity),
+            _ => throw new ArgumentOutOfRangeException(nameof(direction),
+                $"Not expected direction value: {direction}")
+        };
     }
 
     private void UpdateVectors()
@@ -108,7 +100,7 @@ public class Camera
             y = sinPitch,
             z = sinYaw * cosPitch
         };
-        
+
         Front = glm.normalize(front);
         _right = glm.normalize(glm.cross(Front, _worldUp));
         Up = glm.normalize(glm.cross(_right, Front));

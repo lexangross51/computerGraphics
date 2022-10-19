@@ -5,7 +5,8 @@ public class PolygonSection
     public List<vec3> Vertices { get; }
     public int VertexCount => Vertices.Count;
 
-    public PolygonSection() => Vertices = new List<vec3>();
+    public PolygonSection() => Vertices = new();
+
     public PolygonSection(IEnumerable<vec3> vertices) => Vertices = vertices.ToList();
 
     public static PolygonSection ReadJson(string path)
@@ -14,16 +15,16 @@ public class PolygonSection
         {
             if (!File.Exists(path))
             {
-                throw new Exception("File doesn't exist\n");
+                throw new Exception("File doesn't exist");
             }
 
             using var sr = new StreamReader(path);
             return JsonConvert.DeserializeObject<PolygonSection>(sr.ReadToEnd()) ??
-                   throw new NullReferenceException("Fill in the file correctly\n");
+                   throw new NullReferenceException("Fill in the file correctly");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine($"Exception: " + e.Message);
+            Console.WriteLine($"Exception:{ex.Message}");
             throw;
         }
     }
@@ -31,7 +32,6 @@ public class PolygonSection
     public static void WriteJson(PolygonSection section, string path)
     {
         using var sw = new StreamWriter(path);
-        
-        sw.Write(JsonConvert.SerializeObject(section));
+        sw.WriteLine(JsonConvert.SerializeObject(section));
     }
 }

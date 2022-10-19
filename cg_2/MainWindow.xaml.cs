@@ -28,7 +28,7 @@ public partial class MainWindow
         _projectionMatrix = mat4.identity();
         _viewMatrix = mat4.identity();
         _modelMatrix = mat4.identity();
-        
+
         _lastFrame = DateTime.Now;
         _deltaTime = 0.0f;
 
@@ -69,11 +69,11 @@ public partial class MainWindow
         var sectionsCount = _sections.Count;
         var verticesCount = _sections[0].VertexCount;
         var ivertex = (ushort)0;
-        
+
         var vertices = new float[sectionsCount * verticesCount * 3];
         var indices = new ushort[sectionsCount * verticesCount];
         var facesIndices = new ushort[(sectionsCount - 1) * verticesCount * 4];
-        
+
         foreach (var vertex in _sections.SelectMany(section => section.Vertices))
         {
             vertices[3 * ivertex] = vertex.x;
@@ -85,7 +85,7 @@ public partial class MainWindow
         for (ushort i = 0; i < sectionsCount * verticesCount; i++) indices[i] = i;
 
         ivertex = 0;
-        
+
         for (var i = 0; i < (sectionsCount - 1) * verticesCount; i += verticesCount)
         {
             for (var j = 0; j < verticesCount; j++)
@@ -102,7 +102,7 @@ public partial class MainWindow
                     facesIndices[ivertex++] = indices[i + j];
                     facesIndices[ivertex++] = indices[i + j + verticesCount];
                     facesIndices[ivertex++] = indices[i + j + verticesCount + 1];
-                    facesIndices[ivertex++] = indices[i + j + 1];   
+                    facesIndices[ivertex++] = indices[i + j + 1];
                 }
             }
         }
@@ -118,14 +118,14 @@ public partial class MainWindow
         gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 3 * sizeof(float), IntPtr.Zero);
         gl.EnableVertexAttribArray(0);
         _vbo.Unbind(gl);
-        
+
         _ibo.Create(gl);
         _ibo.Bind(gl);
         _ibo.SetData(gl, facesIndices);
 
         _vao.Unbind(gl);
     }
-    
+
     private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
     {
         #region Считаем deltaTime
@@ -139,7 +139,7 @@ public partial class MainWindow
         var gl = args.OpenGL;
         var width = gl.RenderContextProvider.Width;
         var height = gl.RenderContextProvider.Height;
-            
+
         //gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_LINE);
         gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
@@ -164,9 +164,9 @@ public partial class MainWindow
 
         for (var i = 0; i < _sections.Count; i++)
         {
-            gl.DrawArrays(OpenGL.GL_POLYGON, vertexCount * i, vertexCount);   
+            gl.DrawArrays(OpenGL.GL_POLYGON, vertexCount * i, vertexCount);
         }
-        
+
         _ibo.Bind(gl);
         gl.DrawElements(OpenGL.GL_QUADS, (sectionsCount - 1) * vertexCount * 4, OpenGL.GL_UNSIGNED_SHORT, IntPtr.Zero);
 
@@ -212,7 +212,7 @@ public partial class MainWindow
         for (var i = 0; i < _transforms.Count - 1; i++)
         {
             PolygonSection newSection = new();
-            
+
             var sectionV = _sections[i].Vertices;
             var scale = _transforms[i].Scale;
             var angle = _transforms[i].Angle;
@@ -229,60 +229,60 @@ public partial class MainWindow
             vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
 
             var dotProduct = glm.dot(currTraj, nextTraj);
-            var rotAngle = glm.acos(dotProduct / (currTraj.Norm() * nextTraj.Norm())) ;
+            var rotAngle = glm.acos(dotProduct / (currTraj.Norm() * nextTraj.Norm()));
             var axis = glm.cross(nextTraj, currTraj);
             rotateMatrix = axis.Norm() != 0.0f ? glm.rotate(-rotAngle, axis) : mat4.identity();
             var scaleMatrix = glm.scale(mat4.identity(), new vec3(scale));
 
             vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
             vertices4 = vertices4.Select(vertex => scaleMatrix * vertex).ToList();
-            
+
             // Возвращаем в исходное положение в мировом пространстве
             translateMatrix = glm.translate(mat4.identity(), sectionV.MassCenter());
             vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
-            
+
             translateMatrix = glm.translate(mat4.identity(), currTraj);
-           
+
             foreach (var vertex in vertices4)
             {
-                newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));       
+                newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));
             }
 
             _sections.Add(newSection);
-            
+
             // Обработка последней трансформации
             if (i == _transforms.Count - 2)
             {
                 newSection = new PolygonSection();
-                
+
                 sectionV = _sections[^1].Vertices;
                 currTraj = _transforms[^1].Trajectory;
                 scale = _transforms[^1].Scale;
                 angle = _transforms[^1].Angle;
-                
+
                 rotateMatrix = glm.rotate(glm.radians(angle), currTraj);
                 scaleMatrix = glm.scale(mat4.identity(), new vec3(scale));
-                
+
                 // Переносим сечение в начало координат
                 toCenter = new vec3() - sectionV.MassCenter();
                 translateMatrix = glm.translate(mat4.identity(), toCenter);
                 vertices4 = sectionV.Select(vertex => translateMatrix * new vec4(vertex, 1.0f)).ToList();
-                
+
                 // Выполняем преобразования
                 vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
                 vertices4 = vertices4.Select(vertex => scaleMatrix * vertex).ToList();
-                
+
                 // Возвращаем в исходное положение в мировом пространстве
                 translateMatrix = glm.translate(mat4.identity(), sectionV.MassCenter());
                 vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
 
                 translateMatrix = glm.translate(mat4.identity(), currTraj);
-           
+
                 foreach (var vertex in vertices4)
                 {
-                    newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));       
+                    newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));
                 }
-                
+
                 _sections.Add(newSection);
 
                 break;
