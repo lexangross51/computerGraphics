@@ -1,30 +1,12 @@
-﻿using System.Linq;
-
-namespace cg_2.Source.Polygon;
+﻿namespace cg_2.Source.Polygon;
 
 public class PolygonSection
 {
     public List<vec3> Vertices { get; }
+    public int VertexCount => Vertices.Count;
 
-    public PolygonSection(vec3[] vertices) => Vertices = vertices.ToList();
-
-    public vec3 MassCenter()
-    {
-        float x = 0f, y = 0f, z = 0f;
-
-        foreach (var v in Vertices)
-        {
-            x += v.x;
-            y += v.y;
-            z += v.z;
-        }
-
-        x = x / Vertices.Count;
-        y = y / Vertices.Count;
-        z = z / Vertices.Count;
-
-        return new vec3(x, y, z);
-    }
+    public PolygonSection() => Vertices = new List<vec3>();
+    public PolygonSection(IEnumerable<vec3> vertices) => Vertices = vertices.ToList();
 
     public static PolygonSection ReadJson(string path)
     {
