@@ -30,7 +30,7 @@ public class Camera
         Front = new vec3(0.0f, 0.0f, -1.0f);
         _worldUp = new vec3(0.0f, 1.0f, 0.0f);
         Up = new vec3(0.0f, 1.0f, 0.0f);
-        Sensitivity = 0.2f;
+        Sensitivity = 0.1f;
         Speed = 6f;
         _yaw = -90.0f;
         _pitch = 0.0f;
