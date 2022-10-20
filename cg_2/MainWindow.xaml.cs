@@ -10,11 +10,15 @@ public partial class MainWindow
     private DateTime _lastFrame;
     private float _deltaTime;
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
+
     private readonly List<PolygonSection> _texCoords = new();
+
     //private Texture _texture;
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private bool _isWireframe;
+
     private bool _isPerspective;
+
     //private bool _isTexturize;
     private bool _isShowNormals;
     private bool _isSmoothedNormals;
@@ -27,16 +31,22 @@ public partial class MainWindow
         switch (e.Key)
         {
             case Key.W:
-                _mainCamera.Move(TranslateDirection.Forward, _deltaTime);
+                _mainCamera.Move(CameraMovement.Forward, _deltaTime);
                 break;
             case Key.S:
-                _mainCamera.Move(TranslateDirection.Back, _deltaTime);
+                _mainCamera.Move(CameraMovement.Backward, _deltaTime);
                 break;
             case Key.A:
-                _mainCamera.Move(TranslateDirection.Left, _deltaTime);
+                _mainCamera.Move(CameraMovement.Left, _deltaTime);
                 break;
             case Key.D:
-                _mainCamera.Move(TranslateDirection.Right, _deltaTime);
+                _mainCamera.Move(CameraMovement.Right, _deltaTime);
+                break;
+            case Key.Space:
+                _mainCamera.Move(CameraMovement.Up, _deltaTime);
+                break;
+            case Key.LeftCtrl:
+                _mainCamera.Move(CameraMovement.Down, _deltaTime);
                 break;
         }
     }
@@ -62,7 +72,7 @@ public partial class MainWindow
         VertexShader normalVertexShader = new();
         normalVertexShader.CreateInContext(gl);
         normalVertexShader.LoadSource("Source/Shaders/normals.vert");
-        
+
         FragmentShader normalFragmentShader = new();
         normalFragmentShader.CreateInContext(gl);
         normalFragmentShader.LoadSource("Source/Shaders/normals.frag");
@@ -76,12 +86,12 @@ public partial class MainWindow
         _shaderProgram.AttachShader(vertexShader);
         _shaderProgram.AttachShader(fragmentShader);
         _shaderProgram.Link();
-        
+
         _normalProgram.CreateInContext(gl);
         _normalProgram.AttachShader(normalVertexShader);
         _normalProgram.AttachShader(normalFragmentShader);
         _normalProgram.Link();
-        
+
 
         fragmentShader.DestroyInContext(gl);
         normalFragmentShader.DestroyInContext(gl);
@@ -89,7 +99,7 @@ public partial class MainWindow
         normalVertexShader.DestroyInContext(gl);
 
         #endregion
-        
+
         MakeReplication();
         MakeTextureCoordinates();
 
@@ -98,7 +108,7 @@ public partial class MainWindow
         var sectionsCount = _sections.Count;
         var verticesCount = _sections[0].VertexCount;
         var ivertex = (ushort)0;
-        
+
         var listVert = _sections.SelectMany(section => section.Vertices).ToList();
         List<vec3> normals = new();
         List<vec3> normalLines = new();
@@ -116,7 +126,7 @@ public partial class MainWindow
                     listVert.Add(vertS1[j]);
                     listVert.Add(vertS2[j]);
                     listVert.Add(vertS2[0]);
-                    listVert.Add(vertS1[0]);                    
+                    listVert.Add(vertS1[0]);
                 }
                 else
                 {
@@ -127,7 +137,7 @@ public partial class MainWindow
                 }
             }
         }
-        
+
         // Считаем нормали для каждой грани
         for (var i = 0; i < sectionsCount; i++)
         {
@@ -135,14 +145,14 @@ public partial class MainWindow
 
             var vector1 = sectionVert[1] - sectionVert[0];
             var vector2 = sectionVert[2] - sectionVert[0];
-            
-            var normal = glm.normalize(i == sectionsCount - 1 
+
+            var normal = glm.normalize(i == sectionsCount - 1
                 ? glm.cross(vector1, vector2)
                 : glm.cross(vector2, vector1));
-            
+
             normals.Add(normal);
         }
-        
+
         for (var i = 0; i < sectionsCount - 1; i++)
         {
             var vertS1 = _sections[i].Vertices;
@@ -152,11 +162,11 @@ public partial class MainWindow
             {
                 vec3 vector1;
                 vec3 vector2;
-                
+
                 if (j == verticesCount - 1)
                 {
                     vector1 = vertS1[j] - vertS1[0];
-                    vector2 = vertS2[0] - vertS1[0];                    
+                    vector2 = vertS2[0] - vertS1[0];
                 }
                 else
                 {
@@ -168,7 +178,7 @@ public partial class MainWindow
                 normals.Add(normal);
             }
         }
-        
+
         // Задаем нормали отрезками
         int k;
         for (k = 0; k < sectionsCount; k++)
@@ -181,7 +191,7 @@ public partial class MainWindow
                 normalLines.Add(t + normals[k]);
             }
         }
-        
+
         for (int i = 0; i < sectionsCount - 1; i++)
         {
             var vertS1 = _sections[i].Vertices;
@@ -198,7 +208,7 @@ public partial class MainWindow
                     normalLines.Add(vertS2[j]);
                     normalLines.Add(vertS2[j] + normals[k]);
                     normalLines.Add(vertS2[0]);
-                    normalLines.Add(vertS2[0] + normals[k]);                    
+                    normalLines.Add(vertS2[0] + normals[k]);
                 }
                 else
                 {
@@ -215,31 +225,31 @@ public partial class MainWindow
         }
 
         var normalLinesArray = new float[3 * normalLines.Count];
-        _normalsCount = normalLinesArray.Length; 
+        _normalsCount = normalLinesArray.Length;
 
         int inormal = 0;
-        
-        foreach (var normal in  normalLines)
+
+        foreach (var normal in normalLines)
         {
             normalLinesArray[3 * inormal] = normal.x;
             normalLinesArray[3 * inormal + 1] = normal.y;
             normalLinesArray[3 * inormal + 2] = normal.z;
             inormal++;
         }
-        
+
         var vertices = new float[2 * 3 * verticesCount * (5 * sectionsCount - 4)];
-        
+
         k = 0;
         int l = 0;
-        
+
         for (; k < sectionsCount; k++)
         {
             var normal = normals[k];
-            
+
             for (int j = 0; j < verticesCount; j++, l++)
             {
                 var vertex = listVert[l];
-                
+
                 vertices[6 * ivertex] = vertex.x;
                 vertices[6 * ivertex + 1] = vertex.y;
                 vertices[6 * ivertex + 2] = vertex.z;
@@ -249,15 +259,15 @@ public partial class MainWindow
                 ivertex++;
             }
         }
-        
+
         for (; k < normals.Count; k++)
         {
             var normal = normals[k];
-            
+
             for (int j = 0; j < 4; j++, l++)
             {
                 var vertex = listVert[l];
-                
+
                 vertices[6 * ivertex] = vertex.x;
                 vertices[6 * ivertex + 1] = vertex.y;
                 vertices[6 * ivertex + 2] = vertex.z;
@@ -271,7 +281,7 @@ public partial class MainWindow
         #endregion
 
         #region Формирование текстур
-        
+
         //_texture.Create(gl, "Textures/face.png");
 
         #endregion
@@ -286,12 +296,12 @@ public partial class MainWindow
         gl.BufferData(OpenGL.GL_ARRAY_BUFFER, vertices, OpenGL.GL_STATIC_DRAW);
         // gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 3 * sizeof(float), IntPtr.Zero);
         // gl.EnableVertexAttribArray(0);
-        
+
         gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), IntPtr.Zero);
         gl.EnableVertexAttribArray(0);
         gl.VertexAttribPointer(1, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), (IntPtr)(3 * sizeof(float)));
         gl.EnableVertexAttribArray(1);
-        
+
         _vbo.Unbind(gl);
         _vao.Unbind(gl);
 
@@ -310,7 +320,7 @@ public partial class MainWindow
 
         #endregion
     }
-    
+
     private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
     {
         #region Считаем deltaTime
@@ -332,8 +342,8 @@ public partial class MainWindow
 
         _shaderProgram.Push(gl, null);
 
-        var projectionMatrix = _isPerspective 
-            ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f) 
+        var projectionMatrix = _isPerspective
+            ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f)
             : glm.ortho(-width / 50f, width / 50f, -height / 50f, height / 50f, 0.1f, 100);
         var viewMatrix = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
         var modelMatrix = mat4.identity();
@@ -353,21 +363,21 @@ public partial class MainWindow
         var sectionsCount = _sections.Count;
 
         var i = 0;
-        
+
         // Сначала отрисовываем сечения
         for (; i < _sections.Count; i++)
         {
-            gl.DrawArrays(OpenGL.GL_POLYGON, vertexCount * i, vertexCount);   
+            gl.DrawArrays(OpenGL.GL_POLYGON, vertexCount * i, vertexCount);
         }
 
         i--;
-        
+
         // Потом идем до конца массива и рисуем грани
         for (; i < 3 * vertexCount * (5 * sectionsCount - 4); i++)
         {
-            gl.DrawArrays(OpenGL.GL_POLYGON, 4 * i, 4);   
+            gl.DrawArrays(OpenGL.GL_POLYGON, 4 * i, 4);
         }
-        
+
         //gl.Disable(OpenGL.GL_TEXTURE_2D);
         _shaderProgram.Pop(gl, null);
         _vao.Unbind(gl);
@@ -386,9 +396,9 @@ public partial class MainWindow
             gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
             _normalVao.Bind(gl);
-        
+
             gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
-        
+
             _normalProgram.Pop(gl, null);
             _normalVao.Unbind(gl);
         }
@@ -428,7 +438,7 @@ public partial class MainWindow
             "OrthographicMode" => false,
             _ => _isPerspective
         };
-        
+
         _isSmoothedNormals = radioButton.Name switch
         {
             "NormalsButton" => false,
@@ -467,7 +477,7 @@ public partial class MainWindow
         for (var i = 0; i < _transforms.Count - 1; i++)
         {
             PolygonSection newSection = new();
-            
+
             var sectionV = _sections[i].Vertices;
             var scale = _transforms[i].Scale;
             var angle = _transforms[i].Angle;
@@ -484,60 +494,60 @@ public partial class MainWindow
             vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
 
             var dotProduct = glm.dot(currTraj, nextTraj);
-            var rotAngle = glm.acos(dotProduct / (currTraj.Norm() * nextTraj.Norm())) ;
+            var rotAngle = glm.acos(dotProduct / (currTraj.Norm() * nextTraj.Norm()));
             var axis = glm.cross(nextTraj, currTraj);
             rotateMatrix = axis.Norm() != 0.0f ? glm.rotate(-rotAngle, axis) : mat4.identity();
             var scaleMatrix = glm.scale(mat4.identity(), new vec3(scale));
 
             vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
             vertices4 = vertices4.Select(vertex => scaleMatrix * vertex).ToList();
-            
+
             // Возвращаем в исходное положение в мировом пространстве
             translateMatrix = glm.translate(mat4.identity(), sectionV.MassCenter());
             vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
-            
+
             translateMatrix = glm.translate(mat4.identity(), currTraj);
-           
+
             foreach (var vertex in vertices4)
             {
-                newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));       
+                newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));
             }
 
             _sections.Add(newSection);
-            
+
             // Обработка последней трансформации
             if (i == _transforms.Count - 2)
             {
                 newSection = new PolygonSection();
-                
+
                 sectionV = _sections[^1].Vertices;
                 currTraj = _transforms[^1].Trajectory;
                 scale = _transforms[^1].Scale;
                 angle = _transforms[^1].Angle;
-                
+
                 rotateMatrix = glm.rotate(glm.radians(angle), currTraj);
                 scaleMatrix = glm.scale(mat4.identity(), new vec3(scale));
-                
+
                 // Переносим сечение в начало координат
                 toCenter = new vec3() - sectionV.MassCenter();
                 translateMatrix = glm.translate(mat4.identity(), toCenter);
                 vertices4 = sectionV.Select(vertex => translateMatrix * new vec4(vertex, 1.0f)).ToList();
-                
+
                 // Выполняем преобразования
                 vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
                 vertices4 = vertices4.Select(vertex => scaleMatrix * vertex).ToList();
-                
+
                 // Возвращаем в исходное положение в мировом пространстве
                 translateMatrix = glm.translate(mat4.identity(), sectionV.MassCenter());
                 vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
 
                 translateMatrix = glm.translate(mat4.identity(), currTraj);
-           
+
                 foreach (var vertex in vertices4)
                 {
-                    newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));       
+                    newSection.Vertices.Add(new vec3(translateMatrix * new vec4(vertex)));
                 }
-                
+
                 _sections.Add(newSection);
 
                 break;
@@ -558,11 +568,11 @@ public partial class MainWindow
 
         foreach (var t in _texCoords)
         {
-            var vertices = t.Vertices; 
+            var vertices = t.Vertices;
             var xy = MinMaxCoord(t.Vertices);
             var hx = xy[1] - xy[0];
             var hy = xy[3] - xy[2];
-            
+
             for (var j = 0; j < vertices.Count; j++)
             {
                 var vertex = vertices[j];
@@ -589,8 +599,6 @@ public partial class MainWindow
 
         return new[] { minX, maxX, minY, maxY };
     }
-    
-    
 
     #endregion
 }

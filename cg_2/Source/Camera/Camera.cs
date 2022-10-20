@@ -1,11 +1,13 @@
 ﻿namespace cg_2.Source.Camera;
 
-public enum TranslateDirection
+public enum CameraMovement
 {
+    Forward,
+    Backward,
     Left,
     Right,
-    Back,
-    Forward
+    Up,
+    Down
 }
 
 public class Camera
@@ -69,16 +71,18 @@ public class Camera
         UpdateVectors();
     }
 
-    public void Move(TranslateDirection direction, float deltaTime)
+    public void Move(CameraMovement direction, float deltaTime)
     {
         var velocity = Speed * deltaTime;
 
         Position += direction switch
         {
-            TranslateDirection.Forward => Front * velocity,
-            TranslateDirection.Back => -1.0f * (Front * velocity),
-            TranslateDirection.Right => _right * velocity,
-            TranslateDirection.Left => -1.0f * (_right * velocity),
+            CameraMovement.Forward => Front * velocity,
+            CameraMovement.Backward => -1.0f * (Front * velocity),
+            CameraMovement.Right => _right * velocity,
+            CameraMovement.Left => -1.0f * (_right * velocity),
+            CameraMovement.Up => Up * velocity,
+            CameraMovement.Down => -1.0f * Up * velocity,
             _ => throw new ArgumentOutOfRangeException(nameof(direction),
                 $"Not expected direction value: {direction}")
         };
