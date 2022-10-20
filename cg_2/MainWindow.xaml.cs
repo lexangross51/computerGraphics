@@ -1,10 +1,13 @@
-﻿namespace cg_2;
+﻿using Accessibility;
+using cg_2.Source.Wrappers;
+
+namespace cg_2;
 
 public partial class MainWindow
 {
     private readonly Camera _mainCamera = new();
     private readonly VertexBufferArray _vao = new(), _normalVao = new();
-    private readonly VertexBuffer _vbo = new(), _normalVbo = new();
+    private readonly VertexBufferWrapper _vbo = new(new()), _normalVbo = new(new());
     private readonly ShaderProgram _shaderProgram = new();
     private readonly ShaderProgram _normalProgram = new();
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
@@ -112,12 +115,12 @@ public partial class MainWindow
         List<vec3> normalLines = new();
 
         // Формируем список координат сечений и граней
-        for (var i = 0; i < sectionsCount - 1; i++)
+        for (int i = 0; i < sectionsCount - 1; i++)
         {
             var vertS1 = _sections[i].Vertices;
             var vertS2 = _sections[i + 1].Vertices;
 
-            for (var j = 0; j < verticesCount; j++)
+            for (int j = 0; j < verticesCount; j++)
             {
                 if (j == verticesCount - 1)
                 {
@@ -137,7 +140,7 @@ public partial class MainWindow
         }
 
         // Считаем нормали для каждой грани
-        for (var i = 0; i < sectionsCount; i++)
+        for (int i = 0; i < sectionsCount; i++)
         {
             var sectionVert = _sections[i].Vertices;
 
@@ -151,12 +154,12 @@ public partial class MainWindow
             normals.Add(normal);
         }
 
-        for (var i = 0; i < sectionsCount - 1; i++)
+        for (int i = 0; i < sectionsCount - 1; i++)
         {
             var vertS1 = _sections[i].Vertices;
             var vertS2 = _sections[i + 1].Vertices;
 
-            for (var j = 0; j < verticesCount; j++)
+            for (int j = 0; j < verticesCount; j++)
             {
                 vec3 vector1;
                 vec3 vector2;
@@ -225,14 +228,11 @@ public partial class MainWindow
         var normalLinesArray = new float[3 * normalLines.Count];
         _normalsCount = normalLinesArray.Length;
 
-        int inormal = 0;
-
-        foreach (var normal in normalLines)
+        foreach (var (normal, idx) in normalLines.Select((normal, idx) => (normal, idx)))
         {
-            normalLinesArray[3 * inormal] = normal.x;
-            normalLinesArray[3 * inormal + 1] = normal.y;
-            normalLinesArray[3 * inormal + 2] = normal.z;
-            inormal++;
+            normalLinesArray[3 * idx] = normal.x;
+            normalLinesArray[3 * idx + 1] = normal.y;
+            normalLinesArray[3 * idx + 2] = normal.z;
         }
 
         var vertices = new float[2 * 3 * verticesCount * (5 * sectionsCount - 4)];
@@ -287,33 +287,21 @@ public partial class MainWindow
         #region Привязка буферов
 
         _vao.Create(gl);
-        _vao.Bind(gl);
-
+        _normalVao.Create(gl);
         _vbo.Create(gl);
+        _normalVbo.Create(gl);
+
+        _vao.Bind(gl);
         _vbo.Bind(gl);
-        gl.BufferData(OpenGL.GL_ARRAY_BUFFER, vertices, OpenGL.GL_STATIC_DRAW);
-        // gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 3 * sizeof(float), IntPtr.Zero);
-        // gl.EnableVertexAttribArray(0);
 
-        gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), IntPtr.Zero);
-        gl.EnableVertexAttribArray(0);
-        gl.VertexAttribPointer(1, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), (IntPtr)(3 * sizeof(float)));
-        gl.EnableVertexAttribArray(1);
-
-        _vbo.Unbind(gl);
+        _vbo.SetData(gl, 0, vertices, false, 3, 6 * sizeof(float), IntPtr.Zero);
+        _vbo.SetData(gl, 1, vertices, false, 3, 6 * sizeof(float), new IntPtr(3 * sizeof(float)));
         _vao.Unbind(gl);
 
         // Для отрисовки нормалей
-        _normalVao.Create(gl);
         _normalVao.Bind(gl);
-
-        _normalVbo.Create(gl);
         _normalVbo.Bind(gl);
-        gl.BufferData(OpenGL.GL_ARRAY_BUFFER, normalLinesArray, OpenGL.GL_STATIC_DRAW);
-        gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 3 * sizeof(float), IntPtr.Zero);
-        gl.EnableVertexAttribArray(0);
-
-        _normalVbo.Unbind(gl);
+        _normalVbo.SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
         _normalVao.Unbind(gl);
 
         #endregion
@@ -352,13 +340,14 @@ public partial class MainWindow
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
-        _vao.Bind(gl);
         //_texture.Bind(gl);
 
         var vertexCount = _sections[0].VertexCount;
         var sectionsCount = _sections.Count;
 
         var i = 0;
+
+        _vao.Bind(gl);
 
         // Сначала отрисовываем сечения
         for (; i < _sections.Count; i++)
@@ -392,9 +381,7 @@ public partial class MainWindow
             gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
             _normalVao.Bind(gl);
-
             gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
-
             _normalProgram.Pop(gl, null);
             _normalVao.Unbind(gl);
         }
