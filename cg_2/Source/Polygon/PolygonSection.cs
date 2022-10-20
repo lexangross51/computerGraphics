@@ -35,5 +35,5 @@ public class PolygonSection : ICloneable
         sw.WriteLine(JsonConvert.SerializeObject(section));
     }
 
-    public object Clone() => new PolygonSection(this.Vertices);
+    public object Clone() => new PolygonSection(Vertices);
 }

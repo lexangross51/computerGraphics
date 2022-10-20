@@ -7,11 +7,9 @@ public partial class MainWindow
     private readonly VertexBuffer _vbo = new(), _normalVbo = new();
     private readonly ShaderProgram _shaderProgram = new();
     private readonly ShaderProgram _normalProgram = new();
-    private DateTime _lastFrame;
-    private float _deltaTime;
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
-
     private readonly List<PolygonSection> _texCoords = new();
+    private DeltaTime _deltaTime = new();
 
     //private Texture _texture;
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
@@ -31,22 +29,22 @@ public partial class MainWindow
         switch (e.Key)
         {
             case Key.W:
-                _mainCamera.Move(CameraMovement.Forward, _deltaTime);
+                _mainCamera.Move(CameraMovement.Forward, _deltaTime.Result);
                 break;
             case Key.S:
-                _mainCamera.Move(CameraMovement.Backward, _deltaTime);
+                _mainCamera.Move(CameraMovement.Backward, _deltaTime.Result);
                 break;
             case Key.A:
-                _mainCamera.Move(CameraMovement.Left, _deltaTime);
+                _mainCamera.Move(CameraMovement.Left, _deltaTime.Result);
                 break;
             case Key.D:
-                _mainCamera.Move(CameraMovement.Right, _deltaTime);
+                _mainCamera.Move(CameraMovement.Right, _deltaTime.Result);
                 break;
             case Key.Space:
-                _mainCamera.Move(CameraMovement.Up, _deltaTime);
+                _mainCamera.Move(CameraMovement.Up, _deltaTime.Result);
                 break;
             case Key.LeftCtrl:
-                _mainCamera.Move(CameraMovement.Down, _deltaTime);
+                _mainCamera.Move(CameraMovement.Down, _deltaTime.Result);
                 break;
         }
     }
@@ -325,9 +323,7 @@ public partial class MainWindow
     {
         #region Считаем deltaTime
 
-        var currentFrame = DateTime.Now;
-        _deltaTime = (currentFrame.Ticks - _lastFrame.Ticks) / 10000000f;
-        _lastFrame = currentFrame;
+        _deltaTime.Compute();
 
         #endregion
 

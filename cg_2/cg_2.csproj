@@ -63,7 +63,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Textures" />
+	  <Folder Include="Resources" />
 	</ItemGroup>
 
 </Project>

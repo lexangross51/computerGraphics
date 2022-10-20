@@ -1,5 +1,22 @@
 ﻿namespace cg_2.Source.Camera;
 
+public struct DeltaTime
+{
+    private DateTime _lastFrame = DateTime.Now;
+    private float _deltaTime;
+
+    public DeltaTime() => _deltaTime = default;
+
+    public float Result => _deltaTime;
+
+    public void Compute()
+    {
+        var currentFrame = DateTime.Now;
+        _deltaTime = (currentFrame.Ticks - _lastFrame.Ticks) / 10000000f;
+        _lastFrame = currentFrame;
+    }
+}
+
 public enum CameraMovement
 {
     Forward,
