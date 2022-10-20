@@ -2,46 +2,26 @@
 
 public partial class MainWindow
 {
-    private readonly Camera _mainCamera;
-    private readonly VertexBufferArray _vao;
-    private readonly VertexBuffer _vbo;
-    private readonly IndexBuffer _ibo;
-    private readonly ShaderProgram _shaderProgram;
-    private mat4 _projectionMatrix;
-    private mat4 _viewMatrix;
-    private mat4 _modelMatrix;
+    private readonly Camera _mainCamera = new();
+    private readonly VertexBufferArray _vao = new(), _normalVao = new();
+    private readonly VertexBuffer _vbo = new(), _normalVbo = new();
+    private readonly ShaderProgram _shaderProgram = new();
+    private readonly ShaderProgram _normalProgram = new();
     private DateTime _lastFrame;
     private float _deltaTime;
-    private readonly List<PolygonSection> _sections;
-    private readonly List<Transform> _transforms;
+    private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
+    private readonly List<PolygonSection> _texCoords = new();
+    //private Texture _texture;
+    private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private bool _isWireframe;
     private bool _isPerspective;
+    //private bool _isTexturize;
+    private bool _isShowNormals;
+    private bool _isSmoothedNormals;
+    private int _normalsCount;
 
-    public MainWindow()
-    {
-        _mainCamera = new Camera();
+    public MainWindow() => InitializeComponent();
 
-        _shaderProgram = new ShaderProgram();
-        _vao = new VertexBufferArray();
-        _vbo = new VertexBuffer();
-        _ibo = new IndexBuffer();
-
-        _projectionMatrix = mat4.identity();
-        _viewMatrix = mat4.identity();
-        _modelMatrix = mat4.identity();
-        
-        _lastFrame = DateTime.Now;
-        _deltaTime = 0.0f;
-
-        _sections = new List<PolygonSection> { PolygonSection.ReadJson("Input/Section.json") };
-        _transforms = Transform.ReadJson("Input/Transform.json").ToList();
-
-        _isWireframe = false;
-        _isPerspective = true;
-        
-        InitializeComponent();
-    }
-    
     private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
     {
         switch (e.Key)
@@ -66,9 +46,10 @@ public partial class MainWindow
     private void OpenGLControl_OnOpenGLInitialized(object sender, OpenGLRoutedEventArgs args)
     {
         var gl = args.OpenGL;
-
         gl.Enable(OpenGL.GL_DEPTH_TEST);
         gl.Enable(OpenGL.GL_DOUBLEBUFFER);
+
+        #region Загрузка шейдеров
 
         VertexShader vertexShader = new();
         vertexShader.CreateInContext(gl);
@@ -78,63 +59,224 @@ public partial class MainWindow
         fragmentShader.CreateInContext(gl);
         fragmentShader.LoadSource("Source/Shaders/shader.frag");
 
+        VertexShader normalVertexShader = new();
+        normalVertexShader.CreateInContext(gl);
+        normalVertexShader.LoadSource("Source/Shaders/normals.vert");
+        
+        FragmentShader normalFragmentShader = new();
+        normalFragmentShader.CreateInContext(gl);
+        normalFragmentShader.LoadSource("Source/Shaders/normals.frag");
+
         vertexShader.Compile();
+        normalVertexShader.Compile();
         fragmentShader.Compile();
+        normalFragmentShader.Compile();
 
         _shaderProgram.CreateInContext(gl);
         _shaderProgram.AttachShader(vertexShader);
         _shaderProgram.AttachShader(fragmentShader);
         _shaderProgram.Link();
+        
+        _normalProgram.CreateInContext(gl);
+        _normalProgram.AttachShader(normalVertexShader);
+        _normalProgram.AttachShader(normalFragmentShader);
+        _normalProgram.Link();
+        
 
         fragmentShader.DestroyInContext(gl);
+        normalFragmentShader.DestroyInContext(gl);
         vertexShader.DestroyInContext(gl);
+        normalVertexShader.DestroyInContext(gl);
 
+        #endregion
+        
         MakeReplication();
+        MakeTextureCoordinates();
 
-        #region Формируем массив вершин и индексов
+        #region Формируем массив вершин
 
         var sectionsCount = _sections.Count;
         var verticesCount = _sections[0].VertexCount;
         var ivertex = (ushort)0;
         
-        var vertices = new float[sectionsCount * verticesCount * 3];
-        var indices = new ushort[sectionsCount * verticesCount];
-        var facesIndices = new ushort[(sectionsCount - 1) * verticesCount * 4];
-        
-        foreach (var vertex in _sections.SelectMany(section => section.Vertices))
-        {
-            vertices[3 * ivertex] = vertex.x;
-            vertices[3 * ivertex + 1] = vertex.y;
-            vertices[3 * ivertex + 2] = vertex.z;
-            ivertex++;
-        }
+        var listVert = _sections.SelectMany(section => section.Vertices).ToList();
+        List<vec3> normals = new();
+        List<vec3> normalLines = new();
 
-        for (ushort i = 0; i < sectionsCount * verticesCount; i++) indices[i] = i;
-
-        ivertex = 0;
-        
-        for (var i = 0; i < (sectionsCount - 1) * verticesCount; i += verticesCount)
+        // Формируем список координат сечений и граней
+        for (var i = 0; i < sectionsCount - 1; i++)
         {
+            var vertS1 = _sections[i].Vertices;
+            var vertS2 = _sections[i + 1].Vertices;
+
             for (var j = 0; j < verticesCount; j++)
             {
                 if (j == verticesCount - 1)
                 {
-                    facesIndices[ivertex++] = indices[i];
-                    facesIndices[ivertex++] = indices[i + verticesCount];
-                    facesIndices[ivertex++] = indices[i + j + verticesCount];
-                    facesIndices[ivertex++] = indices[i + j];
+                    listVert.Add(vertS1[j]);
+                    listVert.Add(vertS2[j]);
+                    listVert.Add(vertS2[0]);
+                    listVert.Add(vertS1[0]);                    
                 }
                 else
                 {
-                    facesIndices[ivertex++] = indices[i + j];
-                    facesIndices[ivertex++] = indices[i + j + verticesCount];
-                    facesIndices[ivertex++] = indices[i + j + verticesCount + 1];
-                    facesIndices[ivertex++] = indices[i + j + 1];   
+                    listVert.Add(vertS1[j]);
+                    listVert.Add(vertS2[j]);
+                    listVert.Add(vertS2[j + 1]);
+                    listVert.Add(vertS1[j + 1]);
+                }
+            }
+        }
+        
+        // Считаем нормали для каждой грани
+        for (var i = 0; i < sectionsCount; i++)
+        {
+            var sectionVert = _sections[i].Vertices;
+
+            var vector1 = sectionVert[1] - sectionVert[0];
+            var vector2 = sectionVert[2] - sectionVert[0];
+            
+            var normal = glm.normalize(i == sectionsCount - 1 
+                ? glm.cross(vector1, vector2)
+                : glm.cross(vector2, vector1));
+            
+            normals.Add(normal);
+        }
+        
+        for (var i = 0; i < sectionsCount - 1; i++)
+        {
+            var vertS1 = _sections[i].Vertices;
+            var vertS2 = _sections[i + 1].Vertices;
+
+            for (var j = 0; j < verticesCount; j++)
+            {
+                vec3 vector1;
+                vec3 vector2;
+                
+                if (j == verticesCount - 1)
+                {
+                    vector1 = vertS1[j] - vertS1[0];
+                    vector2 = vertS2[0] - vertS1[0];                    
+                }
+                else
+                {
+                    vector1 = vertS1[j] - vertS1[j + 1];
+                    vector2 = vertS2[j + 1] - vertS1[j + 1];
+                }
+
+                var normal = glm.normalize(glm.cross(vector2, vector1));
+                normals.Add(normal);
+            }
+        }
+        
+        // Задаем нормали отрезками
+        int k;
+        for (k = 0; k < sectionsCount; k++)
+        {
+            var sectionVert = _sections[k].Vertices;
+
+            foreach (var t in sectionVert)
+            {
+                normalLines.Add(t);
+                normalLines.Add(t + normals[k]);
+            }
+        }
+        
+        for (int i = 0; i < sectionsCount - 1; i++)
+        {
+            var vertS1 = _sections[i].Vertices;
+            var vertS2 = _sections[i + 1].Vertices;
+
+            for (var j = 0; j < verticesCount; j++, k++)
+            {
+                if (j == verticesCount - 1)
+                {
+                    normalLines.Add(vertS1[j]);
+                    normalLines.Add(vertS1[j] + normals[k]);
+                    normalLines.Add(vertS1[0]);
+                    normalLines.Add(vertS1[0] + normals[k]);
+                    normalLines.Add(vertS2[j]);
+                    normalLines.Add(vertS2[j] + normals[k]);
+                    normalLines.Add(vertS2[0]);
+                    normalLines.Add(vertS2[0] + normals[k]);                    
+                }
+                else
+                {
+                    normalLines.Add(vertS1[j]);
+                    normalLines.Add(vertS1[j] + normals[k]);
+                    normalLines.Add(vertS1[j + 1]);
+                    normalLines.Add(vertS1[j + 1] + normals[k]);
+                    normalLines.Add(vertS2[j]);
+                    normalLines.Add(vertS2[j] + normals[k]);
+                    normalLines.Add(vertS2[j + 1]);
+                    normalLines.Add(vertS2[j + 1] + normals[k]);
                 }
             }
         }
 
+        var normalLinesArray = new float[3 * normalLines.Count];
+        _normalsCount = normalLinesArray.Length; 
+
+        int inormal = 0;
+        
+        foreach (var normal in  normalLines)
+        {
+            normalLinesArray[3 * inormal] = normal.x;
+            normalLinesArray[3 * inormal + 1] = normal.y;
+            normalLinesArray[3 * inormal + 2] = normal.z;
+            inormal++;
+        }
+        
+        var vertices = new float[2 * 3 * verticesCount * (5 * sectionsCount - 4)];
+        
+        k = 0;
+        int l = 0;
+        
+        for (; k < sectionsCount; k++)
+        {
+            var normal = normals[k];
+            
+            for (int j = 0; j < verticesCount; j++, l++)
+            {
+                var vertex = listVert[l];
+                
+                vertices[6 * ivertex] = vertex.x;
+                vertices[6 * ivertex + 1] = vertex.y;
+                vertices[6 * ivertex + 2] = vertex.z;
+                vertices[6 * ivertex + 3] = normal.x;
+                vertices[6 * ivertex + 4] = normal.y;
+                vertices[6 * ivertex + 5] = normal.z;
+                ivertex++;
+            }
+        }
+        
+        for (; k < normals.Count; k++)
+        {
+            var normal = normals[k];
+            
+            for (int j = 0; j < 4; j++, l++)
+            {
+                var vertex = listVert[l];
+                
+                vertices[6 * ivertex] = vertex.x;
+                vertices[6 * ivertex + 1] = vertex.y;
+                vertices[6 * ivertex + 2] = vertex.z;
+                vertices[6 * ivertex + 3] = normal.x;
+                vertices[6 * ivertex + 4] = normal.y;
+                vertices[6 * ivertex + 5] = normal.z;
+                ivertex++;
+            }
+        }
+
         #endregion
+
+        #region Формирование текстур
+        
+        //_texture.Create(gl, "Textures/face.png");
+
+        #endregion
+
+        #region Привязка буферов
 
         _vao.Create(gl);
         _vao.Bind(gl);
@@ -142,15 +284,31 @@ public partial class MainWindow
         _vbo.Create(gl);
         _vbo.Bind(gl);
         gl.BufferData(OpenGL.GL_ARRAY_BUFFER, vertices, OpenGL.GL_STATIC_DRAW);
+        // gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 3 * sizeof(float), IntPtr.Zero);
+        // gl.EnableVertexAttribArray(0);
+        
+        gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), IntPtr.Zero);
+        gl.EnableVertexAttribArray(0);
+        gl.VertexAttribPointer(1, 3, OpenGL.GL_FLOAT, false, 6 * sizeof(float), (IntPtr)(3 * sizeof(float)));
+        gl.EnableVertexAttribArray(1);
+        
+        _vbo.Unbind(gl);
+        _vao.Unbind(gl);
+
+        // Для отрисовки нормалей
+        _normalVao.Create(gl);
+        _normalVao.Bind(gl);
+
+        _normalVbo.Create(gl);
+        _normalVbo.Bind(gl);
+        gl.BufferData(OpenGL.GL_ARRAY_BUFFER, normalLinesArray, OpenGL.GL_STATIC_DRAW);
         gl.VertexAttribPointer(0, 3, OpenGL.GL_FLOAT, false, 3 * sizeof(float), IntPtr.Zero);
         gl.EnableVertexAttribArray(0);
-        _vbo.Unbind(gl);
-        
-        _ibo.Create(gl);
-        _ibo.Bind(gl);
-        _ibo.SetData(gl, facesIndices);
 
-        _vao.Unbind(gl);
+        _normalVbo.Unbind(gl);
+        _normalVao.Unbind(gl);
+
+        #endregion
     }
     
     private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
@@ -167,41 +325,73 @@ public partial class MainWindow
         var width = gl.RenderContextProvider.Width;
         var height = gl.RenderContextProvider.Height;
 
+        //gl.Enable(OpenGL.GL_TEXTURE_2D);
         gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, _isWireframe ? OpenGL.GL_LINE : OpenGL.GL_FILL);
         gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
 
         _shaderProgram.Push(gl, null);
 
-        _projectionMatrix = _isPerspective 
+        var projectionMatrix = _isPerspective 
             ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f) 
             : glm.ortho(-width / 50f, width / 50f, -height / 50f, height / 50f, 0.1f, 100);
-        _viewMatrix = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
+        var viewMatrix = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
+        var modelMatrix = mat4.identity();
 
         var modelLoc = _shaderProgram.GetUniformLocation("model");
         var viewLoc = _shaderProgram.GetUniformLocation("view");
         var projectionLoc = _shaderProgram.GetUniformLocation("projection");
 
-        gl.UniformMatrix4(viewLoc, 1, false, _viewMatrix.to_array());
-        gl.UniformMatrix4(projectionLoc, 1, false, _projectionMatrix.to_array());
+        gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
+        gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
+        gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
         _vao.Bind(gl);
-        _ibo.Bind(gl);
-
-        gl.UniformMatrix4(modelLoc, 1, false, _modelMatrix.to_array());
+        //_texture.Bind(gl);
 
         var vertexCount = _sections[0].VertexCount;
         var sectionsCount = _sections.Count;
 
-        for (var i = 0; i < _sections.Count; i++)
+        var i = 0;
+        
+        // Сначала отрисовываем сечения
+        for (; i < _sections.Count; i++)
         {
             gl.DrawArrays(OpenGL.GL_POLYGON, vertexCount * i, vertexCount);   
         }
-        
-        gl.DrawElements(OpenGL.GL_QUADS, (sectionsCount - 1) * vertexCount * 4, OpenGL.GL_UNSIGNED_SHORT, IntPtr.Zero);
 
+        i--;
+        
+        // Потом идем до конца массива и рисуем грани
+        for (; i < 3 * vertexCount * (5 * sectionsCount - 4); i++)
+        {
+            gl.DrawArrays(OpenGL.GL_POLYGON, 4 * i, 4);   
+        }
+        
+        //gl.Disable(OpenGL.GL_TEXTURE_2D);
         _shaderProgram.Pop(gl, null);
         _vao.Unbind(gl);
+
+        // Отрисовка нормалей
+        if (_isShowNormals)
+        {
+            _normalProgram.Push(gl, null);
+
+            modelLoc = _normalProgram.GetUniformLocation("model");
+            viewLoc = _normalProgram.GetUniformLocation("view");
+            projectionLoc = _normalProgram.GetUniformLocation("projection");
+
+            gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
+            gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
+            gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
+
+            _normalVao.Bind(gl);
+        
+            gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
+        
+            _normalProgram.Pop(gl, null);
+            _normalVao.Unbind(gl);
+        }
     }
 
     private void OpenGLControl_OnMouseMove(object sender, MouseEventArgs e)
@@ -232,12 +422,18 @@ public partial class MainWindow
             "LayoutMode" => false,
             _ => _isWireframe
         };
-
-        _isPerspective = radioButton!.Name switch
+        _isPerspective = radioButton.Name switch
         {
             "PerspectiveMode" => true,
             "OrthographicMode" => false,
             _ => _isPerspective
+        };
+        
+        _isSmoothedNormals = radioButton.Name switch
+        {
+            "NormalsButton" => false,
+            "SmoothedNormalsButton" => true,
+            _ => _isSmoothedNormals
         };
     }
 
@@ -253,6 +449,13 @@ public partial class MainWindow
         {
             _mainCamera.Sensitivity = (float)e.NewValue;
         }
+    }
+
+    private void CheckBoxChecked(object sender, RoutedEventArgs e)
+    {
+        var checkBox = sender as CheckBox;
+
+        _isShowNormals = checkBox!.IsChecked ?? false;
     }
 
     #endregion
@@ -341,6 +544,53 @@ public partial class MainWindow
             }
         }
     }
+
+    #endregion
+
+    #region Текстурирование
+
+    private void MakeTextureCoordinates()
+    {
+        foreach (var section in _sections)
+        {
+            _texCoords.Add((section.Clone() as PolygonSection)!);
+        }
+
+        foreach (var t in _texCoords)
+        {
+            var vertices = t.Vertices; 
+            var xy = MinMaxCoord(t.Vertices);
+            var hx = xy[1] - xy[0];
+            var hy = xy[3] - xy[2];
+            
+            for (var j = 0; j < vertices.Count; j++)
+            {
+                var vertex = vertices[j];
+
+                var texX = (vertex.x - xy[0]) / hx;
+                var texY = (vertex.y - xy[2]) / hy;
+
+                vertices[j] = new vec3(texX, texY, 0.0f);
+            }
+        }
+    }
+
+    private static float[] MinMaxCoord(List<vec3> vertices)
+    {
+        float minX = 1000, maxX = 0, minY = 1000, maxY = 0;
+
+        foreach (var vertex in vertices)
+        {
+            if (vertex.x < minX) minX = vertex.x;
+            if (vertex.x > maxX) maxX = vertex.x;
+            if (vertex.y < minY) minY = vertex.y;
+            if (vertex.y > maxY) maxY = vertex.y;
+        }
+
+        return new[] { minX, maxX, minY, maxY };
+    }
+    
+    
 
     #endregion
 }

@@ -14,7 +14,7 @@
         <sharpGL:OpenGLControl Grid.Column="0" OpenGLDraw="OpenGLControl_OnOpenGLDraw"
                                OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
                                MouseMove="OpenGLControl_OnMouseMove"
-                               RenderContextType="FBO" RenderTransformOrigin="0.496,0.499" />
+                               RenderContextType="FBO" />
 
         <StackPanel Grid.Column="1">
             <GroupBox
@@ -28,28 +28,28 @@
                     <TextBlock>Режим</TextBlock>
                     <RadioButton
                         GroupName="View"
-                        Name="WireframeMode"
-                        IsChecked="false"
+                        x:Name="WireframeMode"
+                        IsChecked="False"
                         Content="Каркас"
                         Checked="RadioButtonChecked" />
                     <RadioButton
                         GroupName="View"
-                        Name="LayoutMode"
-                        IsChecked="true"
+                        x:Name="LayoutMode"
+                        IsChecked="True"
                         Content="Макет"
                         Checked="RadioButtonChecked" />
 
                     <TextBlock Margin="0, 15, 0, 0">Вид</TextBlock>
                     <RadioButton
                         GroupName="Projection"
-                        Name="PerspectiveMode"
-                        IsChecked="true"
+                        x:Name="PerspectiveMode"
+                        IsChecked="True"
                         Content="Перспективная проекция"
                         Checked="RadioButtonChecked" />
                     <RadioButton
                         GroupName="Projection"
-                        Name="OrthographicMode"
-                        IsChecked="false"
+                        x:Name="OrthographicMode"
+                        IsChecked="False"
                         Content="Ортографическая проекция"
                         Checked="RadioButtonChecked" />
 
@@ -61,41 +61,78 @@
                 Header="Настройки камеры"
                 Margin="5, 5, 5, 0"
                 Padding="4">
-                
+
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label Margin="-5, 0,0, 0" Content="Скорость" />
                         <Slider Name="CameraSpeed"
                                 Minimum="1"
-                                Maximum="10" 
-                                TickPlacement="BottomRight" 
-                                TickFrequency="1" 
+                                Maximum="10"
+                                TickPlacement="BottomRight"
+                                TickFrequency="1"
                                 IsSnapToTickEnabled="True"
-                                Margin="0, 3, 0, 0" 
+                                Margin="0, 3, 0, 0"
                                 Width="178"
-                                ValueChanged="SliderValueChanged"/>
+                                ValueChanged="SliderValueChanged" />
                     </StackPanel>
-                
+
                     <StackPanel Orientation="Horizontal">
                         <Label Margin="-5, 0,0, 0" Content="Чувствительность" />
                         <Slider Name="CameraSensitivity"
                                 Minimum="0.1"
-                                Maximum="0.3" 
-                                TickPlacement="BottomRight" 
-                                TickFrequency="0.01" 
-                                Margin="0, 3, 0, 0" 
-                                Width="135" 
-                                ValueChanged="SliderValueChanged"/>
+                                Maximum="0.3"
+                                TickPlacement="BottomRight"
+                                TickFrequency="0.01"
+                                Margin="0, 3, 0, 0"
+                                Width="135"
+                                ValueChanged="SliderValueChanged" />
                     </StackPanel>
+                </StackPanel>
+
+            </GroupBox>
+
+            <GroupBox
+                FontSize="11"
+                Header="Нормали"
+                Padding="4"
+                Margin="5, 5, 5, 0">
+
+                <StackPanel>
+                    <CheckBox
+                        x:Name="ShowNormalsCheckBox"
+                        Checked="CheckBoxChecked"
+                        Unchecked="CheckBoxChecked"
+                        IsChecked="False"
+                        FlowDirection="RightToLeft"
+                        HorizontalAlignment="Left"
+                        Content="Показывать нормали" />
+                    
+                    <RadioButton
+                        GroupName="Normals"
+                        x:Name="NormalsButton"
+                        Content="Несглаженные нормали"
+                        IsChecked="True"
+                        Checked="RadioButtonChecked"/>
+                    <RadioButton 
+                        GroupName="Normals"
+                        x:Name="SmoothedNormalsButton"
+                        Content="Сглаженные нормали"
+                        IsChecked="False"
+                        Checked="RadioButtonChecked"/>
                 </StackPanel>
                 
             </GroupBox>
-            
+
             <GroupBox
                 FontSize="11"
                 Header="Текстурирование"
                 Margin="5, 5, 5, 0"
                 Padding="4">
+                <ComboBox Name="TextureName">
+                    <TextBlock>Нет текстуры</TextBlock>
+                    <TextBlock>Текстура_1</TextBlock>
+                    <TextBlock>Текстура_2</TextBlock>
+                </ComboBox>
             </GroupBox>
         </StackPanel>
     </Grid>

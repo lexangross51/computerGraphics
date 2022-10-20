@@ -13,6 +13,7 @@
 		<PackageReference Include="SharpGL" Version="3.1.1" />
 		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
 		<PackageReference Include="SharpGL.WPF" Version="3.1.1" />
+		<PackageReference Include="SOIL2" Version="1.20.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -27,7 +28,9 @@
 		<Using Include="GlmNet" />
 		<Using Include="SharpGL" />
 		<Using Include="SharpGL.WPF" />
+		<Using Include="SharpGL.SceneGraph" />
 		<Using Include="SharpGL.SceneGraph.Shaders" />
+		<Using Include="SharpGL.SceneGraph.Assets" />
 		<Using Include="SharpGL.VertexBuffers" />
 		<Using Include="Newtonsoft.Json" />
 		<Using Include="cg_2.Source.Camera" />
@@ -48,6 +51,19 @@
 	  <None Update="Input\Transform.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Textures\face.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\normals.vert">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\normals.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Textures" />
 	</ItemGroup>
 
 </Project>
