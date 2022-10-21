@@ -6,7 +6,7 @@
       "z": -3.0
     },
     "Scale": 3.0,
-    "Angle": 45.0
+    "Angle": 0.0
   },
   {
     "Trajectory": {
@@ -15,7 +15,7 @@
       "z": -6.0
     },
     "Scale": 0.5,
-    "Angle": -45.0
+    "Angle": 0.0
   },
   {
     "Trajectory": {
@@ -23,7 +23,7 @@
       "y": 0.0,
       "z": -2.0
     },
-    "Scale": 2,
+    "Scale": 2.0,
     "Angle": 0.0
   }
 ]

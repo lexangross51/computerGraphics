@@ -1,11 +1,11 @@
 ﻿namespace cg_2.Source.Polygon;
 
-public class PolygonSection
+public class PolygonSection : ICloneable
 {
     public List<vec3> Vertices { get; }
     public int VertexCount => Vertices.Count;
 
-    public PolygonSection() => Vertices = new();
+    public PolygonSection() => Vertices = new List<vec3>();
 
     public PolygonSection(IEnumerable<vec3> vertices) => Vertices = vertices.ToList();
 
@@ -34,4 +34,6 @@ public class PolygonSection
         using var sw = new StreamWriter(path);
         sw.WriteLine(JsonConvert.SerializeObject(section));
     }
+
+    public object Clone() => new PolygonSection(Vertices);
 }
