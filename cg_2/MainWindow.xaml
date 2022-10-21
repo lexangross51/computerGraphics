@@ -74,10 +74,7 @@
                         </StackPanel>
                     </GroupBox>
                     <GroupBox FontSize="11" Header="Текстурирование" Margin="5, 5, 5, 0" Padding="4">
-                        <ComboBox Name="TextureName">
-                            <TextBlock>Нет текстуры</TextBlock>
-                            <TextBlock>Текстура_1</TextBlock>
-                            <TextBlock>Текстура_2</TextBlock>
+                        <ComboBox Name="TextureName" SelectionChanged="ComboBoxSelected">
                         </ComboBox>
                     </GroupBox>
                 </StackPanel>

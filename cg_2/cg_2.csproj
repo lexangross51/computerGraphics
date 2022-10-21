@@ -36,6 +36,7 @@
 		<Using Include="cg_2.Source.Camera" />
 		<Using Include="cg_2.Source.Polygon" />
 		<Using Include="cg_2.Source.Extensions" />
+		<Using Include="cg_2.Source.Wrappers" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -58,6 +59,15 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Source\Shaders\normals.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\Textures\wall.bmp">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\Textures\face.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\textures.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

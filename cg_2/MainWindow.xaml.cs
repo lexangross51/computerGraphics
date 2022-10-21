@@ -1,31 +1,32 @@
-﻿using Accessibility;
-using cg_2.Source.Wrappers;
-
-namespace cg_2;
+﻿namespace cg_2;
 
 public partial class MainWindow
 {
     private readonly Camera _mainCamera = new();
     private readonly VertexBufferArray _vao = new(), _normalVao = new();
-    private readonly VertexBufferWrapper _vbo = new(new()), _normalVbo = new(new());
+    private readonly VertexBufferWrapper _vbo = new(new VertexBuffer()), _normalVbo = new(new VertexBuffer());
     private readonly ShaderProgram _shaderProgram = new();
     private readonly ShaderProgram _normalProgram = new();
+    private readonly ShaderProgram _textureProgram = new();
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
-    private readonly List<PolygonSection> _texCoords = new();
-    private DeltaTime _deltaTime = new();
-
-    //private Texture _texture;
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
+    private readonly Texture[] _textures = new Texture[] { new(), new() };
+    private readonly IEnumerable<string> _collectionTextures = new List<string>(){ "Нет текстуры", "Текстура_1", "Текстура_2" };
+    private DeltaTime _deltaTime = new();
     private bool _isWireframe;
-
     private bool _isPerspective;
-
-    //private bool _isTexturize;
+    private bool _isTexturize = false;
+    private int _textureId;
     private bool _isShowNormals;
     private bool _isSmoothedNormals;
     private int _normalsCount;
 
-    public MainWindow() => InitializeComponent();
+    public MainWindow()
+    {
+        InitializeComponent();
+        TextureName.ItemsSource = _collectionTextures;
+        TextureName.SelectedItem = "Нет текстуры";
+    }
 
     private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
     {
@@ -78,10 +79,15 @@ public partial class MainWindow
         normalFragmentShader.CreateInContext(gl);
         normalFragmentShader.LoadSource("Source/Shaders/normals.frag");
 
+        FragmentShader textureFragmentShader = new();
+        textureFragmentShader.CreateInContext(gl);
+        textureFragmentShader.LoadSource("Source/Shaders/textures.frag");
+
         vertexShader.Compile();
         normalVertexShader.Compile();
         fragmentShader.Compile();
         normalFragmentShader.Compile();
+        textureFragmentShader.Compile();
 
         _shaderProgram.CreateInContext(gl);
         _shaderProgram.AttachShader(vertexShader);
@@ -92,29 +98,33 @@ public partial class MainWindow
         _normalProgram.AttachShader(normalVertexShader);
         _normalProgram.AttachShader(normalFragmentShader);
         _normalProgram.Link();
-
+        
+        _textureProgram.CreateInContext(gl);
+        _textureProgram.AttachShader(vertexShader);
+        _textureProgram.AttachShader(textureFragmentShader);
+        _textureProgram.Link();
 
         fragmentShader.DestroyInContext(gl);
         normalFragmentShader.DestroyInContext(gl);
+        textureFragmentShader.DestroyInContext(gl);
         vertexShader.DestroyInContext(gl);
         normalVertexShader.DestroyInContext(gl);
 
         #endregion
 
         MakeReplication();
-        MakeTextureCoordinates();
 
-        #region Формируем массив вершин
+        #region Формируем массив вершин и нормалей
 
         var sectionsCount = _sections.Count;
         var verticesCount = _sections[0].VertexCount;
-        var ivertex = (ushort)0;
+        int k, l, ivertex = 0;
 
         var listVert = _sections.SelectMany(section => section.Vertices).ToList();
         List<vec3> normals = new();
         List<vec3> normalLines = new();
 
-        // Формируем список координат сечений и граней
+        // Формируем список координат сечений и боковых граней
         for (int i = 0; i < sectionsCount - 1; i++)
         {
             var vertS1 = _sections[i].Vertices;
@@ -181,7 +191,6 @@ public partial class MainWindow
         }
 
         // Задаем нормали отрезками
-        int k;
         for (k = 0; k < sectionsCount; k++)
         {
             var sectionVert = _sections[k].Vertices;
@@ -234,12 +243,41 @@ public partial class MainWindow
             normalLinesArray[3 * idx + 1] = normal.y;
             normalLinesArray[3 * idx + 2] = normal.z;
         }
+        
+        // Формируем текстурные координаты
+        List<vec2> textureCoords = new();
+        l = 0;
+        
+        for (int i = 0; i < sectionsCount; i++)
+        {
+            var sectionVertices = _sections[i].Vertices;
+            var xy = MinMaxCoord(sectionVertices);
+            var hx = xy[1] - xy[0];
+            var hy = xy[3] - xy[2];
+            
+            for (k = 0; k < verticesCount; k++, l++)
+            {
+                var vertex = listVert[l];
+                
+                var texX = (vertex.x - xy[0]) / hx;
+                var texY = (vertex.y - xy[2]) / hy;
+                
+                textureCoords.Add(new vec2(texX, texY));
+            }
+        }
 
-        var vertices = new float[2 * 3 * verticesCount * (5 * sectionsCount - 4)];
+        for (; l < listVert.Count; l++)
+        {
+            textureCoords.Add(new vec2(0,1));
+            textureCoords.Add(new vec2(0,0));
+            textureCoords.Add(new vec2(1,0));
+            textureCoords.Add(new vec2(1,1));
+        }
 
+        var vertices = new float[2 * 3 * verticesCount * (5 * sectionsCount - 4) + textureCoords.Count * 2];
         k = 0;
-        int l = 0;
-
+        l = 0;
+        
         for (; k < sectionsCount; k++)
         {
             var normal = normals[k];
@@ -247,13 +285,16 @@ public partial class MainWindow
             for (int j = 0; j < verticesCount; j++, l++)
             {
                 var vertex = listVert[l];
+                var texVertex = textureCoords[l];
 
-                vertices[6 * ivertex] = vertex.x;
-                vertices[6 * ivertex + 1] = vertex.y;
-                vertices[6 * ivertex + 2] = vertex.z;
-                vertices[6 * ivertex + 3] = normal.x;
-                vertices[6 * ivertex + 4] = normal.y;
-                vertices[6 * ivertex + 5] = normal.z;
+                vertices[8 * ivertex] = vertex.x;
+                vertices[8 * ivertex + 1] = vertex.y;
+                vertices[8 * ivertex + 2] = vertex.z;
+                vertices[8 * ivertex + 3] = normal.x;
+                vertices[8 * ivertex + 4] = normal.y;
+                vertices[8 * ivertex + 5] = normal.z;
+                vertices[8 * ivertex + 6] = texVertex.x;
+                vertices[8 * ivertex + 7] = texVertex.y;
                 ivertex++;
             }
         }
@@ -265,22 +306,26 @@ public partial class MainWindow
             for (int j = 0; j < 4; j++, l++)
             {
                 var vertex = listVert[l];
+                var texVertex = textureCoords[l];
 
-                vertices[6 * ivertex] = vertex.x;
-                vertices[6 * ivertex + 1] = vertex.y;
-                vertices[6 * ivertex + 2] = vertex.z;
-                vertices[6 * ivertex + 3] = normal.x;
-                vertices[6 * ivertex + 4] = normal.y;
-                vertices[6 * ivertex + 5] = normal.z;
+                vertices[8 * ivertex] = vertex.x;
+                vertices[8 * ivertex + 1] = vertex.y;
+                vertices[8 * ivertex + 2] = vertex.z;
+                vertices[8 * ivertex + 3] = normal.x;
+                vertices[8 * ivertex + 4] = normal.y;
+                vertices[8 * ivertex + 5] = normal.z;
+                vertices[8 * ivertex + 6] = texVertex.x;
+                vertices[8 * ivertex + 7] = texVertex.y;
                 ivertex++;
             }
         }
 
         #endregion
 
-        #region Формирование текстур
+        #region Загрузка текстур
 
-        //_texture.Create(gl, "Textures/face.png");
+        _textures[0].Create(gl, "Resources/Textures/face.png");
+        _textures[1].Create(gl, "Resources/Textures/wall.bmp");
 
         #endregion
 
@@ -294,8 +339,9 @@ public partial class MainWindow
         _vao.Bind(gl);
         _vbo.Bind(gl);
 
-        _vbo.SetData(gl, 0, vertices, false, 3, 6 * sizeof(float), IntPtr.Zero);
-        _vbo.SetData(gl, 1, vertices, false, 3, 6 * sizeof(float), new IntPtr(3 * sizeof(float)));
+        _vbo.SetData(gl, 0, vertices, false, 3, 8 * sizeof(float), IntPtr.Zero);
+        _vbo.SetData(gl, 1, vertices, false, 3, 8 * sizeof(float), new IntPtr(3 * sizeof(float)));
+        _vbo.SetData(gl, 2, vertices, false, 2, 8 * sizeof(float), new IntPtr(6 * sizeof(float)));
         _vao.Unbind(gl);
 
         // Для отрисовки нормалей
@@ -309,22 +355,25 @@ public partial class MainWindow
 
     private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
     {
-        #region Считаем deltaTime
-
         _deltaTime.Compute();
-
-        #endregion
-
+        
         var gl = args.OpenGL;
         var width = gl.RenderContextProvider.Width;
         var height = gl.RenderContextProvider.Height;
-
-        //gl.Enable(OpenGL.GL_TEXTURE_2D);
+        
         gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, _isWireframe ? OpenGL.GL_LINE : OpenGL.GL_FILL);
         gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
 
-        _shaderProgram.Push(gl, null);
+        if (!_isTexturize)
+        {
+            _shaderProgram.Push(gl, null);   
+        }
+        else
+        {
+            _textures[_textureId].Bind(gl);
+            _textureProgram.Push(gl, null);
+        }
 
         var projectionMatrix = _isPerspective
             ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f)
@@ -339,8 +388,7 @@ public partial class MainWindow
         gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
-
-        //_texture.Bind(gl);
+        
 
         var vertexCount = _sections[0].VertexCount;
         var sectionsCount = _sections.Count;
@@ -357,14 +405,21 @@ public partial class MainWindow
 
         i--;
 
-        // Потом идем до конца массива и рисуем грани
+        // Потом идем до конца массива и рисуем боковые грани
         for (; i < 3 * vertexCount * (5 * sectionsCount - 4); i++)
         {
             gl.DrawArrays(OpenGL.GL_POLYGON, 4 * i, 4);
         }
 
-        //gl.Disable(OpenGL.GL_TEXTURE_2D);
-        _shaderProgram.Pop(gl, null);
+        if (!_isTexturize)
+        {
+            _shaderProgram.Pop(gl, null);   
+        }
+        else
+        {
+            _textureProgram.Pop(gl, null);    
+        }
+        
         _vao.Unbind(gl);
 
         // Отрисовка нормалей
@@ -449,6 +504,22 @@ public partial class MainWindow
         var checkBox = sender as CheckBox;
 
         _isShowNormals = checkBox!.IsChecked ?? false;
+    }
+
+    private void ComboBoxSelected(object sender, RoutedEventArgs e)
+    {
+        var comboBox = sender as ComboBox;
+        var value = comboBox!.SelectedItem.ToString();
+
+        if (value == "Нет текстуры")
+        {
+            _isTexturize = false;
+        }
+        else
+        {
+            _isTexturize = true;
+            _textureId = value == "Текстура_1" ? 0 : 1;
+        }
     }
 
     #endregion
@@ -540,33 +611,7 @@ public partial class MainWindow
 
     #endregion
 
-    #region Текстурирование
-
-    private void MakeTextureCoordinates()
-    {
-        foreach (var section in _sections)
-        {
-            _texCoords.Add((section.Clone() as PolygonSection)!);
-        }
-
-        foreach (var t in _texCoords)
-        {
-            var vertices = t.Vertices;
-            var xy = MinMaxCoord(t.Vertices);
-            var hx = xy[1] - xy[0];
-            var hy = xy[3] - xy[2];
-
-            for (var j = 0; j < vertices.Count; j++)
-            {
-                var vertex = vertices[j];
-
-                var texX = (vertex.x - xy[0]) / hx;
-                var texY = (vertex.y - xy[2]) / hy;
-
-                vertices[j] = new vec3(texX, texY, 0.0f);
-            }
-        }
-    }
+    #region Доп. функции
 
     private static float[] MinMaxCoord(List<vec3> vertices)
     {
