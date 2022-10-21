@@ -1,16 +1,30 @@
-﻿namespace cg_2;
+﻿using cg_2.Source.Primitives;
+
+namespace cg_2;
 
 public partial class MainWindow
 {
     private readonly Camera _mainCamera = new();
-    private readonly VertexBufferArray _vao = new(), _normalVao = new();
-    private readonly VertexBufferWrapper _vbo = new(new VertexBuffer()), _normalVbo = new(new VertexBuffer());
+
+    private readonly VertexBufferArray _vao = new(),
+        _normalVao = new(),
+        _objectVao = new(),
+        _lightVao = new();
+
+    private readonly VertexBufferWrapper _vbo = new(new VertexBuffer()),
+        _normalVbo = new(new VertexBuffer()),
+        _objectVbo = new(new());
+
     private readonly ShaderProgram _shaderProgram = new();
     private readonly ShaderProgram _normalProgram = new();
     private readonly ShaderProgram _textureProgram = new();
+    private readonly ShaderProgram _lightingProgram = new();
+    private readonly ShaderProgram _lampProgram = new();
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private readonly Texture[] _textures = { new(), new() };
+    private readonly vec3 _lightPos = new(1.2f, 1.0f, 2.0f);
+    private float parameter;
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "Нет текстуры", "Текстура_1", "Текстура_2" };
@@ -86,11 +100,26 @@ public partial class MainWindow
         textureFragmentShader.CreateInContext(gl);
         textureFragmentShader.LoadSource("Source/Shaders/textures.frag");
 
+        VertexShader objectShader = new();
+        objectShader.CreateInContext(gl);
+        objectShader.LoadSource("Source/Shaders/object.vert");
+
+        FragmentShader lightingShader = new();
+        lightingShader.CreateInContext(gl);
+        lightingShader.LoadSource("Source/Shaders/lighting.frag");
+
+        FragmentShader lampShader = new();
+        lampShader.CreateInContext(gl);
+        lampShader.LoadSource("Source/Shaders/lamp.frag");
+
         vertexShader.Compile();
         normalVertexShader.Compile();
         fragmentShader.Compile();
         normalFragmentShader.Compile();
         textureFragmentShader.Compile();
+        objectShader.Compile();
+        lightingShader.Compile();
+        lampShader.Compile();
 
         _shaderProgram.CreateInContext(gl);
         _shaderProgram.AttachShader(vertexShader);
@@ -107,13 +136,28 @@ public partial class MainWindow
         _textureProgram.AttachShader(textureFragmentShader);
         _textureProgram.Link();
 
+        _lightingProgram.CreateInContext(gl);
+        _lightingProgram.AttachShader(objectShader);
+        _lightingProgram.AttachShader(lightingShader);
+        _lightingProgram.Link();
+
+        _lampProgram.CreateInContext(gl);
+        _lampProgram.AttachShader(objectShader);
+        _lampProgram.AttachShader(lampShader);
+        _lampProgram.Link();
+
         fragmentShader.DestroyInContext(gl);
         normalFragmentShader.DestroyInContext(gl);
         textureFragmentShader.DestroyInContext(gl);
         vertexShader.DestroyInContext(gl);
         normalVertexShader.DestroyInContext(gl);
+        objectShader.DestroyInContext(gl);
+        lampShader.DestroyInContext(gl);
+        lightingShader.DestroyInContext(gl);
 
         #endregion
+
+        var cubeVertices = Primitives.Cube;
 
         MakeReplication();
 
@@ -336,7 +380,10 @@ public partial class MainWindow
 
         _vao.Create(gl);
         _normalVao.Create(gl);
+        _objectVao.Create(gl);
+        _lightVao.Create(gl);
         _vbo.Create(gl);
+        _objectVbo.Create(gl);
         _normalVbo.Create(gl);
 
         _vao.Bind(gl);
@@ -352,6 +399,19 @@ public partial class MainWindow
         _normalVbo.Bind(gl);
         _normalVbo.SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
         _normalVao.Unbind(gl);
+
+        _objectVao.Bind(gl);
+        _objectVbo.Bind(gl);
+
+        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6 * sizeof(float), IntPtr.Zero);
+        _objectVbo.SetData(gl, 1, cubeVertices, false, 3, 6 * sizeof(float), new(3 * sizeof(float)));
+        _objectVao.Unbind(gl);
+
+        _lightVao.Bind(gl);
+        _objectVbo.Bind(gl);
+
+        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6 * sizeof(float), IntPtr.Zero);
+        _lightVao.Unbind(gl);
 
         #endregion
     }
@@ -441,6 +501,49 @@ public partial class MainWindow
             _normalProgram.Pop(gl, null);
             _normalVao.Unbind(gl);
         }
+
+        _lightingProgram.Push(gl, null);
+
+        modelLoc = _lightingProgram.GetUniformLocation("model");
+        viewLoc = _lightingProgram.GetUniformLocation("view");
+        projectionLoc = _lightingProgram.GetUniformLocation("projection");
+
+        gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
+        gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
+        gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
+
+        var objectColorLoc = _lightingProgram.GetUniformLocation("objectColor");
+        var lightColorLoc = _lightingProgram.GetUniformLocation("lightColor");
+        var lightPosLoc = _lightingProgram.GetUniformLocation("lightPos");
+
+        gl.Uniform3(objectColorLoc, 1.0f, 0.5f, 0.31f);
+        gl.Uniform3(lightColorLoc, 1.0f, 1.0f, 1.0f);
+        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, (float)Math.Sin(parameter * _lightPos.z));
+
+        _objectVao.Bind(gl);
+        gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
+        _objectVao.Unbind(gl);
+        _lightingProgram.Pop(gl, null);
+
+        _lampProgram.Push(gl, null);
+
+        viewLoc = _lampProgram.GetUniformLocation("view");
+        gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
+
+        projectionLoc = _lampProgram.GetUniformLocation("projection");
+        gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
+
+        var model = mat4.identity();
+        model = glm.translate(model, new(_lightPos.x, _lightPos.y, (float)Math.Sin(parameter * _lightPos.z)));
+        parameter += 0.05f;
+        model = glm.scale(model, new(0.2f));
+        modelLoc = _lampProgram.GetUniformLocation("model");
+        gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
+
+        _lightVao.Bind(gl);
+        gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
+        _lightVao.Unbind(gl);
+        _lampProgram.Pop(gl, null);
 
         _deltaTime.Compute();
     }
