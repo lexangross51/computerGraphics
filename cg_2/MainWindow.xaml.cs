@@ -24,7 +24,7 @@ public partial class MainWindow
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private readonly Texture[] _textures = { new(), new() };
     private readonly vec3 _lightPos = new(1.2f, 1.0f, 2.0f);
-    private float parameter;
+    private float _parameter;
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "Нет текстуры", "Текстура_1", "Текстура_2" };
@@ -450,7 +450,6 @@ public partial class MainWindow
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
-
         var vertexCount = _sections[0].VertexCount;
         var sectionsCount = _sections.Count;
 
@@ -518,7 +517,7 @@ public partial class MainWindow
 
         gl.Uniform3(objectColorLoc, 1.0f, 0.5f, 0.31f);
         gl.Uniform3(lightColorLoc, 1.0f, 1.0f, 1.0f);
-        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, (float)Math.Sin(parameter * _lightPos.z));
+        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, (float)Math.Sin(_parameter * _lightPos.z));
 
         _objectVao.Bind(gl);
         gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
@@ -534,8 +533,8 @@ public partial class MainWindow
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
 
         var model = mat4.identity();
-        model = glm.translate(model, new(_lightPos.x, _lightPos.y, (float)Math.Sin(parameter * _lightPos.z)));
-        parameter += 0.05f;
+        model = glm.translate(model, new(_lightPos.x, _lightPos.y, (float)Math.Sin(_parameter * _lightPos.z)));
+        _parameter += 0.05f;
         model = glm.scale(model, new(0.2f));
         modelLoc = _lampProgram.GetUniformLocation("model");
         gl.UniformMatrix4(modelLoc, 1, false, model.to_array());

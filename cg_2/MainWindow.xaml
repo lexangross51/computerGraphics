@@ -14,8 +14,8 @@
             </Grid.ColumnDefinitions>
             <sharpGl:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
                                    OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
-                                   MouseMove="OpenGLControl_OnMouseMove"
-                                   RenderContextType="DIBSection, FBO" DockPanel.Dock="Left"/>
+                                   MouseMove="OpenGLControl_OnMouseMove" FrameRate="144"
+                                   RenderContextType="FBO" DockPanel.Dock="Left"/>
             <Border Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
                     CornerRadius="4">
                 <StackPanel DockPanel.Dock="Right">
