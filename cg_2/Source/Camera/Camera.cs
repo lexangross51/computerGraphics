@@ -1,19 +1,22 @@
 ﻿namespace cg_2.Source.Camera;
 
-public struct DeltaTime
+public class DeltaTime
 {
-    private DateTime _lastFrame = DateTime.Now;
+    private float _lastFrame;
     private float _deltaTime;
-
-    public DeltaTime() => _deltaTime = default;
+    private readonly Stopwatch _sw = new();
 
     public float Result => _deltaTime;
 
     public void Compute()
     {
-        var currentFrame = DateTime.Now;
-        _deltaTime = (currentFrame.Ticks - _lastFrame.Ticks) / 10000000f;
+        _sw.Stop();
+
+        float currentFrame = _sw.ElapsedMilliseconds / 1000.0f;
+        _deltaTime = currentFrame - _lastFrame;
         _lastFrame = currentFrame;
+
+        _sw.Start();
     }
 }
 
