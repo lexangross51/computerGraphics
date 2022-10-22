@@ -3,27 +3,79 @@
 public class ShaderProgramWrapper
 {
     private readonly ShaderProgram _shaderProgram;
-    private readonly OpenGL _glContext;
+
     public bool? LinkStatus => _shaderProgram.LinkStatus;
+    public uint ProgramObject => _shaderProgram.ProgramObject;
+    public OpenGL CurrentOpenGLContext { get; }
 
     public ShaderProgramWrapper(ShaderProgram shaderProgram, OpenGL glContext)
     {
         _shaderProgram = shaderProgram;
-        _glContext = glContext;
-        _shaderProgram.CreateInContext(_glContext);
+        CurrentOpenGLContext = glContext;
+
+        _shaderProgram.CreateInContext(CurrentOpenGLContext);
     }
 
     public void AttachShaders(VertexShader vertexShader, FragmentShader fragmentShader)
     {
         _shaderProgram.AttachShader(vertexShader);
         _shaderProgram.AttachShader(fragmentShader);
+
+        vertexShader.Compile();
+        fragmentShader.Compile();
+
         _shaderProgram.Link();
 
-        vertexShader.DestroyInContext(_glContext);
-        fragmentShader.DestroyInContext(_glContext);
+        vertexShader.DestroyInContext(CurrentOpenGLContext);
+        fragmentShader.DestroyInContext(CurrentOpenGLContext);
     }
 
-    public void Push() => _glContext.UseProgram(_shaderProgram.ProgramObject);
+    public void SetUniform(string name, int value)
+    {
+        int location = CurrentOpenGLContext.GetUniformLocation(_shaderProgram.ProgramObject, name);
 
-    public void Pop() => _glContext.UseProgram(0U);
+        if (location == -1) throw new Exception($"{name} uniform not found on shader");
+
+        CurrentOpenGLContext.Uniform1(location, value);
+    }
+
+    public void SetUniform(string name, float value)
+    {
+        int location = CurrentOpenGLContext.GetUniformLocation(_shaderProgram.ProgramObject, name);
+
+        if (location == -1) throw new Exception($"{name} uniform not found on shader");
+
+        CurrentOpenGLContext.Uniform1(location, value);
+    }
+
+    public void SetUniform(string name, float x, float y, float z)
+    {
+        int location = CurrentOpenGLContext.GetUniformLocation(_shaderProgram.ProgramObject, name);
+
+        if (location == -1) throw new Exception($"{name} uniform not found on shader");
+
+        CurrentOpenGLContext.Uniform3(location, x, y, z);
+    }
+
+    public void SetUniform(string name, float x, float y, float z, float w)
+    {
+        int location = CurrentOpenGLContext.GetUniformLocation(_shaderProgram.ProgramObject, name);
+
+        if (location == -1) throw new Exception($"{name} uniform not found on shader");
+
+        CurrentOpenGLContext.Uniform4(location, x, y, z, w);
+    }
+
+    public void SetUniform(uint program, string name, mat4 value)
+    {
+        int location = CurrentOpenGLContext.GetUniformLocation(program, name);
+
+        if (location == -1) throw new Exception($"{name} uniform not found on shader");
+
+        CurrentOpenGLContext.UniformMatrix4(location, 1, false, value.to_array());
+    }
+
+    public void Push() => CurrentOpenGLContext.UseProgram(_shaderProgram.ProgramObject);
+
+    public void Pop() => CurrentOpenGLContext.UseProgram(0U);
 }

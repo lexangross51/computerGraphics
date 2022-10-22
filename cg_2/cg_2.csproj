@@ -13,7 +13,6 @@
 		<PackageReference Include="SharpGL" Version="3.1.1" />
 		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
 		<PackageReference Include="SharpGL.WPF" Version="3.1.1" />
-		<PackageReference Include="SOIL2" Version="1.20.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>
