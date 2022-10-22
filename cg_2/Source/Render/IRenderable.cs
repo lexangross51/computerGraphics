@@ -4,4 +4,5 @@ public interface IRenderable
 {
     public ShaderProgramWrapper ShaderProgram { get; }
     public float[] Vertices { get; }
+    public MaterialColor MaterialColor { get; }
 }

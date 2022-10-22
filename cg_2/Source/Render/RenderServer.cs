@@ -10,11 +10,11 @@ public class RenderServer
     {
         foreach (var instance in Instances)
         {
-            instance.ShaderProgram.Push();
+            // instance.ShaderProgram.Push();
 
-            // TODO something 
+            instance.ShaderProgram.CurrentOpenGLContext.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
 
-            instance.ShaderProgram.Pop();
+            // instance.ShaderProgram.Pop();
         }
     }
 }

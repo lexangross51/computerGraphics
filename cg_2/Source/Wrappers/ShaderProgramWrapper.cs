@@ -16,8 +16,16 @@ public class ShaderProgramWrapper
         _shaderProgram.CreateInContext(CurrentOpenGLContext);
     }
 
-    public void AttachShaders(VertexShader vertexShader, FragmentShader fragmentShader)
+    public void AttachShaders(string vertexShaderPath, string fragmentShaderPath)
     {
+        var vertexShader = new VertexShader();
+        vertexShader.CreateInContext(CurrentOpenGLContext);
+        vertexShader.LoadSource(vertexShaderPath);
+
+        var fragmentShader = new FragmentShader();
+        fragmentShader.CreateInContext(CurrentOpenGLContext);
+        fragmentShader.LoadSource(fragmentShaderPath);
+
         _shaderProgram.AttachShader(vertexShader);
         _shaderProgram.AttachShader(fragmentShader);
 
@@ -66,9 +74,9 @@ public class ShaderProgramWrapper
         CurrentOpenGLContext.Uniform4(location, x, y, z, w);
     }
 
-    public void SetUniform(uint program, string name, mat4 value)
+    public void SetUniform(string name, mat4 value)
     {
-        int location = CurrentOpenGLContext.GetUniformLocation(program, name);
+        int location = CurrentOpenGLContext.GetUniformLocation(_shaderProgram.ProgramObject, name);
 
         if (location == -1) throw new Exception($"{name} uniform not found on shader");
 

@@ -38,6 +38,7 @@
 		<Using Include="cg_2.Source.Wrappers" />
 		<Using Include="System.Drawing" />
 		<Using Include="cg_2.Source.Primitives" />
+		<Using Include="cg_2.Source.Material" />
 	</ItemGroup>
 
 	<ItemGroup>

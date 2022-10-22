@@ -19,7 +19,7 @@ public class VertexBufferWrapper
     {
         gl.BufferData(34962U, rawData, 35044U);
         gl.VertexAttribPointer(attributeIndex, size, 5126U, isNormalised, stride * sizeof(float),
-            ptr == 0 ? IntPtr.Zero : new IntPtr(ptr * sizeof(float)));
+            ptr == 0 ? IntPtr.Zero : new(ptr * sizeof(float)));
         gl.EnableVertexAttribArray(attributeIndex);
     }
 
