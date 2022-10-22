@@ -165,7 +165,7 @@ public partial class MainWindow
 
         var sectionsCount = _sections.Count;
         var verticesCount = _sections[0].VertexCount;
-        int k, l, ivertex = 0;
+        int k, ivertex = 0;
 
         var listVert = _sections.SelectMany(section => section.Vertices).ToList();
         List<vec3> normals = new();
@@ -293,7 +293,7 @@ public partial class MainWindow
 
         // Формируем текстурные координаты
         List<vec2> textureCoords = new();
-        l = 0;
+        var l = 0;
 
         for (int i = 0; i < sectionsCount; i++)
         {
