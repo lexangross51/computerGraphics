@@ -3,6 +3,7 @@
 public class Instance : IRenderable
 {
     public ShaderProgramWrapper ShaderProgram { get; }
+    public VertexBufferArray Vao { get; private set; } = default!;
     public float[] Vertices { get; }
     public MaterialColor? MaterialColor { get; }
 
@@ -15,10 +16,13 @@ public class Instance : IRenderable
         GenerateBuffers();
     }
 
+    // TODO -> вынести в класс RenderServer
     private void GenerateBuffers()
     {
         VertexBufferArray vao = new();
         VertexBufferWrapper vbo = new(new());
+
+        Vao = vao;
 
         var glContext = ShaderProgram.CurrentOpenGLContext;
 

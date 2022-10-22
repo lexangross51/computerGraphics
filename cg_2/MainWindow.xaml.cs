@@ -554,23 +554,23 @@ public partial class MainWindow
         // _lightVao.Unbind(gl);
         // _lampProgram.Pop(gl, null);
 
-        // _lightingProgram.Push();
+        _lightingProgram.Push();
         
         /* TODO -> создать сущность, которая будет содержать в себе все трансформации
-          и в методе Render() вызывать метод Update(), стоит также присоединять камеру (сущность окружения)
-          + сделать отдельный класс для отображения сечения из-за присутствия циклов и отрисовки типа в виде полигонов */
+                  и в методе Render() вызывать метод Update();
+          TODO -> присоединять камеру (сущность окружения);
+          TODO ->  сделать отдельный класс для отображения сечения из-за присутствия циклов и отрисовки типа в виде полигонов
+          TODO ->  также класс для отображения нормалей */
         
-        _lampProgram.Push();
-
         var projectionMatrix = _isPerspective
             ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f)
             : glm.ortho(-width / 50f, width / 50f, -height / 50f, height / 50f, 0.1f, 100);
         var viewMatrix = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
         var modelMatrix = mat4.identity();
 
-        // _lightingProgram.SetUniform("objectColor", 1.0f, 0.5f, 0.31f);
-        // _lightingProgram.SetUniform("lightColor", 1.0f, 1.0f, 1.0f);
-        // _lightingProgram.SetUniform("lightPos", _lightPos.x, _lightPos.y, _lightPos.z);
+        _lightingProgram.SetUniform("objectColor", 1.0f, 0.5f, 0.31f);
+        _lightingProgram.SetUniform("lightColor", 1.0f, 1.0f, 1.0f);
+        _lightingProgram.SetUniform("lightPos", _lightPos.x, _lightPos.y, _lightPos.z);
         // _parameter += 0.01f;
 
         _lightingProgram.SetUniform("view", viewMatrix);
@@ -578,8 +578,8 @@ public partial class MainWindow
         _lightingProgram.SetUniform("model", modelMatrix);
 
         _renderServer.Render();
-
-        _lampProgram.Pop();
+        
+        _lightingProgram.Pop();
 
         _deltaTime.Compute();
     }

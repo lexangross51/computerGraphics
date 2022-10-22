@@ -6,15 +6,14 @@ public class RenderServer
 
     public RenderServer(IEnumerable<IRenderable> instances) => Instances = instances;
 
+    // TODO -> момент с Update()
     public void Render()
     {
         foreach (var instance in Instances)
         {
-            // instance.ShaderProgram.Push();
-
+            instance.Vao.Bind( instance.ShaderProgram.CurrentOpenGLContext);
             instance.ShaderProgram.CurrentOpenGLContext.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
-
-            // instance.ShaderProgram.Pop();
+            instance.Vao.Unbind( instance.ShaderProgram.CurrentOpenGLContext);
         }
     }
 }
