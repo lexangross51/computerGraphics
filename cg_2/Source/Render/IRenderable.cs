@@ -2,6 +2,6 @@
 
 public interface IRenderable
 {
-    public VertexBufferWrapper Vbo { get; }
+    public ShaderProgramWrapper ShaderProgram { get; }
     public float[] Vertices { get; }
 }

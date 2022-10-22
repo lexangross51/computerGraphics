@@ -36,6 +36,8 @@
 		<Using Include="cg_2.Source.Polygon" />
 		<Using Include="cg_2.Source.Extensions" />
 		<Using Include="cg_2.Source.Wrappers" />
+		<Using Include="System.Drawing" />
+		<Using Include="cg_2.Source.Primitives" />
 	</ItemGroup>
 
 	<ItemGroup>

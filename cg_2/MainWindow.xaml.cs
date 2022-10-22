@@ -389,28 +389,28 @@ public partial class MainWindow
         _vao.Bind(gl);
         _vbo.Bind(gl);
 
-        _vbo.SetData(gl, 0, vertices, false, 3, 8 * sizeof(float), IntPtr.Zero);
-        _vbo.SetData(gl, 1, vertices, false, 3, 8 * sizeof(float), new IntPtr(3 * sizeof(float)));
-        _vbo.SetData(gl, 2, vertices, false, 2, 8 * sizeof(float), new IntPtr(6 * sizeof(float)));
+        _vbo.SetData(gl, 0, vertices, false, 3, 8, 0);
+        _vbo.SetData(gl, 1, vertices, false, 3, 8, 3);
+        _vbo.SetData(gl, 2, vertices, false, 2, 8, 6);
         _vao.Unbind(gl);
 
         // Для отрисовки нормалей
         _normalVao.Bind(gl);
         _normalVbo.Bind(gl);
-        _normalVbo.SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
+        _normalVbo.SetData(gl, 0, normalLinesArray, false, 3, 3, 0);
         _normalVao.Unbind(gl);
 
         _objectVao.Bind(gl);
         _objectVbo.Bind(gl);
 
-        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6 * sizeof(float), IntPtr.Zero);
-        _objectVbo.SetData(gl, 1, cubeVertices, false, 3, 6 * sizeof(float), new(3 * sizeof(float)));
+        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6, 0);
+        _objectVbo.SetData(gl, 1, cubeVertices, false, 3, 6, 3);
         _objectVao.Unbind(gl);
 
         _lightVao.Bind(gl);
         _objectVbo.Bind(gl);
 
-        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6 * sizeof(float), IntPtr.Zero);
+        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6, 0);
         _lightVao.Unbind(gl);
 
         #endregion
