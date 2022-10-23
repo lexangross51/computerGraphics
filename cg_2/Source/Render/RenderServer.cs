@@ -6,14 +6,28 @@ public class RenderServer
 
     public RenderServer(IEnumerable<IRenderable> instances) => Instances = instances;
 
-    // TODO -> момент с Update()
-    public void Render()
+    public void Load()
     {
         foreach (var instance in Instances)
         {
-            instance.Vao.Bind( instance.ShaderProgram.CurrentOpenGLContext);
-            instance.ShaderProgram.CurrentOpenGLContext.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
-            instance.Vao.Unbind( instance.ShaderProgram.CurrentOpenGLContext);
+            instance.Initialize(new(), new(new()));
+        }
+    }
+
+    public void Render(MainCamera camera)
+    {
+        foreach (var instance in Instances)
+        {
+            instance.ShaderProgram.Push();
+
+            instance.UpdateUniform(camera);
+
+            instance.Vao.Bind(instance.ShaderProgram.CurrentOpenGLContext);
+            instance.ShaderProgram.CurrentOpenGLContext.DrawArrays(OpenGL.GL_TRIANGLES, 0,
+                36); // TODO подсчитать кол-во вершин
+            instance.Vao.Unbind(instance.ShaderProgram.CurrentOpenGLContext);
+
+            instance.ShaderProgram.Pop();
         }
     }
 }

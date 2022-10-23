@@ -4,7 +4,7 @@ namespace cg_2;
 
 public partial class MainWindow
 {
-    private readonly Camera _mainCamera = new();
+    private readonly MainCamera _camera = new(CameraMode.Perspective);
 
     private readonly VertexBufferArray _vao = new(),
         _normalVao = new(),
@@ -52,22 +52,22 @@ public partial class MainWindow
         switch (e.Key)
         {
             case Key.W:
-                _mainCamera.Move(CameraMovement.Forward, _deltaTime.Result);
+                _camera.Move(CameraMovement.Forward, _deltaTime.Result);
                 break;
             case Key.S:
-                _mainCamera.Move(CameraMovement.Backward, _deltaTime.Result);
+                _camera.Move(CameraMovement.Backward, _deltaTime.Result);
                 break;
             case Key.A:
-                _mainCamera.Move(CameraMovement.Left, _deltaTime.Result);
+                _camera.Move(CameraMovement.Left, _deltaTime.Result);
                 break;
             case Key.D:
-                _mainCamera.Move(CameraMovement.Right, _deltaTime.Result);
+                _camera.Move(CameraMovement.Right, _deltaTime.Result);
                 break;
             case Key.Space:
-                _mainCamera.Move(CameraMovement.Up, _deltaTime.Result);
+                _camera.Move(CameraMovement.Up, _deltaTime.Result);
                 break;
             case Key.LeftCtrl:
-                _mainCamera.Move(CameraMovement.Down, _deltaTime.Result);
+                _camera.Move(CameraMovement.Down, _deltaTime.Result);
                 break;
         }
     }
@@ -77,6 +77,9 @@ public partial class MainWindow
     private void OpenGLControl_OnOpenGLInitialized(object sender, OpenGLRoutedEventArgs args)
     {
         var gl = args.OpenGL;
+        var width = gl.RenderContextProvider.Width;
+        var height = gl.RenderContextProvider.Height;
+
 
         gl.Enable(OpenGL.GL_DEPTH_TEST);
         gl.Enable(OpenGL.GL_DOUBLEBUFFER);
@@ -87,16 +90,27 @@ public partial class MainWindow
         _lightingProgram.AttachShaders("Source/Shaders/object.vert",
             "Source/Shaders/lighting.frag");
 
-        _lampProgram.AttachShaders("Source/Shaders/object.vert",
-            "Source/Shaders/lamp.frag");
+        // _lampProgram.AttachShaders("Source/Shaders/object.vert",
+        //     "Source/Shaders/lamp.frag");
+
+        var projectionMatrix = _isPerspective
+            ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f)
+            : glm.ortho(-width / 50f, width / 50f, -height / 50f, height / 50f, 0.1f, 100);
+        var viewMatrix = glm.lookAt(_camera.Position, _camera.Position + _camera.Front, _camera.Up);
+        var modelMatrix = mat4.identity();
 
         _renderables = new IRenderable[]
         {
-            new Instance(_lightingProgram, Primitives.Cube),
-            // new Instance(_lampProgram, Primitives.Cube)
+            new SolidInstance(_lightingProgram, Primitives.Cube, new IUniformContext[]
+            {
+                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
+                new Lighting(new(new(Color.Coral), "objectColor"), (new(1.0f, 1.0f, 1.0f), "lightColor"),
+                    (_lightPos, "lightPos"))
+            })
         };
 
         _renderServer = new(_renderables);
+        _renderServer.Load();
 
         // #region Загрузка шейдеров
         //
@@ -439,8 +453,6 @@ public partial class MainWindow
     private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
     {
         var gl = args.OpenGL;
-        var width = gl.RenderContextProvider.Width;
-        var height = gl.RenderContextProvider.Height;
 
         // gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, _isWireframe ? OpenGL.GL_LINE : OpenGL.GL_FILL);
         gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -554,32 +566,11 @@ public partial class MainWindow
         // _lightVao.Unbind(gl);
         // _lampProgram.Pop(gl, null);
 
-        _lightingProgram.Push();
-        
-        /* TODO -> создать сущность, которая будет содержать в себе все трансформации
-                  и в методе Render() вызывать метод Update();
-          TODO -> присоединять камеру (сущность окружения);
-          TODO ->  сделать отдельный класс для отображения сечения из-за присутствия циклов и отрисовки типа в виде полигонов
+
+        /* TODO ->  сделать отдельный класс для отображения сечения из-за присутствия циклов и отрисовки типа в виде полигонов
           TODO ->  также класс для отображения нормалей */
-        
-        var projectionMatrix = _isPerspective
-            ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f)
-            : glm.ortho(-width / 50f, width / 50f, -height / 50f, height / 50f, 0.1f, 100);
-        var viewMatrix = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
-        var modelMatrix = mat4.identity();
 
-        _lightingProgram.SetUniform("objectColor", 1.0f, 0.5f, 0.31f);
-        _lightingProgram.SetUniform("lightColor", 1.0f, 1.0f, 1.0f);
-        _lightingProgram.SetUniform("lightPos", _lightPos.x, _lightPos.y, _lightPos.z);
-        // _parameter += 0.01f;
-
-        _lightingProgram.SetUniform("view", viewMatrix);
-        _lightingProgram.SetUniform("projection", projectionMatrix);
-        _lightingProgram.SetUniform("model", modelMatrix);
-
-        _renderServer.Render();
-        
-        _lightingProgram.Pop();
+        _renderServer.Render(_camera);
 
         _deltaTime.Compute();
     }
@@ -590,11 +581,11 @@ public partial class MainWindow
         {
             var pos = e.GetPosition(this);
 
-            _mainCamera.LookAt((float)pos.X, (float)pos.Y);
+            _camera.LookAt((float)pos.X, (float)pos.Y);
         }
         else
         {
-            _mainCamera.FirstMouse = true;
+            _camera.FirstMouse = true;
         }
     }
 
@@ -633,11 +624,11 @@ public partial class MainWindow
 
         if (slider!.Name == "CameraSpeed")
         {
-            _mainCamera.Speed = (float)e.NewValue;
+            _camera.Speed = (float)e.NewValue;
         }
         else
         {
-            _mainCamera.Sensitivity = (float)e.NewValue;
+            _camera.Sensitivity = (float)e.NewValue;
         }
     }
 

@@ -39,6 +39,8 @@
 		<Using Include="System.Drawing" />
 		<Using Include="cg_2.Source.Primitives" />
 		<Using Include="cg_2.Source.Material" />
+		<Using Include="cg_2.Source.Render" />
+		<Using Include="cg_2.Source.UniformsContext" />
 	</ItemGroup>
 
 	<ItemGroup>

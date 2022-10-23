@@ -27,4 +27,6 @@ public static class GlmVectorExtensions
 
         return new(x, y, z);
     }
+
+    public static float ToFloat(this byte @byte) => @byte / 255.0f;
 }

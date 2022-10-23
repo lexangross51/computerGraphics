@@ -30,7 +30,13 @@ public enum CameraMovement
     Down
 }
 
-public class Camera
+public enum CameraMode
+{
+    Perspective,
+    Orthographic
+}
+
+public class MainCamera
 {
     private float _yaw;
     private float _pitch;
@@ -45,8 +51,9 @@ public class Camera
     public vec3 Position { get; private set; }
     public vec3 Front { get; private set; }
     public vec3 Up { get; private set; }
+    public CameraMode CameraMode { get; set; }
 
-    public Camera()
+    public MainCamera(CameraMode cameraMode)
     {
         Position = new vec3(0.0f, 0.0f, 3.0f);
         Front = new vec3(0.0f, 0.0f, -1.0f);
@@ -58,12 +65,13 @@ public class Camera
         _pitch = 0.0f;
         _lastX = _lastY = 0.0f;
         FirstMouse = true;
+        CameraMode = cameraMode;
 
         UpdateVectors();
     }
 
-    public void CameraPosition(vec3 position, vec3 front, vec3 up)
-        => (Position, Front, _worldUp) = (position, front, up);
+    public void CameraPosition(vec3 position, vec3 front, vec3 up, CameraMode cameraMode)
+        => (Position, Front, _worldUp, CameraMode) = (position, front, up, cameraMode);
 
     public void LookAt(float xPos, float yPos)
     {
