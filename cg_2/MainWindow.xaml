@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
+        xmlns:control="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280" KeyDown="MainWindow_OnKeyDown">
     <DockPanel>
@@ -12,10 +12,8 @@
                 <ColumnDefinition Width="4*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <sharpGl:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
-                                   OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
-                                   MouseMove="OpenGLControl_OnMouseMove" FrameRate="144"
-                                   RenderContextType="FBO" DockPanel.Dock="Left"/>
+            <control:GLWpfControl x:Name="Control" Render="Render" Initialized="Initialize" DockPanel.Dock="Left"
+                                  MouseMove="OnMouseMove" />
             <Border Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
                     CornerRadius="4">
                 <StackPanel DockPanel.Dock="Right">

@@ -8,11 +8,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="GlmNet" Version="0.7.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
-		<PackageReference Include="SharpGL" Version="3.1.1" />
-		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
-		<PackageReference Include="SharpGL.WPF" Version="3.1.1" />
+		<PackageReference Include="OpenTK.GLWpfControl" Version="4.2.2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -24,13 +21,6 @@
 		<Using Include="System.Windows.Input" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Windows.Controls" />
-		<Using Include="GlmNet" />
-		<Using Include="SharpGL" />
-		<Using Include="SharpGL.WPF" />
-		<Using Include="SharpGL.SceneGraph" />
-		<Using Include="SharpGL.SceneGraph.Shaders" />
-		<Using Include="SharpGL.SceneGraph.Assets" />
-		<Using Include="SharpGL.VertexBuffers" />
 		<Using Include="Newtonsoft.Json" />
 		<Using Include="cg_2.Source.Camera" />
 		<Using Include="cg_2.Source.Polygon" />
@@ -41,6 +31,8 @@
 		<Using Include="cg_2.Source.Material" />
 		<Using Include="cg_2.Source.Render" />
 		<Using Include="cg_2.Source.UniformsContext" />
+		<Using Include="OpenTK.Graphics.OpenGL4" />
+		<Using Include="OpenTK.Mathematics" />
 	</ItemGroup>
 
 	<ItemGroup>

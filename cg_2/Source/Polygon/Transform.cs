@@ -2,11 +2,11 @@
 
 public class Transform
 {
-    public vec3 Trajectory { get; }
+    public Vector3 Trajectory { get; }
     public float Scale { get; }
     public float Angle { get; }
 
-    public Transform(vec3 trajectory, float scale, float angle)
+    public Transform(Vector3 trajectory, float scale, float angle)
         => (Trajectory, Scale, Angle) = (trajectory, scale, angle);
 
     public static IEnumerable<Transform> ReadJson(string path)

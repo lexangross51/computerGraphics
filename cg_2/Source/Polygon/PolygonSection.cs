@@ -2,12 +2,12 @@
 
 public class PolygonSection : ICloneable
 {
-    public List<vec3> Vertices { get; }
+    public List<Vector3> Vertices { get; }
     public int VertexCount => Vertices.Count;
 
-    public PolygonSection() => Vertices = new List<vec3>();
+    public PolygonSection() => Vertices = new();
 
-    public PolygonSection(IEnumerable<vec3> vertices) => Vertices = vertices.ToList();
+    public PolygonSection(IEnumerable<Vector3> vertices) => Vertices = vertices.ToList();
 
     public static PolygonSection ReadJson(string path)
     {
