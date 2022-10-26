@@ -1,6 +1,4 @@
-﻿using cg_2.Source.Descriptors;
-
-namespace cg_2.Source.Render;
+﻿namespace cg_2.Source.Render;
 
 public interface IRenderable
 {

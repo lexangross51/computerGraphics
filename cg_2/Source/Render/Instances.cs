@@ -10,7 +10,7 @@ public class Instance : IRenderable
     public Color4 Color { get; }
     public PrimitiveType PrimitiveType { get; }
 
-    protected Instance(ShaderProgram shaderProgram, float[] vertices, IUniformContext[] uniformContext,
+    public Instance(ShaderProgram shaderProgram, float[] vertices, IUniformContext[] uniformContext,
         InstanceDescriptor descriptor,
         Color4 color, PrimitiveType primitiveType = PrimitiveType.Triangles)
     {
@@ -37,8 +37,11 @@ public class Instance : IRenderable
         //     GL.EnableVertexAttribArray(i);
         // } TODO -> можно использовать GL.EnableVertexArrayAttrib
         // GL.VertexArrayAttribFormat, но придется хранить обертку над массивом Vertices, так что это вариант
-        
-        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Byte, false, 3 * sizeof(float), 0);
+
+        GL.VertexAttribPointer(0, 6, VertexAttribPointerType.Float, false, 6 * vbo.Stride, 0);
+        GL.EnableVertexAttribArray(0);
+
+        GL.VertexAttribPointer(1, 6, VertexAttribPointerType.Float, false, 6 * vbo.Stride, 3);
         GL.EnableVertexAttribArray(0);
     }
 

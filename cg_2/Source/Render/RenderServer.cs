@@ -15,7 +15,7 @@ public class RenderServer
             instance.UpdateUniform(camera);
 
             instance.Vao.Bind();
-            GL.DrawArrays(instance.PrimitiveType, 0, 3);
+            GL.DrawArrays(instance.PrimitiveType, 0, 36);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 public class VertexBufferObject<T> : IDisposable where T : unmanaged
 {
+    public unsafe int Stride => sizeof(T);
     public int Handle { get; }
     public BufferUsageHint TypeDraw { get; init; } = BufferUsageHint.StaticDraw;
 

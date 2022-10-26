@@ -29,10 +29,10 @@
 		<Using Include="cg_2.Source.Primitives" />
 		<Using Include="cg_2.Source.Render" />
 		<Using Include="cg_2.Source.UniformsContext" />
-		<Using Include="OpenTK.Graphics.OpenGL4" />
 		<Using Include="OpenTK.Mathematics" />
 		<Using Include="OpenTK.Wpf" />
 		<Using Include="cg_2.Source.Descriptors" />
+		<Using Include="OpenTK.Graphics.OpenGL4" />
 	</ItemGroup>
 
 	<ItemGroup>

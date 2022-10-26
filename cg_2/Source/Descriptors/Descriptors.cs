@@ -11,12 +11,12 @@ public class InstanceDescriptor
         {
             if (!value) return;
             _onlyVertices = true;
-            WithNormales = WithTextures = WithColors = false;
+            WithNormals = WithTextures = WithColors = false;
             _attributeСount = 1;
         }
     }
 
-    public bool WithNormales
+    public bool WithNormals
     {
         init
         {

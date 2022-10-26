@@ -21,11 +21,11 @@ public class Transformation : IUniformContext
 
     public void Update(ShaderProgram shaderProgram, MainCamera camera)
     {
-        var width = (float)shaderProgram.Control.ActualWidth;
-        var height = (float)shaderProgram.Control.ActualHeight;
+        var width = (float)shaderProgram.Control.RenderSize.Width;
+        var height = (float)shaderProgram.Control.RenderSize.Height;
 
         Projection = (camera.CameraMode == CameraMode.Perspective
-                ? Matrix4.CreatePerspectiveFieldOfView(45.0f,
+                ? Matrix4.CreatePerspectiveFieldOfView(0.45f,
                     width / height, 0.1f, 100.0f)
                 : Matrix4.CreateOrthographic(-width / 50.0f, -height / 50.0f, 0.1f, 100.0f),
             Projection.Name);
