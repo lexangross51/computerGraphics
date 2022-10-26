@@ -38,10 +38,10 @@ public class Instance : IRenderable
         // } TODO -> можно использовать GL.EnableVertexArrayAttrib
         // GL.VertexArrayAttribFormat, но придется хранить обертку над массивом Vertices, так что это вариант
 
-        GL.VertexAttribPointer(0, 6, VertexAttribPointerType.Float, false, 6 * vbo.Stride, 0);
+        GL.VertexAttribPointer(0, 6, VertexAttribPointerType.Float, false, 6 * vbo.Sizeof, 0);
         GL.EnableVertexAttribArray(0);
 
-        GL.VertexAttribPointer(1, 6, VertexAttribPointerType.Float, false, 6 * vbo.Stride, 3);
+        GL.VertexAttribPointer(1, 6, VertexAttribPointerType.Float, false, 6 * vbo.Sizeof, 3);
         GL.EnableVertexAttribArray(0);
     }
 
