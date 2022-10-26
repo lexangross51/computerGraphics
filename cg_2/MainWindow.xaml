@@ -8,6 +8,6 @@
         Title="MainWindow" Height="720" Width="1280" KeyDown="MainWindow_OnKeyDown">
     <DockPanel>
         <control:GLWpfControl x:Name="OpenTkControl" Render="Render" Initialized="Initialize"
-                              MouseMove="OnMouseMove" />
+                              MouseMove="OnMouseMove"/>
     </DockPanel>
 </Window>

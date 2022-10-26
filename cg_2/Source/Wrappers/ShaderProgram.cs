@@ -11,10 +11,7 @@ public class ShaderProgram : IDisposable
         Control = control;
     }
 
-    public void Use()
-    {
-        GL.UseProgram(Handle);
-    }
+    public void Use() => GL.UseProgram(Handle);
 
     public void Initialize(string vertexShaderPath, string fragmentShaderPath)
     {

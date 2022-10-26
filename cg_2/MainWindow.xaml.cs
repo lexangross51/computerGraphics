@@ -1,4 +1,6 @@
-﻿namespace cg_2;
+﻿using Size = System.Windows.Size;
+
+namespace cg_2;
 
 public partial class MainWindow
 {
@@ -63,20 +65,21 @@ public partial class MainWindow
     {
         var mainSettings = new GLWpfControlSettings { MajorVersion = 3, MinorVersion = 3 };
         OpenTkControl.Start(mainSettings);
+        OpenTkControl.RenderSize = new Size(1920, 1080); // TODO (default value is 0 or NaN)
 
         var width = (float)OpenTkControl.RenderSize.Width;
         var height = (float)OpenTkControl.RenderSize.Height;
-        
+    
         _lightingProgram = new(OpenTkControl);
         _lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lighting.frag");
-        
+    
         var projectionMatrix = _camera.CameraMode == CameraMode.Perspective
             ? Matrix4.CreatePerspectiveFieldOfView(0.45f,
                 width / height, 0.1f, 100.0f)
             : Matrix4.CreateOrthographic(-width / 50.0f, -height / 50.0f, 0.1f, 100.0f);
         var viewMatrix = Matrix4.LookAt(_camera.Position, _camera.Position + _camera.Front, _camera.Up);
         var modelMatrix = Matrix4.Identity;
-        
+    
         _renderables = new IRenderable[]
         {
             new Instance(_lightingProgram, Primitives.Cube, new IUniformContext[]
@@ -89,9 +92,9 @@ public partial class MainWindow
                 WithNormals = true // not implemented
             }, Color4.Coral)
         };
-        
+    
         _renderables[0].Initialize(new(VertexAttribType.Float), new VertexBufferObject<float>());
-        
+    
         _renderServer = new(_renderables);
     }
 }

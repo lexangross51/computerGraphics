@@ -40,7 +40,7 @@ public class MainCamera
         _worldUp = new Vector3(0.0f, 1.0f, 0.0f);
         Up = new Vector3(0.0f, 1.0f, 0.0f);
         Sensitivity = 0.1f;
-        Speed = 6f;
+        Speed = 0.01f;
         _yaw = -90.0f;
         _pitch = 0.0f;
         _lastX = _lastY = 0.0f;
