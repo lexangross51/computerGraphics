@@ -1,25 +1,5 @@
 ﻿namespace cg_2.Source.Camera;
 
-public class DeltaTime
-{
-    private float _lastFrame;
-    private float _deltaTime;
-    private readonly Stopwatch _sw = new();
-
-    public float Result => _deltaTime;
-
-    public void Compute()
-    {
-        _sw.Stop();
-
-        float currentFrame = _sw.ElapsedMilliseconds / 1000.0f;
-        _deltaTime = currentFrame - _lastFrame;
-        _lastFrame = currentFrame;
-
-        _sw.Start();
-    }
-}
-
 public enum CameraMovement
 {
     Forward,
@@ -41,24 +21,24 @@ public class MainCamera
     private float _yaw;
     private float _pitch;
     private float _lastX, _lastY;
-    private vec3 _worldUp;
-    private vec3 _right;
+    private Vector3 _worldUp;
+    private Vector3 _right;
 
     public bool FirstMouse { get; set; }
     public float Sensitivity { get; set; }
     public float Speed { get; set; }
 
-    public vec3 Position { get; private set; }
-    public vec3 Front { get; private set; }
-    public vec3 Up { get; private set; }
+    public Vector3 Position { get; private set; }
+    public Vector3 Front { get; private set; }
+    public Vector3 Up { get; private set; }
     public CameraMode CameraMode { get; set; }
 
     public MainCamera(CameraMode cameraMode)
     {
-        Position = new vec3(0.0f, 0.0f, 3.0f);
-        Front = new vec3(0.0f, 0.0f, -1.0f);
-        _worldUp = new vec3(0.0f, 1.0f, 0.0f);
-        Up = new vec3(0.0f, 1.0f, 0.0f);
+        Position = new Vector3(0.0f, 0.0f, 3.0f);
+        Front = new Vector3(0.0f, 0.0f, -1.0f);
+        _worldUp = new Vector3(0.0f, 1.0f, 0.0f);
+        Up = new Vector3(0.0f, 1.0f, 0.0f);
         Sensitivity = 0.1f;
         Speed = 6f;
         _yaw = -90.0f;
@@ -70,7 +50,7 @@ public class MainCamera
         UpdateVectors();
     }
 
-    public void CameraPosition(vec3 position, vec3 front, vec3 up, CameraMode cameraMode)
+    public void CameraPosition(Vector3 position, Vector3 front, Vector3 up, CameraMode cameraMode)
         => (Position, Front, _worldUp, CameraMode) = (position, front, up, cameraMode);
 
     public void LookAt(float xPos, float yPos)
@@ -118,23 +98,23 @@ public class MainCamera
 
     private void UpdateVectors()
     {
-        var radYaw = glm.radians(_yaw);
-        var radPitch = glm.radians(_pitch);
+        var radYaw = MathHelper.DegreesToRadians(_yaw);
+        var radPitch = MathHelper.DegreesToRadians(_pitch);
 
-        var cosYaw = glm.cos(radYaw);
-        var sinYaw = glm.sin(radYaw);
-        var cosPitch = glm.cos(radPitch);
-        var sinPitch = glm.sin(radPitch);
+        var cosYaw = (float)MathHelper.Cos(radYaw);
+        var sinYaw = (float)MathHelper.Sin(radYaw);
+        var cosPitch = (float)MathHelper.Cos(radPitch);
+        var sinPitch = (float)MathHelper.Sin(radPitch);
 
-        vec3 front = new()
+        Vector3 front = new()
         {
-            x = cosYaw * cosPitch,
-            y = sinPitch,
-            z = sinYaw * cosPitch
+            X = cosYaw * cosPitch,
+            Y = sinPitch,
+            Z = sinYaw * cosPitch
         };
 
-        Front = glm.normalize(front);
-        _right = glm.normalize(glm.cross(Front, _worldUp));
-        Up = glm.normalize(glm.cross(_right, Front));
+        Front = Vector3.Normalize(front);
+        _right = Vector3.Normalize(Vector3.Cross(Front, _worldUp));
+        Up = Vector3.Normalize(Vector3.Cross(_right, Front));
     }
 }

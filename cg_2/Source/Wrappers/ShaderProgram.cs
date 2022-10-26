@@ -4,8 +4,13 @@ public class ShaderProgram : IDisposable
 {
     private readonly Dictionary<string, int> _uniformLocations = new();
     public int Handle { get; }
+    public GLWpfControl Control { get; }
 
-    public ShaderProgram() => Handle = GL.CreateProgram();
+    public ShaderProgram(GLWpfControl control)
+    {
+        Control = control;
+        Handle = GL.CreateProgram();
+    }
 
     public void Use()
     {

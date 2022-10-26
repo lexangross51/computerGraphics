@@ -1,107 +1,47 @@
 ﻿namespace cg_2.Source.Render;
 
-public abstract class BaseInstance : IRenderable
+public class Instance : IRenderable
 {
-    public ShaderProgramWrapper ShaderProgram { get; }
-    public VertexBufferArray? Vao { get; protected set; }
-    public VertexBufferWrapper? Vbo { get; protected set; }
+    public ShaderProgram ShaderProgram { get; }
+    public VertexArrayObject? Vao { get; private set; }
     public float[] Vertices { get; }
     public IUniformContext[] UniformContext { get; }
-    public MaterialColor? MaterialColor { get; }
+    public InstanceDescriptor Descriptor { get; }
+    public Color4 Color { get; }
+    public PrimitiveType PrimitiveType { get; }
 
-    protected BaseInstance(ShaderProgramWrapper shaderProgram, float[] vertices, IUniformContext[] uniformContext,
-        MaterialColor? materialColor = null)
+    protected Instance(ShaderProgram shaderProgram, float[] vertices, IUniformContext[] uniformContext,
+        InstanceDescriptor descriptor,
+        Color4 color, PrimitiveType primitiveType = PrimitiveType.Triangles)
     {
         ShaderProgram = shaderProgram;
         Vertices = vertices;
         UniformContext = uniformContext;
-        MaterialColor = materialColor ?? MaterialColor.Standart;
+        Descriptor = descriptor;
+        PrimitiveType = primitiveType;
+        Color = color;
     }
 
-    public virtual void Initialize(VertexBufferArray vao, VertexBufferWrapper vbo)
+    public void Initialize<T>(VertexArrayObject vao, VertexBufferObject<T> vbo) where T : unmanaged
     {
         Vao = vao;
-        Vbo = vbo;
 
-        var glContext = ShaderProgram.CurrentOpenGLContext;
+        vbo.Bind();
+        vbo.BufferData(Vertices.Length, Vertices);
 
-        vao.Create(glContext);
-        vbo.Create(glContext);
+        vao.Bind();
 
-        vao.Bind(glContext);
-        vbo.Bind(glContext);
-
-        vbo.SetData(glContext, 0, Vertices, false, 3, 8, 0);
-        vbo.SetData(glContext, 1, Vertices, false, 3, 8, 3);
-        vbo.SetData(glContext, 2, Vertices, false, 2, 8, 6);
-
-        vao.Unbind(glContext);
+        // for (int i = 0; i < Descriptor.AttributeCount; i++)
+        // {
+        //     GL.VertexAttribPointer(i, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+        //     GL.EnableVertexAttribArray(i);
+        // } TODO -> можно использовать GL.EnableVertexArrayAttrib
+        // GL.VertexArrayAttribFormat, но придется хранить обертку над массивом Vertices, так что это вариант
+        
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Byte, false, 3 * sizeof(float), 0);
+        GL.EnableVertexAttribArray(0);
     }
 
     public void UpdateUniform(MainCamera camera)
         => Array.ForEach(UniformContext, item => item.Update(ShaderProgram, camera));
-}
-
-public class CompleteInstance : BaseInstance
-{
-    public CompleteInstance(ShaderProgramWrapper shaderProgram, float[] vertices, IUniformContext[] uniformContext,
-        MaterialColor? materialColor = null) : base(
-        shaderProgram, vertices, uniformContext, materialColor)
-    {
-    }
-}
-
-public class SolidInstance : BaseInstance
-{
-    public SolidInstance(ShaderProgramWrapper shaderProgram, float[] vertices, IUniformContext[] uniformContext,
-        MaterialColor? materialColor = null) : base(
-        shaderProgram, vertices, uniformContext, materialColor)
-    {
-    }
-
-    public override void Initialize(VertexBufferArray vao, VertexBufferWrapper vbo)
-    {
-        Vao = vao;
-        Vbo = vbo;
-
-        var glContext = ShaderProgram.CurrentOpenGLContext;
-
-        vao.Create(glContext);
-        vbo.Create(glContext);
-
-        vao.Bind(glContext);
-        vbo.Bind(glContext);
-
-        vbo.SetData(glContext, 0, Vertices, false, 3, 6, 0);
-        vbo.SetData(glContext, 1, Vertices, false, 3, 6, 3);
-
-        vao.Unbind(glContext);
-    }
-}
-
-public class StandartInstance : BaseInstance
-{
-    public StandartInstance(ShaderProgramWrapper shaderProgram, float[] vertices, IUniformContext[] uniformContext,
-        MaterialColor? materialColor = null) : base(
-        shaderProgram, vertices, uniformContext, materialColor)
-    {
-    }
-
-    public override void Initialize(VertexBufferArray vao, VertexBufferWrapper vbo)
-    {
-        Vao = vao;
-        Vbo = vbo;
-
-        var glContext = ShaderProgram.CurrentOpenGLContext;
-
-        vao.Create(glContext);
-        vbo.Create(glContext);
-
-        vao.Bind(glContext);
-        vbo.Bind(glContext);
-
-        vbo.SetData(glContext, 0, Vertices, false, 3, 3, 0);
-
-        vao.Unbind(glContext);
-    }
 }
