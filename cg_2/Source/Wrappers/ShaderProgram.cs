@@ -107,10 +107,10 @@ public class ShaderProgram : IDisposable
         GL.Uniform3(_uniformLocations[name], value);
     }
 
-    public void SetUniform(string name, Color color)
+    public void SetUniform(string name, Color4 color)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
-        GL.Uniform3(_uniformLocations[name], color.R, color.G, color.B);
+        GL.Uniform3(_uniformLocations[name], new(color.R, color.G, color.B));
     }
 
     public void SetUniform(string name, Matrix4 value)

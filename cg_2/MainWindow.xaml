@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:control="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280" KeyDown="MainWindow_OnKeyDown">
+        Title="MainWindow" Height="720" Width="1280" KeyDown="OnKeyDown">
     <DockPanel>
         <control:GLWpfControl x:Name="OpenTkControl" Render="OnRender" Initialized="OnInitialize"
                               MouseMove="OnMouseMove" />

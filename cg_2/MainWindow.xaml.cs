@@ -7,12 +7,12 @@ public partial class MainWindow
     private IRenderable[] _renderables = default!;
     private ShaderProgram _lightingProgram = default!;
     private ShaderProgram _lampProgram = default!;
-    private readonly Vector3 _lightPos = new(1.2f, 1.0f, 2.0f);
+    private readonly Vector3 _lightPos = new(0.5f, 2.0f, 2.0f);
     private float _deltaTime;
 
     public MainWindow() => InitializeComponent();
 
-    private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
+    private void OnKeyDown(object sender, KeyEventArgs e)
     {
         switch (e.Key)
         {
@@ -65,7 +65,7 @@ public partial class MainWindow
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new(1920, 1080);
 
-        GL.ClearColor(Color.RosyBrown);
+        GL.ClearColor(Color.Black);
         GL.Enable(EnableCap.DepthTest);
 
         var width = (float)OpenTkControl.RenderSize.Width;
@@ -89,8 +89,8 @@ public partial class MainWindow
             new RenderObject(_lightingProgram, Primitives.Cube, new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                new Lighting((Color4.Coral, "objectColor"), (new(1.0f), "lightColor"),
-                    (_lightPos, "lightPos"), "viewPos")
+                Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
+                Material.GoldMaterial
             }),
             new RenderObject(_lampProgram, Primitives.Cube, new IUniformContext[]
             {
