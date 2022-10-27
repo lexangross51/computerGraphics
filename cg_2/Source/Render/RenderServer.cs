@@ -10,11 +10,9 @@ public class RenderServer
     {
         foreach (var instance in Instances)
         {
-            instance.ShaderProgram.Use();
-
-            instance.UpdateUniform(camera);
-
             instance.Vao.Bind();
+            instance.ShaderProgram.Use();
+            instance.UpdateUniform(camera);
             GL.DrawArrays(instance.PrimitiveType, 0, 36);
         }
     }

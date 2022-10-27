@@ -21,8 +21,7 @@ public class Transformation : IUniformContext
 
     public void Update(ShaderProgram shaderProgram, MainCamera camera)
     {
-        Projection = (camera.GetProjectionMatrix(),
-            Projection.Name);
+        Projection = (camera.GetProjectionMatrix(), Projection.Name);
         View = (camera.GetViewMatrix(), View.Name);
 
         shaderProgram.SetUniform(View.Name, View.ViewMatrix);
@@ -36,13 +35,15 @@ public class Lighting : IUniformContext
     public (Color4 Color, string Name) Color { get; }
     public (Vector3 LightColor, string Name) LightColor { get; }
     public (Vector3 LightPos, string Name) LightPos { get; }
+    public string ViewPosName { get; }
 
     public Lighting((Color4 Color, string Name) color, (Vector3 LightColor, string Name) lightColor,
-        (Vector3 LightPos, string Name) lightPos)
+        (Vector3 LightPos, string Name) lightPos, string viewPosName)
     {
         Color = color;
         LightColor = lightColor;
         LightPos = lightPos;
+        ViewPosName = viewPosName;
     }
 
     public void Update(ShaderProgram shaderProgram, MainCamera camera)
@@ -50,6 +51,7 @@ public class Lighting : IUniformContext
         shaderProgram.SetUniform(Color.Name, Color.Color.R,
             Color.Color.G, Color.Color.B);
         shaderProgram.SetUniform(LightColor.Name, LightColor.LightColor);
-        shaderProgram.SetUniform(LightPos.Name, LightPos.LightPos);
+        shaderProgram.SetUniform(LightPos.Name, LightPos.LightPos.X, LightPos.LightPos.Y, LightPos.LightPos.Z);
+        shaderProgram.SetUniform(ViewPosName, camera.Position);
     }
 }

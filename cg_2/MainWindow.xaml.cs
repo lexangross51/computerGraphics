@@ -1,5 +1,4 @@
-﻿using Buffer = System.Buffer;
-using Size = System.Windows.Size;
+﻿using Size = System.Windows.Size;
 
 namespace cg_2;
 
@@ -64,7 +63,7 @@ public partial class MainWindow
 
     private void OnInitialize(object? sender, EventArgs e)
     {
-        var mainSettings = new GLWpfControlSettings { MajorVersion = 3, MinorVersion = 3 };
+        var mainSettings = new GLWpfControlSettings();
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new Size(1920, 1080); // TODO (default value is 0 or NaN)
 
@@ -75,25 +74,25 @@ public partial class MainWindow
         var height = (float)OpenTkControl.RenderSize.Height;
         _camera.AspectRatio = width / height;
 
-        _lightingProgram = new(OpenTkControl);
+        _lightingProgram = new();
         _lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lighting.frag");
 
-        _lampProgram = new(OpenTkControl);
+        _lampProgram = new();
         _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag");
 
         var projectionMatrix = _camera.GetProjectionMatrix();
         var viewMatrix = _camera.GetViewMatrix();
         var modelMatrix = Matrix4.Identity;
         var modelMatrix1 = Matrix4.CreateScale(0.2f);
-        modelMatrix1 *= Matrix4.CreateTranslation(_lightPos.X, _lightPos.Y, _lightPos.Z);
+        modelMatrix1 *= Matrix4.CreateTranslation(_lightPos);
 
         _renderables = new IRenderable[]
         {
             new Instance(_lightingProgram, Primitives.Cube, new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                new Lighting((new Color4(1.0f, 0.0f, 0.0f, 1.0f), "objectColor"), (new(1.0f), "lightColor"),
-                    (_lightPos, "lightPos"))
+                new Lighting((new Color4(1.0f, 0.0f, 0.0f, 0.0f), "objectColor"), (new(0.5f), "lightColor"),
+                    (_lightPos, "lightPos"), "viewPos")
             }),
             new Instance(_lampProgram, Primitives.Cube, new IUniformContext[]
             {
