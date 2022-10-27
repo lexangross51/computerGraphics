@@ -3,11 +3,9 @@
 public class ShaderProgram : IDisposable
 {
     private readonly Dictionary<string, int> _uniformLocations = new();
-    public int Handle { get; private set; }
+    public int Handle { get; }
 
-    public ShaderProgram()
-    {
-    }
+    public ShaderProgram() => Handle = GL.CreateProgram();
 
     public void Use() => GL.UseProgram(Handle);
 
@@ -35,8 +33,6 @@ public class ShaderProgram : IDisposable
 
         CompileShader(vertexShader);
         CompileShader(fragmentShader);
-
-        Handle = GL.CreateProgram();
 
         GL.AttachShader(Handle, vertexShader);
         GL.AttachShader(Handle, fragmentShader);
@@ -79,6 +75,8 @@ public class ShaderProgram : IDisposable
         throw new Exception($"Error occurred whilst linking Program({program})");
     }
 
+    public int GetAttributeLocation(string name) => GL.GetAttribLocation(Handle, name);
+
     public void SetUniform(string name, int value)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
@@ -107,6 +105,12 @@ public class ShaderProgram : IDisposable
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
         GL.Uniform3(_uniformLocations[name], value);
+    }
+
+    public void SetUniform(string name, Color color)
+    {
+        if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
+        GL.Uniform3(_uniformLocations[name], color.R, color.G, color.B);
     }
 
     public void SetUniform(string name, Matrix4 value)

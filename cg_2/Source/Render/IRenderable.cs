@@ -4,6 +4,7 @@ public interface IRenderable
 {
     public ShaderProgram ShaderProgram { get; }
     public VertexArrayObject Vao { get; }
+    public float[] Vertices { get; }
     public PrimitiveType PrimitiveType { get; }
 
     public void Initialize<T>(VertexArrayObject vao, VertexBufferObject<T> vbo) where T : unmanaged;

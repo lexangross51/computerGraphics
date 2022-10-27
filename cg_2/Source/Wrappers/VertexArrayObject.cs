@@ -2,12 +2,12 @@
 
 public class VertexArrayObject : IDisposable
 {
-    public VertexAttribType VertexAttributeType { get; }
+    public VertexAttribPointerType VertexAttributePointerType { get; }
     public int Handle { get; }
 
-    public VertexArrayObject(VertexAttribType vertexAttribType)
+    public VertexArrayObject(VertexAttribPointerType vertexAttribPointerType)
     {
-        VertexAttributeType = vertexAttribType;
+        VertexAttributePointerType = vertexAttribPointerType;
         Handle = GL.GenVertexArray();
     }
 

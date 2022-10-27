@@ -11,7 +11,7 @@ public class VertexBufferObject<T> : IDisposable where T : unmanaged
     public void Bind() => GL.BindBuffer(BufferTarget.ArrayBuffer, Handle);
 
     public void BufferData(float[] data)
-        => GL.BufferData(BufferTarget.ArrayBuffer, data.Length * Sizeof, data, TypeDraw);
+        => GL.BufferData(BufferTarget.ArrayBuffer, data.Length * sizeof(float), data, TypeDraw);
 
     public void Dispose() => GL.DeleteBuffer(Handle);
 }

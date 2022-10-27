@@ -32,26 +32,25 @@ public class Transformation : IUniformContext
 
 public class Lighting : IUniformContext
 {
-    public (Color4 Color, string Name) Color { get; }
-    public (Vector3 LightColor, string Name) LightColor { get; }
-    public (Vector3 LightPos, string Name) LightPos { get; }
+    public (Color4 Color, string Name) ColorContext { get; }
+    public (Vector3 LightColor, string Name) LightColorContext { get; }
+    public (Vector3 LightPos, string Name) LightPosContext { get; }
     public string ViewPosName { get; }
 
-    public Lighting((Color4 Color, string Name) color, (Vector3 LightColor, string Name) lightColor,
-        (Vector3 LightPos, string Name) lightPos, string viewPosName)
+    public Lighting((Color4 Color, string Name) colorContext, (Vector3 LightColor, string Name) lightColorContext,
+        (Vector3 LightPos, string Name) lightPosContext, string viewPosName)
     {
-        Color = color;
-        LightColor = lightColor;
-        LightPos = lightPos;
+        ColorContext = colorContext;
+        LightColorContext = lightColorContext;
+        LightPosContext = lightPosContext;
         ViewPosName = viewPosName;
     }
 
     public void Update(ShaderProgram shaderProgram, MainCamera camera)
     {
-        shaderProgram.SetUniform(Color.Name, Color.Color.R,
-            Color.Color.G, Color.Color.B);
-        shaderProgram.SetUniform(LightColor.Name, LightColor.LightColor);
-        shaderProgram.SetUniform(LightPos.Name, LightPos.LightPos.X, LightPos.LightPos.Y, LightPos.LightPos.Z);
+        shaderProgram.SetUniform(ColorContext.Name, new Vector3(ColorContext.Color.A, ColorContext.Color.G, ColorContext.Color.B));
+        shaderProgram.SetUniform(LightColorContext.Name, LightColorContext.LightColor);
+        shaderProgram.SetUniform(LightPosContext.Name, LightPosContext.LightPos);
         shaderProgram.SetUniform(ViewPosName, camera.Position);
     }
 }

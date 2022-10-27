@@ -13,7 +13,7 @@ public class RenderServer
             instance.Vao.Bind();
             instance.ShaderProgram.Use();
             instance.UpdateUniform(camera);
-            GL.DrawArrays(instance.PrimitiveType, 0, 36);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
         }
     }
 }
