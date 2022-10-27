@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using System.Windows.Media;
+using Color = System.Drawing.Color;
 
 namespace cg_2;
 
@@ -11,6 +12,9 @@ public partial class MainWindow
     private ShaderProgram _lampProgram = default!;
     private readonly Vector3 _lightPos = new(1.2f, 1.0f, 2.0f);
     private float _deltaTime;
+    private VertexBufferObject<float> _vbo;
+    private VertexArrayObject _lVao;
+    private VertexArrayObject _lampVao;
 
     public MainWindow() => InitializeComponent();
 
@@ -58,16 +62,41 @@ public partial class MainWindow
         _deltaTime = (float)deltaTime.TotalMilliseconds;
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        _renderServer.Render(_camera);
+        // _renderServer.Render(_camera);
+
+        _lVao.Bind();
+
+        _lightingProgram.Use();
+
+        _lightingProgram.SetUniform("model", Matrix4.Identity);
+        _lightingProgram.SetUniform("view", _camera.GetViewMatrix());
+        _lightingProgram.SetUniform("projection", _camera.GetProjectionMatrix());
+
+        _lightingProgram.SetUniform("objectColor", new Vector3(1.0f, 0.5f, 0.31f));
+        _lightingProgram.SetUniform("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
+        _lightingProgram.SetUniform("lightPos", _lightPos);
+        _lightingProgram.SetUniform("viewPos", _camera.Position);
+
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        
+        _lampVao.Bind();
+
+        _lampProgram.Use();
+
+        _lampProgram.SetUniform("model", Matrix4.CreateScale(0.2f)  * Matrix4.CreateTranslation(_lightPos));
+        _lampProgram.SetUniform("view", _camera.GetViewMatrix());
+        _lampProgram.SetUniform("projection", _camera.GetProjectionMatrix());
+
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
     }
 
     private void OnInitialize(object? sender, EventArgs e)
     {
-        var mainSettings = new GLWpfControlSettings { MajorVersion = 3, MinorVersion = 3 };
+        var mainSettings = new GLWpfControlSettings();
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new(1920, 1080);
 
-        GL.ClearColor(Color4.RosyBrown);
+        GL.ClearColor(Color.RosyBrown);
         GL.Enable(EnableCap.DepthTest);
 
         var width = (float)OpenTkControl.RenderSize.Width;
@@ -80,31 +109,51 @@ public partial class MainWindow
         _lampProgram = new();
         _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag");
 
-        var projectionMatrix = _camera.GetProjectionMatrix();
-        var viewMatrix = _camera.GetViewMatrix();
-        var modelMatrix = Matrix4.Identity;
-        var modelMatrix1 = Matrix4.CreateScale(0.2f);
-        modelMatrix1 *= Matrix4.CreateTranslation(_lightPos);
+        // var projectionMatrix = _camera.GetProjectionMatrix();
+        // var viewMatrix = _camera.GetViewMatrix();
+        // var modelMatrix = Matrix4.Identity;
+        // var modelMatrix1 = Matrix4.CreateScale(0.2f);
+        // modelMatrix1 *= Matrix4.CreateTranslation(_lightPos);
+        //
+        // _renderables = new IRenderable[]
+        // {
+        //     new Instance(_lightingProgram, Primitives.Cube, new IUniformContext[]
+        //     {
+        //         new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
+        //         new Lighting((Color.DarkGoldenrod, "objectColor"), (new(1.0f), "lightColor"),
+        //             (_lightPos, "lightPos"), "viewPos")
+        //     }),
+        //     new Instance(_lampProgram, Primitives.Cube, new IUniformContext[]
+        //     {
+        //         new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix1, "model"))
+        //     })
+        // };
 
-        _renderables = new IRenderable[]
-        {
-            new Instance(_lightingProgram, Primitives.Cube, new IUniformContext[]
-            {
-                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                new Lighting((Color4.GhostWhite, "objectColor"), (new(0.5f), "lightColor"),
-                    (_lightPos, "lightPos"), "viewPos")
-            }),
-            new Instance(_lampProgram, Primitives.Cube, new IUniformContext[]
-            {
-                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix1, "model"))
-            })
-        };
+        _vbo = new();
+        _vbo.Bind();
+        _vbo.BufferData(Primitives.Cube);
 
-        foreach (var renderable in _renderables)
-        {
-            renderable.Initialize(new(VertexAttribType.Float), new VertexBufferObject<float>());
-        }
+        _lVao = new(VertexAttribType.Float);
 
-        _renderServer = new(_renderables);
+        _lVao.Bind();
+        GL.EnableVertexAttribArray(0);
+        // Remember to change the stride as we now have 6 floats per vertex
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+        // We now need to define the layout of the normal so the shader can use it
+        GL.EnableVertexAttribArray(1);
+        GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float),
+            3 * sizeof(float));
+
+        _lampVao = new(VertexAttribType.Float);
+        _lampVao.Bind();
+
+        GL.EnableVertexAttribArray(0);
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+        // _renderables[0].Vao = _lVao;
+        // _renderables[1].Vao = _lampVao;
+        //
+        // _renderServer = new(_renderables);
     }
 }
