@@ -1,4 +1,4 @@
-﻿using Size = System.Windows.Size;
+﻿using OpenTK.Graphics.OpenGL4;
 
 namespace cg_2;
 
@@ -63,9 +63,9 @@ public partial class MainWindow
 
     private void OnInitialize(object? sender, EventArgs e)
     {
-        var mainSettings = new GLWpfControlSettings();
+        var mainSettings = new GLWpfControlSettings { MajorVersion = 3, MinorVersion = 3 };
         OpenTkControl.Start(mainSettings);
-        OpenTkControl.RenderSize = new Size(1920, 1080); // TODO (default value is 0 or NaN)
+        OpenTkControl.RenderSize = new(1920, 1080);
 
         GL.ClearColor(Color4.RosyBrown);
         GL.Enable(EnableCap.DepthTest);
@@ -91,7 +91,7 @@ public partial class MainWindow
             new Instance(_lightingProgram, Primitives.Cube, new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                new Lighting((new Color4(1.0f, 0.0f, 0.0f, 0.0f), "objectColor"), (new(0.5f), "lightColor"),
+                new Lighting((Color4.GhostWhite, "objectColor"), (new(0.5f), "lightColor"),
                     (_lightPos, "lightPos"), "viewPos")
             }),
             new Instance(_lampProgram, Primitives.Cube, new IUniformContext[]

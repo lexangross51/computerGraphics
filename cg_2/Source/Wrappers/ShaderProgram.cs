@@ -3,9 +3,11 @@
 public class ShaderProgram : IDisposable
 {
     private readonly Dictionary<string, int> _uniformLocations = new();
-    public int Handle { get; }
+    public int Handle { get; private set; }
 
-    public ShaderProgram() => Handle = GL.CreateProgram();
+    public ShaderProgram()
+    {
+    }
 
     public void Use() => GL.UseProgram(Handle);
 
@@ -33,6 +35,8 @@ public class ShaderProgram : IDisposable
 
         CompileShader(vertexShader);
         CompileShader(fragmentShader);
+
+        Handle = GL.CreateProgram();
 
         GL.AttachShader(Handle, vertexShader);
         GL.AttachShader(Handle, fragmentShader);

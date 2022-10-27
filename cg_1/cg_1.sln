@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cg_1", "cg_1\cg_1.csproj", "{D0683C50-2B0E-4E40-A69B-B0E4A027B18A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cg_2", "..\cg_2\cg_2.csproj", "{B62FBCDE-0289-410F-B0CC-CF48B1FBC81E}"
 EndProject
 Global
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D0683C50-2B0E-4E40-A69B-B0E4A027B18A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0683C50-2B0E-4E40-A69B-B0E4A027B18A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D0683C50-2B0E-4E40-A69B-B0E4A027B18A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D0683C50-2B0E-4E40-A69B-B0E4A027B18A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B62FBCDE-0289-410F-B0CC-CF48B1FBC81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B62FBCDE-0289-410F-B0CC-CF48B1FBC81E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B62FBCDE-0289-410F-B0CC-CF48B1FBC81E}.Release|Any CPU.ActiveCfg = Release|Any CPU

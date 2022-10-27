@@ -15,6 +15,9 @@
 
 	<ItemGroup>
 		<Using Include="System" />
+		<Using Include="OpenTK.Wpf" />
+		<Using Include="OpenTK.Graphics.OpenGL4" />
+		<Using Include="OpenTK.Mathematics" />
 		<Using Include="System.Linq" />
 		<Using Include="System.IO" />
 		<Using Include="System.Windows" />
@@ -29,9 +32,6 @@
 		<Using Include="cg_2.Source.Primitives" />
 		<Using Include="cg_2.Source.Render" />
 		<Using Include="cg_2.Source.UniformsContext" />
-		<Using Include="OpenTK.Mathematics" />
-		<Using Include="OpenTK.Wpf" />
-		<Using Include="OpenTK.Graphics.OpenGL4" />
 	</ItemGroup>
 
 	<ItemGroup>
