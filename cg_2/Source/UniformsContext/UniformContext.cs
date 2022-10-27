@@ -24,12 +24,9 @@ public class Transformation : IUniformContext
         var width = (float)shaderProgram.Control.RenderSize.Width;
         var height = (float)shaderProgram.Control.RenderSize.Height;
 
-        Projection = (camera.CameraMode == CameraMode.Perspective
-                ? Matrix4.CreatePerspectiveFieldOfView(0.45f,
-                    width / height, 0.1f, 100.0f)
-                : Matrix4.CreateOrthographic(-width / 50.0f, -height / 50.0f, 0.1f, 100.0f),
+        Projection = (camera.GetProjectionMatrix(),
             Projection.Name);
-        View = (Matrix4.LookAt(camera.Position, camera.Position + camera.Front, camera.Up), View.Name);
+        View = (camera.GetViewMatrix(), View.Name);
 
         shaderProgram.SetUniform(View.Name, View.ViewMatrix);
         shaderProgram.SetUniform(Projection.Name, Projection.ProjectionMatrix);
@@ -55,7 +52,7 @@ public class Lighting : IUniformContext
     {
         shaderProgram.SetUniform(Color.Name, Color.Color.R,
             Color.Color.G, Color.Color.B);
-        shaderProgram.SetUniform(LightColor.Name, 1.0f, 1.0f, 1.0f);
-        shaderProgram.SetUniform(LightPos.Name, LightPos.LightPos.X, LightPos.LightPos.Y, LightPos.LightPos.Z);
+        shaderProgram.SetUniform(LightColor.Name, LightColor.LightColor);
+        shaderProgram.SetUniform(LightPos.Name, LightPos.LightPos);
     }
 }

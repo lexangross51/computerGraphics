@@ -3,12 +3,13 @@
 public class ShaderProgram : IDisposable
 {
     private readonly Dictionary<string, int> _uniformLocations = new();
-    public int Handle { get; private set; }
+    public int Handle { get; }
     public GLWpfControl Control { get; }
 
     public ShaderProgram(GLWpfControl control)
     {
         Control = control;
+        Handle = GL.CreateProgram();
     }
 
     public void Use() => GL.UseProgram(Handle);
@@ -37,8 +38,6 @@ public class ShaderProgram : IDisposable
 
         CompileShader(vertexShader);
         CompileShader(fragmentShader);
-
-        Handle = GL.CreateProgram();
 
         GL.AttachShader(Handle, vertexShader);
         GL.AttachShader(Handle, fragmentShader);
@@ -84,48 +83,36 @@ public class ShaderProgram : IDisposable
     public void SetUniform(string name, int value)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
-
-        GL.UseProgram(Handle);
         GL.Uniform1(_uniformLocations[name], value);
     }
 
     public void SetUniform(string name, float value)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
-
-        GL.UseProgram(Handle);
         GL.Uniform1(_uniformLocations[name], value);
     }
 
     public void SetUniform(string name, float x, float y, float z)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
-
-        GL.UseProgram(Handle);
         GL.Uniform3(_uniformLocations[name], x, y, z);
     }
 
     public void SetUniform(string name, float x, float y, float z, float w)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
-
-        GL.UseProgram(Handle);
         GL.Uniform4(_uniformLocations[name], x, y, z, w);
     }
 
     public void SetUniform(string name, Vector3 value)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
-
-        GL.UseProgram(Handle);
         GL.Uniform3(_uniformLocations[name], value);
     }
 
     public void SetUniform(string name, Matrix4 value)
     {
         if (!_uniformLocations.ContainsKey(name)) throw new Exception($"{name} uniform not found on shader");
-
-        GL.UseProgram(Handle);
         GL.UniformMatrix4(_uniformLocations[name], false, ref value);
     }
 

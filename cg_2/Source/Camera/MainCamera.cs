@@ -27,6 +27,7 @@ public class MainCamera
     public bool FirstMouse { get; set; }
     public float Sensitivity { get; set; }
     public float Speed { get; set; }
+    public float AspectRatio { get; set; }
 
     public Vector3 Position { get; private set; }
     public Vector3 Front { get; private set; }
@@ -50,8 +51,13 @@ public class MainCamera
         UpdateVectors();
     }
 
-    public void CameraPosition(Vector3 position, Vector3 front, Vector3 up, CameraMode cameraMode)
+    public MainCamera(Vector3 position, Vector3 front, Vector3 up, CameraMode cameraMode)
         => (Position, Front, _worldUp, CameraMode) = (position, front, up, cameraMode);
+
+    public Matrix4 GetViewMatrix() => Matrix4.LookAt(Position, Position + Front, Up);
+
+    public Matrix4 GetProjectionMatrix() =>
+        Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver2, AspectRatio, 0.01f, 100f);
 
     public void LookAt(float xPos, float yPos)
     {

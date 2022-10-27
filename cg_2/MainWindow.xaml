@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280" KeyDown="MainWindow_OnKeyDown">
     <DockPanel>
-        <control:GLWpfControl x:Name="OpenTkControl" Render="Render" Initialized="Initialize"
-                              MouseMove="OnMouseMove"/>
+        <control:GLWpfControl x:Name="OpenTkControl" Render="OnRender" Initialized="OnInitialize"
+                              MouseMove="OnMouseMove" />
     </DockPanel>
 </Window>

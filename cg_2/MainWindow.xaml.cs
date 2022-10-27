@@ -8,6 +8,7 @@ public partial class MainWindow
     private RenderServer _renderServer = default!;
     private IRenderable[] _renderables = default!;
     private ShaderProgram _lightingProgram = default!;
+    private ShaderProgram _lampProgram = default!;
     private readonly Vector3 _lightPos = new(1.2f, 1.0f, 2.0f);
     private float _deltaTime;
 
@@ -52,7 +53,7 @@ public partial class MainWindow
         }
     }
 
-    private void Render(TimeSpan deltaTime)
+    private void OnRender(TimeSpan deltaTime)
     {
         _deltaTime = (float)deltaTime.TotalMilliseconds;
         GL.ClearColor(new Color4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -61,40 +62,55 @@ public partial class MainWindow
         _renderServer.Render(_camera);
     }
 
-    private void Initialize(object? sender, EventArgs e)
+    private void OnInitialize(object? sender, EventArgs e)
     {
         var mainSettings = new GLWpfControlSettings { MajorVersion = 3, MinorVersion = 3 };
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new Size(1920, 1080); // TODO (default value is 0 or NaN)
 
+        GL.Enable(EnableCap.DepthTest);
+
         var width = (float)OpenTkControl.RenderSize.Width;
         var height = (float)OpenTkControl.RenderSize.Height;
-    
+        _camera.AspectRatio = width / height;
+
         _lightingProgram = new(OpenTkControl);
         _lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lighting.frag");
-    
-        var projectionMatrix = _camera.CameraMode == CameraMode.Perspective
-            ? Matrix4.CreatePerspectiveFieldOfView(0.45f,
-                width / height, 0.1f, 100.0f)
-            : Matrix4.CreateOrthographic(-width / 50.0f, -height / 50.0f, 0.1f, 100.0f);
-        var viewMatrix = Matrix4.LookAt(_camera.Position, _camera.Position + _camera.Front, _camera.Up);
+
+        _lampProgram = new(OpenTkControl);
+        _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag");
+
+        var projectionMatrix = _camera.GetProjectionMatrix();
+        var viewMatrix = _camera.GetViewMatrix();
         var modelMatrix = Matrix4.Identity;
-    
+        var modelMatrix1 = Matrix4.CreateScale(0.2f);
+        modelMatrix1 *= Matrix4.CreateTranslation(_lightPos.X, _lightPos.Y, _lightPos.Z);
+
         _renderables = new IRenderable[]
         {
             new Instance(_lightingProgram, Primitives.Cube, new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                new Lighting((Color4.Gold, "objectColor"), (new(1.0f, 1.0f, 1.0f), "lightColor"),
+                new Lighting((Color.Coral, "objectColor"), (new(1.0f, 1.0f, 1.0f), "lightColor"),
                     (_lightPos, "lightPos"))
             }, new()
             {
                 WithNormals = true // not implemented
-            }, Color4.Coral)
+            }),
+            new Instance(_lampProgram, Primitives.Cube, new IUniformContext[]
+            {
+                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix1, "model"))
+            }, new()
+            {
+                WithNormals = true
+            })
         };
-    
-        _renderables[0].Initialize(new(VertexAttribType.Float), new VertexBufferObject<float>());
-    
+
+        foreach (var renderable in _renderables)
+        {
+            renderable.Initialize(new(VertexAttribType.Float), new VertexBufferObject<float>());
+        }
+
         _renderServer = new(_renderables);
     }
 }
