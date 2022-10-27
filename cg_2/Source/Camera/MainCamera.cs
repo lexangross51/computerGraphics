@@ -23,6 +23,7 @@ public class MainCamera
     private float _lastX, _lastY;
     private Vector3 _worldUp;
     private Vector3 _right;
+    private float _fov = MathHelper.PiOver2;
 
     public bool FirstMouse { get; set; }
     public float Sensitivity { get; set; }
@@ -33,6 +34,16 @@ public class MainCamera
     public Vector3 Front { get; private set; }
     public Vector3 Up { get; private set; }
     public CameraMode CameraMode { get; set; }
+
+    public float Fov
+    {
+        get => MathHelper.RadiansToDegrees(_fov);
+        set
+        {
+            var angle = MathHelper.Clamp(value, 1.0f, 90.0f);
+            _fov = MathHelper.DegreesToRadians(angle);
+        }
+    }
 
     public MainCamera(CameraMode cameraMode)
     {
@@ -57,7 +68,7 @@ public class MainCamera
     public Matrix4 GetViewMatrix() => Matrix4.LookAt(Position, Position + Front, Up);
 
     public Matrix4 GetProjectionMatrix() =>
-        Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver2, AspectRatio, 0.01f, 100f);
+        Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
 
     public void LookAt(float xPos, float yPos)
     {

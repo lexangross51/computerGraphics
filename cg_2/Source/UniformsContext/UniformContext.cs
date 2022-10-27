@@ -63,12 +63,17 @@ public class Lighting : IUniformContext
     public static Lighting DarkenLight((Vector3 Value, string Name) position, string viewPosName)
         => new(
             (new(0.2f), "light.ambient"),
-            (new(0.5f), "light.diffuse"), (new(1.0f), "light.specular"), position, viewPosName);
+            (new(0.5f), "light.diffuse"), (new(1.0f), "light.specular"),
+            position,
+            viewPosName);
 
     public static Lighting BrightLight((Vector3 Value, string Name) position, string viewPosName)
         => new(
             (new(1.0f), "light.ambient"),
-            (new(1.0f), "light.diffuse"), (new(1.0f), "light.specular"), position, viewPosName);
+            (new(1.0f), "light.diffuse"),
+            (new(1.0f), "light.specular"),
+            position,
+            viewPosName);
 }
 
 public readonly record struct Material((Vector3 Value, string Name) AmbientContext,

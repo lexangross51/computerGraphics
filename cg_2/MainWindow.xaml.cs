@@ -14,27 +14,12 @@ public partial class MainWindow
 
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
-        switch (e.Key)
-        {
-            case Key.W:
-                _camera.Move(CameraMovement.Forward, _deltaTime);
-                break;
-            case Key.S:
-                _camera.Move(CameraMovement.Backward, _deltaTime);
-                break;
-            case Key.A:
-                _camera.Move(CameraMovement.Left, _deltaTime);
-                break;
-            case Key.D:
-                _camera.Move(CameraMovement.Right, _deltaTime);
-                break;
-            case Key.Space:
-                _camera.Move(CameraMovement.Up, _deltaTime);
-                break;
-            case Key.LeftCtrl:
-                _camera.Move(CameraMovement.Down, _deltaTime);
-                break;
-        }
+        if (e.KeyboardDevice.IsKeyDown(Key.W)) _camera.Move(CameraMovement.Forward, _deltaTime);
+        if (e.KeyboardDevice.IsKeyDown(Key.S)) _camera.Move(CameraMovement.Backward, _deltaTime);
+        if (e.KeyboardDevice.IsKeyDown(Key.A)) _camera.Move(CameraMovement.Left, _deltaTime);
+        if (e.KeyboardDevice.IsKeyDown(Key.D)) _camera.Move(CameraMovement.Right, _deltaTime);
+        if (e.KeyboardDevice.IsKeyDown(Key.Space)) _camera.Move(CameraMovement.Up, _deltaTime);
+        if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl)) _camera.Move(CameraMovement.Down, _deltaTime);
     }
 
     private void OnMouseMove(object sender, MouseEventArgs e)
@@ -106,4 +91,6 @@ public partial class MainWindow
 
         _renderServer = new(_renderables);
     }
+
+    private void OnMouseWheel(object sender, MouseWheelEventArgs e) => _camera.Fov -= e.Delta / 100.0f;
 }
