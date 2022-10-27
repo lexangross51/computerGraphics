@@ -6,18 +6,15 @@ public class Instance : IRenderable
     public VertexArrayObject? Vao { get; private set; }
     public float[] Vertices { get; }
     public IUniformContext[] UniformContext { get; }
-    public InstanceDescriptor Descriptor { get; }
     public PrimitiveType PrimitiveType { get; }
     public bool IsInitialized { get; private set; }
 
     public Instance(ShaderProgram shaderProgram, float[] vertices, IUniformContext[] uniformContext,
-        InstanceDescriptor descriptor,
         PrimitiveType primitiveType = PrimitiveType.Triangles)
     {
         ShaderProgram = shaderProgram;
         Vertices = vertices;
         UniformContext = uniformContext;
-        Descriptor = descriptor;
         PrimitiveType = primitiveType;
     }
 

@@ -1,4 +1,5 @@
-﻿using Size = System.Windows.Size;
+﻿using Buffer = System.Buffer;
+using Size = System.Windows.Size;
 
 namespace cg_2;
 
@@ -56,7 +57,6 @@ public partial class MainWindow
     private void OnRender(TimeSpan deltaTime)
     {
         _deltaTime = (float)deltaTime.TotalMilliseconds;
-        GL.ClearColor(new Color4(0.5f, 0.5f, 0.5f, 1.0f));
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         _renderServer.Render(_camera);
@@ -68,6 +68,7 @@ public partial class MainWindow
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new Size(1920, 1080); // TODO (default value is 0 or NaN)
 
+        GL.ClearColor(Color4.RosyBrown);
         GL.Enable(EnableCap.DepthTest);
 
         var width = (float)OpenTkControl.RenderSize.Width;
@@ -91,18 +92,12 @@ public partial class MainWindow
             new Instance(_lightingProgram, Primitives.Cube, new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                new Lighting((Color.Coral, "objectColor"), (new(1.0f, 1.0f, 1.0f), "lightColor"),
+                new Lighting((new Color4(1.0f, 0.0f, 0.0f, 1.0f), "objectColor"), (new(1.0f), "lightColor"),
                     (_lightPos, "lightPos"))
-            }, new()
-            {
-                WithNormals = true // not implemented
             }),
             new Instance(_lampProgram, Primitives.Cube, new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix1, "model"))
-            }, new()
-            {
-                WithNormals = true
             })
         };
 

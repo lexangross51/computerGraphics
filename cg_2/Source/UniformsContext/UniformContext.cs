@@ -21,9 +21,6 @@ public class Transformation : IUniformContext
 
     public void Update(ShaderProgram shaderProgram, MainCamera camera)
     {
-        var width = (float)shaderProgram.Control.RenderSize.Width;
-        var height = (float)shaderProgram.Control.RenderSize.Height;
-
         Projection = (camera.GetProjectionMatrix(),
             Projection.Name);
         View = (camera.GetViewMatrix(), View.Name);
