@@ -514,10 +514,12 @@ public partial class MainWindow
         var objectColorLoc = _lightingProgram.GetUniformLocation("objectColor");
         var lightColorLoc = _lightingProgram.GetUniformLocation("lightColor");
         var lightPosLoc = _lightingProgram.GetUniformLocation("lightPos");
+        var viewPosLoc = _lightingProgram.GetUniformLocation("viewPos");
 
         gl.Uniform3(objectColorLoc, 1.0f, 0.5f, 0.31f);
         gl.Uniform3(lightColorLoc, 1.0f, 1.0f, 1.0f);
         gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, (float)Math.Sin(_parameter * _lightPos.z));
+        gl.Uniform3(viewPosLoc, _mainCamera.Position.x, _mainCamera.Position.y, _mainCamera.Position.z);
 
         _objectVao.Bind(gl);
         gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
