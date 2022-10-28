@@ -9,6 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="GlmNet" Version="0.7.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
 		<PackageReference Include="OpenTK.GLWpfControl" Version="4.2.2" />
 	</ItemGroup>
@@ -26,12 +27,14 @@
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Windows.Controls" />
 		<Using Include="Newtonsoft.Json" />
+		<Using Include="GlmNet" />
 		<Using Include="cg_2.Source.Camera" />
 		<Using Include="cg_2.Source.Wrappers" />
 		<Using Include="System.Drawing" />
 		<Using Include="cg_2.Source.Primitives" />
 		<Using Include="cg_2.Source.Render" />
 		<Using Include="cg_2.Source.UniformsContext" />
+		<Using Include="cg_2.Source.Extensions" />
 	</ItemGroup>
 
 	<ItemGroup>

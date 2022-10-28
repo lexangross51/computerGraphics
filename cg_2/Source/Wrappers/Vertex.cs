@@ -1,15 +1,15 @@
 ﻿namespace cg_2.Source.Wrappers;
 
-public readonly record struct Vertex
+public record struct Vertex
 {
-    private readonly Vector3 _position;
-    private readonly Vector3 _normal;
+    public Vector3 Position { get; set; }
+    public Vector3 Normal { get; set; }
 
     public static int Size => (3 + 3) * 4;
 
     public Vertex(Vector3 position, Vector3 normal)
     {
-        _position = position;
-        _normal = normal;
+        Position = position;
+        Normal = normal;
     }
 }
