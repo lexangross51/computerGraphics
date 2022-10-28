@@ -68,10 +68,13 @@
 	  <None Update="Source\Shaders\lamp.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\lighting.frag">
+	  <None Update="Source\Shaders\object.vert">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\object.vert">
+	  <None Update="Source\Shaders\directionLight.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\pointLight.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

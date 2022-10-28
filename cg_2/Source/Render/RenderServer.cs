@@ -2,17 +2,17 @@
 
 public class RenderServer
 {
-    public IEnumerable<IRenderable> Instances { get; }
+    public IEnumerable<IRenderable> RenderObjects { get; }
 
-    public RenderServer(IEnumerable<IRenderable> instances) => Instances = instances;
+    public RenderServer(IEnumerable<IRenderable> renderObjects) => RenderObjects = renderObjects;
 
     public void Render(MainCamera camera)
     {
-        foreach (var instance in Instances)
+        foreach (var renderObject in RenderObjects)
         {
-            instance.Vao.Bind();
-            instance.ShaderProgram.Use();
-            instance.UpdateUniform(camera);
+            renderObject.Vao.Bind();
+            renderObject.ShaderProgram.Use();
+            renderObject.UpdateUniform(camera);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
         }
     }

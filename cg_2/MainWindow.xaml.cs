@@ -7,7 +7,7 @@ public partial class MainWindow
     private IRenderable[] _renderables = default!;
     private ShaderProgram _lightingProgram = default!;
     private ShaderProgram _lampProgram = default!;
-    private readonly Vector3 _lightPos = new(0.5f, 2.0f, 2.0f);
+    private readonly Vector3 _lightPos = new(0.0f, 2.0f, 0.0f);
     private float _deltaTime;
 
     public MainWindow() => InitializeComponent();
@@ -36,6 +36,8 @@ public partial class MainWindow
         }
     }
 
+    private void OnMouseWheel(object sender, MouseWheelEventArgs e) => _camera.Fov -= e.Delta / 100.0f;
+
     private void OnRender(TimeSpan deltaTime)
     {
         _deltaTime = (float)deltaTime.TotalMilliseconds;
@@ -58,39 +60,44 @@ public partial class MainWindow
         _camera.AspectRatio = width / height;
 
         _lightingProgram = new();
-        _lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lighting.frag");
+        _lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/pointLight.frag");
 
         _lampProgram = new();
         _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag");
 
         var projectionMatrix = _camera.GetProjectionMatrix();
         var viewMatrix = _camera.GetViewMatrix();
-        var modelMatrix = Matrix4.Identity;
+        var modelMatrix = Matrix4.CreateTranslation(new(0.0f, -2.0f, 0.0f));
         var modelMatrix1 = Matrix4.CreateScale(0.2f);
         modelMatrix1 *= Matrix4.CreateTranslation(_lightPos);
+        var model2 = Matrix4.CreateTranslation(new(-1.0f, -2.0f, 1.0f));
 
         _renderables = new IRenderable[]
         {
-            new RenderObject(_lightingProgram, Primitives.Cube, new IUniformContext[]
+            new RenderObject(_lightingProgram, Primitives.Cube(0.5f), new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
                 Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
                 Material.GoldMaterial
             }),
-            new RenderObject(_lampProgram, Primitives.Cube, new IUniformContext[]
+            new RenderObject(_lampProgram, Primitives.Cube(0.5f), new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix1, "model"))
+            }),
+            new RenderObject(_lightingProgram, Primitives.Cube(0.5f), new IUniformContext[]
+            {
+                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (model2, "model")),
+                Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
+                Material.GoldMaterial
             })
         };
 
         foreach (var renderable in _renderables)
         {
-            renderable.Initialize(new VertexArrayObject(VertexAttribPointerType.Float),
+            renderable.Initialize(new VertexArrayObject(VertexAttribType.Float),
                 new VertexBufferObject<float>());
         }
 
         _renderServer = new(_renderables);
     }
-
-    private void OnMouseWheel(object sender, MouseWheelEventArgs e) => _camera.Fov -= e.Delta / 100.0f;
 }
