@@ -18,13 +18,11 @@ public partial class MainWindow
     private readonly ShaderProgramWrapper _shaderProgram = new(new());
     private readonly ShaderProgramWrapper _normalProgram = new(new());
     private readonly ShaderProgramWrapper _textureProgram = new(new());
-    private readonly ShaderProgramWrapper _lightingProgram = new(new());
     private readonly ShaderProgramWrapper _lampProgram = new(new());
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private readonly Texture[] _textures = { new(), new() };
-    private readonly vec3 _lightPos = new(1.2f, 1.0f, 2.0f);
-    private float _parameter;
+    private readonly vec3 _lightPos = new(1.2f, 3.0f, -5.0f);
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "Нет текстуры", "Текстура_1", "Текстура_2" };
@@ -65,10 +63,9 @@ public partial class MainWindow
 
         #region Загрузка шейдеров
 
-        _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/shader.frag", gl);
+        _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/lighting.frag", gl);
         _normalProgram.Initialize("Source/Shaders/normals.vert", "Source/Shaders/normals.frag", gl);
         _textureProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/textures.frag", gl);
-        _lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lighting.frag", gl);
         _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag", gl);
 
         #endregion
@@ -362,6 +359,16 @@ public partial class MainWindow
         var viewLoc = _shaderProgram.GetUniformLocation("view");
         var projectionLoc = _shaderProgram.GetUniformLocation("projection");
 
+        var objectColorLoc = _shaderProgram.GetUniformLocation("objectColor");
+        var lightColorLoc = _shaderProgram.GetUniformLocation("lightColor");
+        var lightPosLoc = _shaderProgram.GetUniformLocation("lightPos");
+        var viewPosLoc = _shaderProgram.GetUniformLocation("viewPos");
+
+        gl.Uniform3(objectColorLoc, 1.0f, 0.5f, 0.31f);
+        gl.Uniform3(lightColorLoc, 1.0f, 1.0f, 1.0f);
+        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, _lightPos.z);
+        gl.Uniform3(viewPosLoc, _camera.Position.x, _camera.Position.y, _camera.Position.z);
+
         gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
@@ -404,29 +411,6 @@ public partial class MainWindow
             gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
         }
 
-        _lightingProgram.Use();
-
-        modelLoc = _lightingProgram.GetUniformLocation("model");
-        viewLoc = _lightingProgram.GetUniformLocation("view");
-        projectionLoc = _lightingProgram.GetUniformLocation("projection");
-
-        gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
-        gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
-        gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
-
-        var objectColorLoc = _lightingProgram.GetUniformLocation("objectColor");
-        var lightColorLoc = _lightingProgram.GetUniformLocation("lightColor");
-        var lightPosLoc = _lightingProgram.GetUniformLocation("lightPos");
-        var viewPosLoc = _lightingProgram.GetUniformLocation("viewPos");
-
-        gl.Uniform3(objectColorLoc, 1.0f, 0.5f, 0.31f);
-        gl.Uniform3(lightColorLoc, 1.0f, 1.0f, 1.0f);
-        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, (float)Math.Sin(_parameter * _lightPos.z));
-        gl.Uniform3(viewPosLoc, _camera.Position.x, _camera.Position.y, _camera.Position.z);
-
-        _objectVao.Bind(gl);
-        gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
-
         _lampProgram.Use();
 
         viewLoc = _lampProgram.GetUniformLocation("view");
@@ -436,8 +420,7 @@ public partial class MainWindow
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
 
         var model = mat4.identity();
-        model = glm.translate(model, new(_lightPos.x, _lightPos.y, (float)Math.Sin(_parameter * _lightPos.z)));
-        _parameter += 0.05f;
+        model = glm.translate(model, new(_lightPos.x, _lightPos.y, _lightPos.z));
         model = glm.scale(model, new(0.2f));
         modelLoc = _lampProgram.GetUniformLocation("model");
         gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
