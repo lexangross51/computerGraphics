@@ -41,7 +41,8 @@ public partial class MainWindow
         { "None", new() }
     };
 
-    private IEnumerable<string> LightTypes => _lightDictionary.Keys;
+    private IEnumerable<string> _lightTypes => _lightDictionary.Keys;
+    private IEnumerable<string> _materials => _materialDictionary.Keys;
 
     private readonly vec3 _lightPos = new(20.0f, 2.0f, -6.0f);
     private readonly vec3 _lightDir = new(0.0f, 0.0f, -1.0f); // for spot
