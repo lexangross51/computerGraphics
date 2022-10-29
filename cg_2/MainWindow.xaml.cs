@@ -82,22 +82,50 @@ public partial class MainWindow
 
         var sectionsCount = _sections.Count;
         var verticesBySection = _sections[0].VertexCount;
+        var facesCount = (sectionsCount - 1) * verticesBySection; 
 
         var sectionsVerticesArray = new Vertex[sectionsCount * verticesBySection];
+        var facesVerticesArray = new Vertex[facesCount * 4];
         int idx = 0;
 
         foreach (var vertex in _sections.SelectMany(section => section.Vertices))
         {
             sectionsVerticesArray[idx++].Position = vertex;
         }
+
+        idx = 0;
+        for (int i = 0; i < sectionsCount - 1; i++)
+        {
+            var vertices1 = _sections[i].Vertices;
+            var vertices2 = _sections[i + 1].Vertices;
+
+            for (int j = 0; j < verticesBySection; j++)
+            {
+                if (j == verticesBySection - 1)
+                {
+                    facesVerticesArray[idx++].Position = vertices1[j];
+                    facesVerticesArray[idx++].Position = vertices2[j];
+                    facesVerticesArray[idx++].Position = vertices2[0];
+                    facesVerticesArray[idx++].Position = vertices1[0];
+                }
+                else
+                {
+                    facesVerticesArray[idx++].Position = vertices1[j];
+                    facesVerticesArray[idx++].Position = vertices2[j];
+                    facesVerticesArray[idx++].Position = vertices2[j + 1];
+                    facesVerticesArray[idx++].Position = vertices1[j + 1];
+                }
+            }
+        }
         
         // Считаем нормали для каждой грани
-        for (int i = 0, inormal = 0; i < sectionsCount; i++)
+        idx = 0;
+        for (int i = 0; i < sectionsCount; i++)
         {
             var sectionVertices = _sections[i].Vertices;
 
             var vector1 = sectionVertices[1] - sectionVertices[0];
-            var vector2 = sectionVertices[2] - sectionVertices[0];
+            var vector2 = sectionVertices[^1] - sectionVertices[0];
 
             var normal = Vector3.Normalize(i == sectionsCount - 1
                 ? Vector3.Cross(vector1, vector2)
@@ -105,10 +133,37 @@ public partial class MainWindow
 
             for (int j = 0; j < verticesBySection; j++)
             {
-                sectionsVerticesArray[inormal].Normal = normal;
+                sectionsVerticesArray[idx++].Normal = normal;
             }
         }
+        
+        idx = 0;
+        for (int i = 0; i < sectionsCount - 1; i++)
+        {
+            var vertices1 = _sections[i].Vertices;
+            var vertices2 = _sections[i + 1].Vertices;
 
+            for (int j = 0; j < verticesBySection; j++)
+            {
+                Vector3 vector1;
+                Vector3 vector2;
+
+                if (j == verticesBySection - 1)
+                {
+                    vector1 = vertices1[j] - vertices1[0];
+                    vector2 = vertices2[0] - vertices1[0];
+                }
+                else
+                {
+                    vector1 = vertices1[j] - vertices1[j + 1];
+                    vector2 = vertices2[j + 1] - vertices1[j + 1];
+                }
+
+                var normal = Vector3.Normalize(Vector3.Cross(vector2, vector1));
+                facesVerticesArray[idx++].Normal = normal;
+            }
+        }
+        
         #endregion
 
         _renderables = new IRenderable[]
@@ -119,7 +174,13 @@ public partial class MainWindow
                 Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
                 Material.GoldMaterial
             }),
-            new RenderObject(_lampProgram, Primitives.Cube(0.5f), new IUniformContext[]
+            new RenderObject(_lightingProgram, facesVerticesArray, new IUniformContext[]
+            {
+                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
+                Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
+                Material.GoldMaterial
+            }, PrimitiveType.Quads),
+            new RenderObject(_lampProgram, Primitives.Cube(1.5f), new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix1, "model"))
             }),
@@ -155,26 +216,32 @@ public partial class MainWindow
             // Перенесем сечение в начало координат
             var toCenter = new Vector3() - sectionV.MassCenter();
             var translateMatrix = Matrix4.CreateTranslation(toCenter);
+            translateMatrix.Transpose();
             var vertices4 = sectionV.Select(vertex => translateMatrix * new Vector4(vertex, 1.0f)).ToList();
 
             // Выполняем преобразования
             var rotateMatrix = Matrix4.CreateFromAxisAngle(currTraj, (float)(angle * Math.PI / 180.0));
+            rotateMatrix.Transpose();
             vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
 
             var dotProduct = Vector3.Dot(currTraj, nextTraj);
             var rotAngle = (float)Math.Acos(dotProduct / (currTraj.Length * nextTraj.Length));
             var axis = Vector3.Cross(nextTraj, currTraj);
             rotateMatrix = axis.Length != 0.0f ? Matrix4.CreateFromAxisAngle(axis, -rotAngle) : Matrix4.Identity;
+            rotateMatrix.Transpose();
             var scaleMatrix = Matrix4.CreateScale(scale);
+            scaleMatrix.Transpose();
 
             vertices4 = vertices4.Select(vertex => rotateMatrix * vertex).ToList();
             vertices4 = vertices4.Select(vertex => scaleMatrix * vertex).ToList();
 
             // Возвращаем в исходное положение в мировом пространстве
             translateMatrix = Matrix4.CreateTranslation(sectionV.MassCenter());
+            translateMatrix.Transpose();
             vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
 
             translateMatrix = Matrix4.CreateTranslation(currTraj);
+            translateMatrix.Transpose();
 
             foreach (var vertex in vertices4)
             {
@@ -194,11 +261,14 @@ public partial class MainWindow
                 angle = _transforms[^1].Angle;
 
                 rotateMatrix = Matrix4.CreateFromAxisAngle(currTraj, (float)(angle * Math.PI / 180.0));
+                rotateMatrix.Transpose();
                 scaleMatrix = Matrix4.CreateScale(scale);
+                scaleMatrix.Transpose();
 
                 // Переносим сечение в начало координат
                 toCenter = new Vector3() - sectionV.MassCenter();
                 translateMatrix = Matrix4.CreateTranslation(toCenter);
+                translateMatrix.Transpose();
                 vertices4 = sectionV.Select(vertex => translateMatrix * new Vector4(vertex, 1.0f)).ToList();
 
                 // Выполняем преобразования
@@ -207,9 +277,11 @@ public partial class MainWindow
 
                 // Возвращаем в исходное положение в мировом пространстве
                 translateMatrix = Matrix4.CreateTranslation(sectionV.MassCenter());
+                translateMatrix.Transpose();
                 vertices4 = vertices4.Select(vertex => translateMatrix * vertex).ToList();
 
                 translateMatrix = Matrix4.CreateTranslation(currTraj);
+                translateMatrix.Transpose();
 
                 foreach (var vertex in vertices4)
                 {
