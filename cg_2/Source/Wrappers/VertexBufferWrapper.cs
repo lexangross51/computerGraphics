@@ -15,10 +15,10 @@ public class VertexBufferWrapper
         bool isNormalised,
         int size,
         int stride,
-        IntPtr ptr)
+        int ptr)
     {
         gl.BufferData(34962U, rawData, 35044U);
-        gl.VertexAttribPointer(attributeIndex, size, 5126U, isNormalised, stride, ptr);
+        gl.VertexAttribPointer(attributeIndex, size, 5126U, isNormalised, stride, (IntPtr)ptr);
         gl.EnableVertexAttribArray(attributeIndex);
     }
 
