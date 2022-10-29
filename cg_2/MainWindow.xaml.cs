@@ -1,4 +1,6 @@
-﻿using cg_2.Source.Primitives;
+﻿using cg_2.Source.Light;
+using cg_2.Source.Primitives;
+using Material = cg_2.Source.Material.Material;
 
 namespace cg_2;
 
@@ -22,7 +24,25 @@ public partial class MainWindow
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private readonly Texture[] _textures = { new(), new() };
-    private readonly vec3 _lightPos = new(1.2f, 3.0f, -5.0f);
+
+    private readonly Dictionary<string, Material> _materialDictionary = new()
+    {
+        { "Gold", Material.GoldMaterial },
+        { "Pearl", Material.PearlMaterial },
+        { "BlackPlastic", Material.BlackPlasticMaterial }
+    };
+
+    private readonly Dictionary<string, Light> _lightDictionary = new()
+    {
+        { "Directional", Light.DirectionalLight },
+        { "Point", Light.PointLight }, // need position,
+        { "PointWithAttenuation", Light.PointLightWithAttenuation },
+        { "Spot", Light.SpotLight },
+        { "None", new() }
+    };
+
+    private readonly vec3 _lightPos = new(-3.0f, 2.0f, -6.0f);
+    private readonly vec3 _lightDir = new(0f, 3.0f, 3.0f);
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "Нет текстуры", "Текстура_1", "Текстура_2" };
@@ -35,6 +55,8 @@ public partial class MainWindow
     private bool _isShowNormals;
     private bool _isSmoothedNormals;
     private int _normalsCount;
+    private string _currentLight = "Spot";
+    private string _currentMaterial = "Gold";
 
     public MainWindow()
     {
@@ -355,23 +377,53 @@ public partial class MainWindow
         var viewMatrix = glm.lookAt(_camera.Position, _camera.Position + _camera.Front, _camera.Up);
         var modelMatrix = mat4.identity();
 
+        _shaderProgram.Use();
+
         var modelLoc = _shaderProgram.GetUniformLocation("model");
         var viewLoc = _shaderProgram.GetUniformLocation("view");
         var projectionLoc = _shaderProgram.GetUniformLocation("projection");
 
-        var objectColorLoc = _shaderProgram.GetUniformLocation("objectColor");
-        var lightColorLoc = _shaderProgram.GetUniformLocation("lightColor");
-        var lightPosLoc = _shaderProgram.GetUniformLocation("lightPos");
-        var viewPosLoc = _shaderProgram.GetUniformLocation("viewPos");
+        var matAmbLoc = _shaderProgram.GetUniformLocation("material.ambient");
+        var matDiffLoc = _shaderProgram.GetUniformLocation("material.diffuse");
+        var matSpecLoc = _shaderProgram.GetUniformLocation("material.specular");
+        var matShinLoc = _shaderProgram.GetUniformLocation("material.shininess");
 
-        gl.Uniform3(objectColorLoc, 1.0f, 0.5f, 0.31f);
-        gl.Uniform3(lightColorLoc, 1.0f, 1.0f, 1.0f);
-        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, _lightPos.z);
-        gl.Uniform3(viewPosLoc, _camera.Position.x, _camera.Position.y, _camera.Position.z);
+        var lightPosLoc = _shaderProgram.GetUniformLocation("light.position");
+        var lightAmbLoc = _shaderProgram.GetUniformLocation("light.ambient");
+        var lightDiffLoc = _shaderProgram.GetUniformLocation("light.diffuse");
+        var lightSpecLoc = _shaderProgram.GetUniformLocation("light.specular");
+        var lightConstLoc = _shaderProgram.GetUniformLocation("light.constant");
+        var lightLinLoc = _shaderProgram.GetUniformLocation("light.linear");
+        var lightQuadLoc = _shaderProgram.GetUniformLocation("light.quadratic");
+        var lightCutLoc = _shaderProgram.GetUniformLocation("light.cutOff");
+        var lightOuterLoc = _shaderProgram.GetUniformLocation("light.outerCutOff");
+        var viewPosLoc = _shaderProgram.GetUniformLocation("viewPos");
 
         gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
+
+        gl.Uniform3(matAmbLoc, _materialDictionary[_currentMaterial].Ambient.x,
+            _materialDictionary[_currentMaterial].Ambient.y, _materialDictionary[_currentMaterial].Ambient.z);
+        gl.Uniform3(matDiffLoc, _materialDictionary[_currentMaterial].Diffuse.x,
+            _materialDictionary[_currentMaterial].Diffuse.y, _materialDictionary[_currentMaterial].Diffuse.z);
+        gl.Uniform3(matSpecLoc, _materialDictionary[_currentMaterial].Specular.x,
+            _materialDictionary[_currentMaterial].Specular.y, _materialDictionary[_currentMaterial].Specular.z);
+        gl.Uniform1(matShinLoc, _materialDictionary[_currentMaterial].Shininess);
+
+        gl.Uniform3(lightPosLoc, _lightDir.x, _lightDir.y, _lightDir.z);
+        gl.Uniform3(lightAmbLoc, _lightDictionary[_currentLight].Ambient.x, _lightDictionary[_currentLight].Ambient.y,
+            _lightDictionary[_currentLight].Ambient.z);
+        gl.Uniform3(lightDiffLoc, _lightDictionary[_currentLight].Diffuse.x, _lightDictionary[_currentLight].Diffuse.y,
+            _lightDictionary[_currentLight].Diffuse.z);
+        gl.Uniform3(lightSpecLoc, _lightDictionary[_currentLight].Specular.x,
+            _lightDictionary[_currentLight].Specular.y, _lightDictionary[_currentLight].Specular.z);
+        gl.Uniform1(lightConstLoc, _lightDictionary[_currentLight].Constant);
+        gl.Uniform1(lightLinLoc, _lightDictionary[_currentLight].Linear);
+        gl.Uniform1(lightQuadLoc, _lightDictionary[_currentLight].Quadratic);
+        gl.Uniform1(lightCutLoc, _lightDictionary[_currentLight].CutOff);
+        gl.Uniform1(lightOuterLoc, _lightDictionary[_currentLight].OuterCutOff);
+        gl.Uniform3(viewPosLoc, _camera.Position.x, _camera.Position.y, _camera.Position.z);
 
         var vertexCount = _sections[0].VertexCount;
         var sectionsCount = _sections.Count;
@@ -411,22 +463,22 @@ public partial class MainWindow
             gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
         }
 
-        _lampProgram.Use();
-
-        viewLoc = _lampProgram.GetUniformLocation("view");
-        gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
-
-        projectionLoc = _lampProgram.GetUniformLocation("projection");
-        gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
-
-        var model = mat4.identity();
-        model = glm.translate(model, new(_lightPos.x, _lightPos.y, _lightPos.z));
-        model = glm.scale(model, new(0.2f));
-        modelLoc = _lampProgram.GetUniformLocation("model");
-        gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
-
-        _lightVao.Bind(gl);
-        gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
+        // _lampProgram.Use();
+        //
+        // viewLoc = _lampProgram.GetUniformLocation("view");
+        // gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
+        //
+        // projectionLoc = _lampProgram.GetUniformLocation("projection");
+        // gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
+        //
+        // var model = mat4.identity();
+        // model = glm.translate(model, new(_lightPos.x, _lightPos.y, _lightPos.z));
+        // model = glm.scale(model, new(0.2f));
+        // modelLoc = _lampProgram.GetUniformLocation("model");
+        // gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
+        //
+        // _lightVao.Bind(gl);
+        // gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
 
         _deltaTime.Compute();
     }
