@@ -41,8 +41,10 @@ public partial class MainWindow
         { "None", new() }
     };
 
-    private readonly vec3 _lightPos = new(-3.0f, 2.0f, -6.0f);
-    private readonly vec3 _lightDir = new(2.0f, 1.0f, 0.0f);
+    private IEnumerable<string> LightTypes => _lightDictionary.Keys;
+
+    private readonly vec3 _lightPos = new(20.0f, 2.0f, -6.0f);
+    private readonly vec3 _lightDir = new(0.0f, 0.0f, -1.0f); // for spot
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "Нет текстуры", "Текстура_1", "Текстура_2" };
@@ -55,7 +57,7 @@ public partial class MainWindow
     private bool _isShowNormals;
     private bool _isSmoothedNormals;
     private int _normalsCount;
-    private string _currentLight = "Spot";
+    private string _currentLight = "Directional";
     private string _currentMaterial = "Gold";
 
     public MainWindow()
@@ -85,7 +87,7 @@ public partial class MainWindow
 
         #region Загрузка шейдеров
 
-        _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/lighting.frag", gl);
+        _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/directional.frag", gl);
         _normalProgram.Initialize("Source/Shaders/normals.vert", "Source/Shaders/normals.frag", gl);
         _textureProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/textures.frag", gl);
         _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag", gl);
@@ -466,19 +468,19 @@ public partial class MainWindow
         }
 
         _lampProgram.Use();
-        
+
         viewLoc = _lampProgram.GetUniformLocation("view");
         gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
-        
+
         projectionLoc = _lampProgram.GetUniformLocation("projection");
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
-        
+
         var model = mat4.identity();
         model = glm.translate(model, new(_lightPos.x, _lightPos.y, _lightPos.z));
         model = glm.scale(model, new(0.2f));
         modelLoc = _lampProgram.GetUniformLocation("model");
         gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
-        
+
         _lightVao.Bind(gl);
         gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
 
