@@ -42,7 +42,7 @@ public partial class MainWindow
     };
 
     private readonly vec3 _lightPos = new(-3.0f, 2.0f, -6.0f);
-    private readonly vec3 _lightDir = new(0f, 3.0f, 3.0f);
+    private readonly vec3 _lightDir = new(2.0f, 1.0f, 0.0f);
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "Нет текстуры", "Текстура_1", "Текстура_2" };
@@ -389,6 +389,7 @@ public partial class MainWindow
         var matShinLoc = _shaderProgram.GetUniformLocation("material.shininess");
 
         var lightPosLoc = _shaderProgram.GetUniformLocation("light.position");
+        var lightDirLoc = _shaderProgram.GetUniformLocation("light.direction");
         var lightAmbLoc = _shaderProgram.GetUniformLocation("light.ambient");
         var lightDiffLoc = _shaderProgram.GetUniformLocation("light.diffuse");
         var lightSpecLoc = _shaderProgram.GetUniformLocation("light.specular");
@@ -411,7 +412,8 @@ public partial class MainWindow
             _materialDictionary[_currentMaterial].Specular.y, _materialDictionary[_currentMaterial].Specular.z);
         gl.Uniform1(matShinLoc, _materialDictionary[_currentMaterial].Shininess);
 
-        gl.Uniform3(lightPosLoc, _lightDir.x, _lightDir.y, _lightDir.z);
+        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, _lightPos.z);
+        gl.Uniform3(lightDirLoc, _lightDir.x, _lightDir.y, _lightDir.z);
         gl.Uniform3(lightAmbLoc, _lightDictionary[_currentLight].Ambient.x, _lightDictionary[_currentLight].Ambient.y,
             _lightDictionary[_currentLight].Ambient.z);
         gl.Uniform3(lightDiffLoc, _lightDictionary[_currentLight].Diffuse.x, _lightDictionary[_currentLight].Diffuse.y,
@@ -463,22 +465,22 @@ public partial class MainWindow
             gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
         }
 
-        // _lampProgram.Use();
-        //
-        // viewLoc = _lampProgram.GetUniformLocation("view");
-        // gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
-        //
-        // projectionLoc = _lampProgram.GetUniformLocation("projection");
-        // gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
-        //
-        // var model = mat4.identity();
-        // model = glm.translate(model, new(_lightPos.x, _lightPos.y, _lightPos.z));
-        // model = glm.scale(model, new(0.2f));
-        // modelLoc = _lampProgram.GetUniformLocation("model");
-        // gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
-        //
-        // _lightVao.Bind(gl);
-        // gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
+        _lampProgram.Use();
+        
+        viewLoc = _lampProgram.GetUniformLocation("view");
+        gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
+        
+        projectionLoc = _lampProgram.GetUniformLocation("projection");
+        gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
+        
+        var model = mat4.identity();
+        model = glm.translate(model, new(_lightPos.x, _lightPos.y, _lightPos.z));
+        model = glm.scale(model, new(0.2f));
+        modelLoc = _lampProgram.GetUniformLocation("model");
+        gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
+        
+        _lightVao.Bind(gl);
+        gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
 
         _deltaTime.Compute();
     }
