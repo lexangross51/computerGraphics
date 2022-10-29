@@ -7,9 +7,11 @@ public partial class MainWindow
     private IRenderable[] _renderables = default!;
     private ShaderProgram _lightingProgram = default!;
     private ShaderProgram _lampProgram = default!;
-    private readonly Vector3 _lightPos = new(0.0f, 2.0f, 0.0f);
+    private readonly Vector3 _lightPos = new(0.5f, 0.0f, 0.0f);
+    private readonly Vector3 _lightDir = new(0.0f, -1.0f, 0.0f);
     private float _deltaTime;
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
+
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     // private Vertex[] _sectionsVertices = default!;
     // private Vertex[] _facesVertices = default!;
@@ -71,18 +73,19 @@ public partial class MainWindow
 
         var projectionMatrix = _camera.GetProjectionMatrix();
         var viewMatrix = _camera.GetViewMatrix();
-        var modelMatrix = Matrix4.CreateTranslation(new(0.0f, -2.0f, 0.0f));
+        var modelMatrix = Matrix4.CreateTranslation(new(0.5f, 0.0f, -2.0f));
         var modelMatrix1 = Matrix4.CreateScale(0.2f);
         modelMatrix1 *= Matrix4.CreateTranslation(_lightPos);
-        var model2 = Matrix4.CreateTranslation(new(-1.0f, -2.0f, 1.0f));
-        
+        var model2 = Matrix4.CreateTranslation(new(0.5f, -2.0f, 0.0f));
+        var model3 = Matrix4.CreateTranslation(new(2.0f, 0.0f, 0.0f));
+
         MakeReplication();
 
         #region Формирование вершин для сечений и граней
 
         var sectionsCount = _sections.Count;
         var verticesBySection = _sections[0].VertexCount;
-        var facesCount = (sectionsCount - 1) * verticesBySection; 
+        var facesCount = (sectionsCount - 1) * verticesBySection;
 
         var sectionsVerticesArray = new Vertex[sectionsCount * verticesBySection];
         var facesVerticesArray = new Vertex[facesCount * 4];
@@ -117,7 +120,7 @@ public partial class MainWindow
                 }
             }
         }
-        
+
         // Считаем нормали для каждой грани
         idx = 0;
         for (int i = 0; i < sectionsCount; i++)
@@ -136,7 +139,7 @@ public partial class MainWindow
                 sectionsVerticesArray[idx++].Normal = normal;
             }
         }
-        
+
         idx = 0;
         for (int i = 0; i < sectionsCount - 1; i++)
         {
@@ -163,33 +166,36 @@ public partial class MainWindow
                 facesVerticesArray[idx++].Normal = normal;
             }
         }
-        
+
         #endregion
 
         _renderables = new IRenderable[]
         {
-            new RenderObject(_lightingProgram, sectionsVerticesArray, new IUniformContext[]
+            new RenderObject(_lightingProgram, Primitives.Cube(1.0f), new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
-                Material.GoldMaterial
-            }),
-            new RenderObject(_lightingProgram, facesVerticesArray, new IUniformContext[]
-            {
-                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix, "model")),
-                Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
+                Lighting.BrightLight((_lightPos, "light.position"),
+                    (_lightDir, "light.direction"), "viewPos"),
                 Material.GoldMaterial
             }, PrimitiveType.Quads),
             new RenderObject(_lampProgram, Primitives.Cube(1.5f), new IUniformContext[]
             {
                 new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (modelMatrix1, "model"))
             }),
-            // new RenderObject(_lightingProgram, Primitives.Cube(0.5f), new IUniformContext[]
-            // {
-            //     new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (model2, "model")),
-            //     Lighting.BrightLight((_lightPos, "light.position"), "viewPos"),
-            //     Material.GoldMaterial
-            // })
+            new RenderObject(_lightingProgram, Primitives.Cube(0.5f), new IUniformContext[]
+            {
+                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (model2, "model")),
+                Lighting.BrightLight((_lightPos, "light.position"),
+                    (_lightDir, "light.direction"), "viewPos"),
+                Material.GoldMaterial
+            }),
+            new RenderObject(_lightingProgram, Primitives.Cube(0.5f), new IUniformContext[]
+            {
+                new Transformation((viewMatrix, "view"), (projectionMatrix, "projection"), (model3, "model")),
+                Lighting.BrightLight((_lightPos, "light.position"),
+                    (_lightDir, "light.direction"), "viewPos"),
+                Material.GoldMaterial
+            })
         };
 
         foreach (var renderable in _renderables)
@@ -200,7 +206,7 @@ public partial class MainWindow
 
         _renderServer = new(_renderables);
     }
-    
+
     private void MakeReplication()
     {
         for (var i = 0; i < _transforms.Count - 1; i++)

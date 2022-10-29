@@ -1,4 +1,6 @@
-﻿namespace cg_2.Source.UniformsContext;
+﻿using System.Windows.Media.Media3D;
+
+namespace cg_2.Source.UniformsContext;
 
 public interface IUniformContext
 {
@@ -64,6 +66,7 @@ public class Lighting : IUniformContext
     public (Vector3 Value, string Name) DiffuseContext { get; }
     public (Vector3 Value, string Name) SpecularContext { get; }
     public (Vector3 Value, string Name) LightPosContext { get; }
+    public (Vector3 Value, string Name) LightDirContext { get; }
     public (Attenuation Value, string NameConst, string NameLin, string NameQuad) AttenuationContext { get; }
     public (Spot Value, string NameCut, string NameOuterCut) SpotContext { get; }
     public string ViewPosName { get; }
@@ -72,6 +75,7 @@ public class Lighting : IUniformContext
         (Vector3 Value, string Name) diffuseContext,
         (Vector3 Value, string Name) specularContext,
         (Vector3 Value, string Name) lightPosContext,
+        (Vector3 Value, string Name) lightDirContext,
         (Attenuation Value, string NameConst, string NameLin, string NameQuad) attenuationContext,
         (Spot Value, string NameCut, string NameOuterCut) spotContext,
         string viewPosName)
@@ -80,6 +84,7 @@ public class Lighting : IUniformContext
         DiffuseContext = diffuseContext;
         SpecularContext = specularContext;
         LightPosContext = lightPosContext;
+        LightDirContext = lightDirContext;
         AttenuationContext = attenuationContext;
         SpotContext = spotContext;
         ViewPosName = viewPosName;
@@ -90,6 +95,7 @@ public class Lighting : IUniformContext
         shaderProgram.SetUniform(AmbientContext.Name, AmbientContext.Value);
         shaderProgram.SetUniform(DiffuseContext.Name, DiffuseContext.Value);
         shaderProgram.SetUniform(LightPosContext.Name, LightPosContext.Value);
+        shaderProgram.SetUniform(LightDirContext.Name, LightDirContext.Value);
         shaderProgram.SetUniform(AttenuationContext.NameConst, AttenuationContext.Value.Constant);
         shaderProgram.SetUniform(AttenuationContext.NameLin, AttenuationContext.Value.Linear);
         shaderProgram.SetUniform(AttenuationContext.NameQuad, AttenuationContext.Value.Quadratic);
@@ -104,14 +110,16 @@ public class Lighting : IUniformContext
     //         (new(0.5f), "light.diffuse"), (new(1.0f), "light.specular"),
     //         position, (new(1.0f, 0.0f, 0.0f), "light.constant", "light.linear", "light.quadratic"), viewPosName);
 
-    public static Lighting BrightLight((Vector3 Value, string Name) position, string viewPosName)
+    public static Lighting BrightLight((Vector3 Value, string Name) position, (Vector3 Value, string Name) direction,
+        string viewPosName)
         => new(
             (new(1.0f), "light.ambient"),
             (new(1.0f), "light.diffuse"),
             (new(1.0f), "light.specular"),
-            position, (new(1.0f, 0.0f, 0.0f), "light.constant", "light.linear", "light.quadratic"),
-            (new(MathF.Cos(MathHelper.DegreesToRadians(12.5f)), MathF.Cos(MathHelper.DegreesToRadians(17.5f))), "light.cutOff", "light.outerCutOff"),
-                viewPosName);
+            position, direction, (new(1.0f, 0.0f, 0.0f), "light.constant", "light.linear", "light.quadratic"),
+            (new(MathF.Cos(MathHelper.DegreesToRadians(12.5f)), MathF.Cos(MathHelper.DegreesToRadians(17.5f))),
+                "light.cutOff", "light.outerCutOff"),
+            viewPosName);
 
     // public static Lighting BrightLightAttenuation600((Vector3 Value, string Name) position, string viewPosName)
     //     => new(
