@@ -25,14 +25,14 @@ public partial class MainWindow
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private readonly Texture[] _textures = { new(), new() };
 
-    private readonly Dictionary<string, Material> _materialDictionary = new()
+    private static readonly Dictionary<string, Material> s_materialDictionary = new()
     {
         { "Gold", Material.GoldMaterial },
         { "Pearl", Material.PearlMaterial },
         { "BlackPlastic", Material.BlackPlasticMaterial }
     };
 
-    private readonly Dictionary<string, Light> _lightDictionary = new()
+    private static readonly Dictionary<string, Light> s_lightDictionary = new()
     {
         { "Directional", Light.DirectionalLight },
         { "Point", Light.PointLight }, // need position,
@@ -41,8 +41,8 @@ public partial class MainWindow
         { "None", new() }
     };
 
-    private IEnumerable<string> _lightTypes => _lightDictionary.Keys;
-    private IEnumerable<string> _materials => _materialDictionary.Keys;
+    private IEnumerable<string> _lightTypes = s_lightDictionary.Keys;
+    private IEnumerable<string> _materials = s_lightDictionary.Keys;
 
     private readonly vec3 _lightPos = new(20.0f, 2.0f, -6.0f);
     private readonly vec3 _lightDir = new(0.0f, 0.0f, -1.0f); // for spot
@@ -407,27 +407,27 @@ public partial class MainWindow
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
-        gl.Uniform3(matAmbLoc, _materialDictionary[_currentMaterial].Ambient.x,
-            _materialDictionary[_currentMaterial].Ambient.y, _materialDictionary[_currentMaterial].Ambient.z);
-        gl.Uniform3(matDiffLoc, _materialDictionary[_currentMaterial].Diffuse.x,
-            _materialDictionary[_currentMaterial].Diffuse.y, _materialDictionary[_currentMaterial].Diffuse.z);
-        gl.Uniform3(matSpecLoc, _materialDictionary[_currentMaterial].Specular.x,
-            _materialDictionary[_currentMaterial].Specular.y, _materialDictionary[_currentMaterial].Specular.z);
-        gl.Uniform1(matShinLoc, _materialDictionary[_currentMaterial].Shininess);
+        gl.Uniform3(matAmbLoc, s_materialDictionary[_currentMaterial].Ambient.x,
+            s_materialDictionary[_currentMaterial].Ambient.y, s_materialDictionary[_currentMaterial].Ambient.z);
+        gl.Uniform3(matDiffLoc, s_materialDictionary[_currentMaterial].Diffuse.x,
+            s_materialDictionary[_currentMaterial].Diffuse.y, s_materialDictionary[_currentMaterial].Diffuse.z);
+        gl.Uniform3(matSpecLoc, s_materialDictionary[_currentMaterial].Specular.x,
+            s_materialDictionary[_currentMaterial].Specular.y, s_materialDictionary[_currentMaterial].Specular.z);
+        gl.Uniform1(matShinLoc, s_materialDictionary[_currentMaterial].Shininess);
 
         gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, _lightPos.z);
         gl.Uniform3(lightDirLoc, _lightDir.x, _lightDir.y, _lightDir.z);
-        gl.Uniform3(lightAmbLoc, _lightDictionary[_currentLight].Ambient.x, _lightDictionary[_currentLight].Ambient.y,
-            _lightDictionary[_currentLight].Ambient.z);
-        gl.Uniform3(lightDiffLoc, _lightDictionary[_currentLight].Diffuse.x, _lightDictionary[_currentLight].Diffuse.y,
-            _lightDictionary[_currentLight].Diffuse.z);
-        gl.Uniform3(lightSpecLoc, _lightDictionary[_currentLight].Specular.x,
-            _lightDictionary[_currentLight].Specular.y, _lightDictionary[_currentLight].Specular.z);
-        gl.Uniform1(lightConstLoc, _lightDictionary[_currentLight].Constant);
-        gl.Uniform1(lightLinLoc, _lightDictionary[_currentLight].Linear);
-        gl.Uniform1(lightQuadLoc, _lightDictionary[_currentLight].Quadratic);
-        gl.Uniform1(lightCutLoc, _lightDictionary[_currentLight].CutOff);
-        gl.Uniform1(lightOuterLoc, _lightDictionary[_currentLight].OuterCutOff);
+        gl.Uniform3(lightAmbLoc, s_lightDictionary[_currentLight].Ambient.x, s_lightDictionary[_currentLight].Ambient.y,
+            s_lightDictionary[_currentLight].Ambient.z);
+        gl.Uniform3(lightDiffLoc, s_lightDictionary[_currentLight].Diffuse.x, s_lightDictionary[_currentLight].Diffuse.y,
+            s_lightDictionary[_currentLight].Diffuse.z);
+        gl.Uniform3(lightSpecLoc, s_lightDictionary[_currentLight].Specular.x,
+            s_lightDictionary[_currentLight].Specular.y, s_lightDictionary[_currentLight].Specular.z);
+        gl.Uniform1(lightConstLoc, s_lightDictionary[_currentLight].Constant);
+        gl.Uniform1(lightLinLoc, s_lightDictionary[_currentLight].Linear);
+        gl.Uniform1(lightQuadLoc, s_lightDictionary[_currentLight].Quadratic);
+        gl.Uniform1(lightCutLoc, s_lightDictionary[_currentLight].CutOff);
+        gl.Uniform1(lightOuterLoc, s_lightDictionary[_currentLight].OuterCutOff);
         gl.Uniform3(viewPosLoc, _camera.Position.x, _camera.Position.y, _camera.Position.z);
 
         var vertexCount = _sections[0].VertexCount;
