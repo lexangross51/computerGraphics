@@ -1,16 +1,51 @@
-﻿namespace cg_2;
+﻿using cg_2.Source.Light;
+using cg_2.Source.Primitives;
+using Material = cg_2.Source.Material.Material;
+
+namespace cg_2;
 
 public partial class MainWindow
 {
-    private readonly Camera _mainCamera = new();
-    private readonly VertexBufferArray _vao = new(), _normalVao = new();
-    private readonly VertexBufferWrapper _vbo = new(new VertexBuffer()), _normalVbo = new(new VertexBuffer());
-    private readonly ShaderProgram _shaderProgram = new();
-    private readonly ShaderProgram _normalProgram = new();
-    private readonly ShaderProgram _textureProgram = new();
+    private readonly Camera _camera = new();
+
+    private readonly VertexBufferArray _vao = new(),
+        _normalVao = new(),
+        _objectVao = new(),
+        _lightVao = new();
+
+    private readonly VertexBufferWrapper _vbo = new(new()),
+        _normalVbo = new(new()),
+        _objectVbo = new(new());
+
+    private readonly ShaderProgramWrapper _shaderProgram = new(new());
+    private readonly ShaderProgramWrapper _normalProgram = new(new());
+    private readonly ShaderProgramWrapper _textureProgram = new(new());
+    private readonly ShaderProgramWrapper _lampProgram = new(new());
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private readonly Texture[] _textures = { new(), new() };
+
+    private static readonly Dictionary<string, Material> s_materialDictionary = new()
+    {
+        { "Gold", Material.GoldMaterial },
+        { "Pearl", Material.PearlMaterial },
+        { "BlackPlastic", Material.BlackPlasticMaterial }
+    };
+
+    private static readonly Dictionary<string, Light> s_lightDictionary = new()
+    {
+        { "Directional", Light.DirectionalLight },
+        { "Point", Light.PointLight }, // need position,
+        { "PointWithAttenuation", Light.PointLightWithAttenuation },
+        { "Spot", Light.SpotLight },
+        { "None", new() }
+    };
+
+    private IEnumerable<string> _lightTypes = s_lightDictionary.Keys;
+    private IEnumerable<string> _materials = s_lightDictionary.Keys;
+
+    private readonly vec3 _lightPos = new(20.0f, 2.0f, -6.0f);
+    private readonly vec3 _lightDir = new(0.0f, 0.0f, -1.0f); // for spot
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "Нет текстуры", "Текстура_1", "Текстура_2" };
@@ -23,6 +58,8 @@ public partial class MainWindow
     private bool _isShowNormals;
     private bool _isSmoothedNormals;
     private int _normalsCount;
+    private string _currentLight = "Directional";
+    private string _currentMaterial = "Gold";
 
     public MainWindow()
     {
@@ -31,34 +68,19 @@ public partial class MainWindow
         TextureName.SelectedItem = "Нет текстуры";
     }
 
-    private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
+    private void OnKeyDown(object sender, KeyEventArgs e)
     {
-        switch (e.Key)
-        {
-            case Key.W:
-                _mainCamera.Move(CameraMovement.Forward, _deltaTime.Result);
-                break;
-            case Key.S:
-                _mainCamera.Move(CameraMovement.Backward, _deltaTime.Result);
-                break;
-            case Key.A:
-                _mainCamera.Move(CameraMovement.Left, _deltaTime.Result);
-                break;
-            case Key.D:
-                _mainCamera.Move(CameraMovement.Right, _deltaTime.Result);
-                break;
-            case Key.Space:
-                _mainCamera.Move(CameraMovement.Up, _deltaTime.Result);
-                break;
-            case Key.LeftCtrl:
-                _mainCamera.Move(CameraMovement.Down, _deltaTime.Result);
-                break;
-        }
+        if (e.KeyboardDevice.IsKeyDown(Key.W)) _camera.Move(CameraMovement.Forward, _deltaTime.Result);
+        if (e.KeyboardDevice.IsKeyDown(Key.S)) _camera.Move(CameraMovement.Backward, _deltaTime.Result);
+        if (e.KeyboardDevice.IsKeyDown(Key.A)) _camera.Move(CameraMovement.Left, _deltaTime.Result);
+        if (e.KeyboardDevice.IsKeyDown(Key.D)) _camera.Move(CameraMovement.Right, _deltaTime.Result);
+        if (e.KeyboardDevice.IsKeyDown(Key.Space)) _camera.Move(CameraMovement.Up, _deltaTime.Result);
+        if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl)) _camera.Move(CameraMovement.Down, _deltaTime.Result);
     }
 
     #region OpenGL
 
-    private void OpenGLControl_OnOpenGLInitialized(object sender, OpenGLRoutedEventArgs args)
+    private void OnOpenGLInitialized(object sender, OpenGLRoutedEventArgs args)
     {
         var gl = args.OpenGL;
         gl.Enable(OpenGL.GL_DEPTH_TEST);
@@ -66,54 +88,14 @@ public partial class MainWindow
 
         #region Загрузка шейдеров
 
-        VertexShader vertexShader = new();
-        vertexShader.CreateInContext(gl);
-        vertexShader.LoadSource("Source/Shaders/shader.vert");
-
-        FragmentShader fragmentShader = new();
-        fragmentShader.CreateInContext(gl);
-        fragmentShader.LoadSource("Source/Shaders/shader.frag");
-
-        VertexShader normalVertexShader = new();
-        normalVertexShader.CreateInContext(gl);
-        normalVertexShader.LoadSource("Source/Shaders/normals.vert");
-
-        FragmentShader normalFragmentShader = new();
-        normalFragmentShader.CreateInContext(gl);
-        normalFragmentShader.LoadSource("Source/Shaders/normals.frag");
-
-        FragmentShader textureFragmentShader = new();
-        textureFragmentShader.CreateInContext(gl);
-        textureFragmentShader.LoadSource("Source/Shaders/textures.frag");
-
-        vertexShader.Compile();
-        normalVertexShader.Compile();
-        fragmentShader.Compile();
-        normalFragmentShader.Compile();
-        textureFragmentShader.Compile();
-
-        _shaderProgram.CreateInContext(gl);
-        _shaderProgram.AttachShader(vertexShader);
-        _shaderProgram.AttachShader(fragmentShader);
-        _shaderProgram.Link();
-
-        _normalProgram.CreateInContext(gl);
-        _normalProgram.AttachShader(normalVertexShader);
-        _normalProgram.AttachShader(normalFragmentShader);
-        _normalProgram.Link();
-
-        _textureProgram.CreateInContext(gl);
-        _textureProgram.AttachShader(vertexShader);
-        _textureProgram.AttachShader(textureFragmentShader);
-        _textureProgram.Link();
-
-        fragmentShader.DestroyInContext(gl);
-        normalFragmentShader.DestroyInContext(gl);
-        textureFragmentShader.DestroyInContext(gl);
-        vertexShader.DestroyInContext(gl);
-        normalVertexShader.DestroyInContext(gl);
+        _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/directional.frag", gl);
+        _normalProgram.Initialize("Source/Shaders/normals.vert", "Source/Shaders/normals.frag", gl);
+        _textureProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/textures.frag", gl);
+        _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag", gl);
 
         #endregion
+
+        var cubeVertices = Primitives.Cube;
 
         MakeReplication();
 
@@ -336,27 +318,43 @@ public partial class MainWindow
 
         _vao.Create(gl);
         _normalVao.Create(gl);
+        _objectVao.Create(gl);
+        _lightVao.Create(gl);
         _vbo.Create(gl);
+        _objectVbo.Create(gl);
         _normalVbo.Create(gl);
 
         _vao.Bind(gl);
         _vbo.Bind(gl);
 
-        _vbo.SetData(gl, 0, vertices, false, 3, 8 * sizeof(float), IntPtr.Zero);
-        _vbo.SetData(gl, 1, vertices, false, 3, 8 * sizeof(float), new IntPtr(3 * sizeof(float)));
-        _vbo.SetData(gl, 2, vertices, false, 2, 8 * sizeof(float), new IntPtr(6 * sizeof(float)));
+        _vbo.SetData(gl, 0, vertices, false, 3, 8 * sizeof(float), 0);
+        _vbo.SetData(gl, 1, vertices, false, 3, 8 * sizeof(float), 3 * sizeof(float));
+        _vbo.SetData(gl, 2, vertices, false, 2, 8 * sizeof(float), 6 * sizeof(float));
         _vao.Unbind(gl);
 
         // Для отрисовки нормалей
         _normalVao.Bind(gl);
         _normalVbo.Bind(gl);
-        _normalVbo.SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
+        _normalVbo.SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), 0);
         _normalVao.Unbind(gl);
+
+        _objectVao.Bind(gl);
+        _objectVbo.Bind(gl);
+
+        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6 * sizeof(float), 0);
+        _objectVbo.SetData(gl, 1, cubeVertices, false, 3, 6 * sizeof(float), 3 * sizeof(float));
+        _objectVao.Unbind(gl);
+
+        _lightVao.Bind(gl);
+        _objectVbo.Bind(gl);
+
+        _objectVbo.SetData(gl, 0, cubeVertices, false, 3, 6 * sizeof(float), 0);
+        _lightVao.Unbind(gl);
 
         #endregion
     }
 
-    private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
+    private void OnOpenGLDraw(object sender, OpenGLRoutedEventArgs args)
     {
         var gl = args.OpenGL;
         var width = gl.RenderContextProvider.Width;
@@ -368,28 +366,69 @@ public partial class MainWindow
 
         if (!_isTexturize)
         {
-            _shaderProgram.Push(gl, null);
+            _shaderProgram.Use();
         }
         else
         {
             _textures[_textureId].Bind(gl);
-            _textureProgram.Push(gl, null);
+            _textureProgram.Use();
         }
 
         var projectionMatrix = _isPerspective
             ? glm.perspective(45.0f, width / (float)height, 0.1f, 100.0f)
             : glm.ortho(-width / 50f, width / 50f, -height / 50f, height / 50f, 0.1f, 100);
-        var viewMatrix = glm.lookAt(_mainCamera.Position, _mainCamera.Position + _mainCamera.Front, _mainCamera.Up);
+        var viewMatrix = glm.lookAt(_camera.Position, _camera.Position + _camera.Front, _camera.Up);
         var modelMatrix = mat4.identity();
+
+        _shaderProgram.Use();
 
         var modelLoc = _shaderProgram.GetUniformLocation("model");
         var viewLoc = _shaderProgram.GetUniformLocation("view");
         var projectionLoc = _shaderProgram.GetUniformLocation("projection");
 
+        var matAmbLoc = _shaderProgram.GetUniformLocation("material.ambient");
+        var matDiffLoc = _shaderProgram.GetUniformLocation("material.diffuse");
+        var matSpecLoc = _shaderProgram.GetUniformLocation("material.specular");
+        var matShinLoc = _shaderProgram.GetUniformLocation("material.shininess");
+
+        var lightPosLoc = _shaderProgram.GetUniformLocation("light.position");
+        var lightDirLoc = _shaderProgram.GetUniformLocation("light.direction");
+        var lightAmbLoc = _shaderProgram.GetUniformLocation("light.ambient");
+        var lightDiffLoc = _shaderProgram.GetUniformLocation("light.diffuse");
+        var lightSpecLoc = _shaderProgram.GetUniformLocation("light.specular");
+        var lightConstLoc = _shaderProgram.GetUniformLocation("light.constant");
+        var lightLinLoc = _shaderProgram.GetUniformLocation("light.linear");
+        var lightQuadLoc = _shaderProgram.GetUniformLocation("light.quadratic");
+        var lightCutLoc = _shaderProgram.GetUniformLocation("light.cutOff");
+        var lightOuterLoc = _shaderProgram.GetUniformLocation("light.outerCutOff");
+        var viewPosLoc = _shaderProgram.GetUniformLocation("viewPos");
+
         gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
+        gl.Uniform3(matAmbLoc, s_materialDictionary[_currentMaterial].Ambient.x,
+            s_materialDictionary[_currentMaterial].Ambient.y, s_materialDictionary[_currentMaterial].Ambient.z);
+        gl.Uniform3(matDiffLoc, s_materialDictionary[_currentMaterial].Diffuse.x,
+            s_materialDictionary[_currentMaterial].Diffuse.y, s_materialDictionary[_currentMaterial].Diffuse.z);
+        gl.Uniform3(matSpecLoc, s_materialDictionary[_currentMaterial].Specular.x,
+            s_materialDictionary[_currentMaterial].Specular.y, s_materialDictionary[_currentMaterial].Specular.z);
+        gl.Uniform1(matShinLoc, s_materialDictionary[_currentMaterial].Shininess);
+
+        gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, _lightPos.z);
+        gl.Uniform3(lightDirLoc, _lightDir.x, _lightDir.y, _lightDir.z);
+        gl.Uniform3(lightAmbLoc, s_lightDictionary[_currentLight].Ambient.x, s_lightDictionary[_currentLight].Ambient.y,
+            s_lightDictionary[_currentLight].Ambient.z);
+        gl.Uniform3(lightDiffLoc, s_lightDictionary[_currentLight].Diffuse.x, s_lightDictionary[_currentLight].Diffuse.y,
+            s_lightDictionary[_currentLight].Diffuse.z);
+        gl.Uniform3(lightSpecLoc, s_lightDictionary[_currentLight].Specular.x,
+            s_lightDictionary[_currentLight].Specular.y, s_lightDictionary[_currentLight].Specular.z);
+        gl.Uniform1(lightConstLoc, s_lightDictionary[_currentLight].Constant);
+        gl.Uniform1(lightLinLoc, s_lightDictionary[_currentLight].Linear);
+        gl.Uniform1(lightQuadLoc, s_lightDictionary[_currentLight].Quadratic);
+        gl.Uniform1(lightCutLoc, s_lightDictionary[_currentLight].CutOff);
+        gl.Uniform1(lightOuterLoc, s_lightDictionary[_currentLight].OuterCutOff);
+        gl.Uniform3(viewPosLoc, _camera.Position.x, _camera.Position.y, _camera.Position.z);
 
         var vertexCount = _sections[0].VertexCount;
         var sectionsCount = _sections.Count;
@@ -412,21 +451,10 @@ public partial class MainWindow
             gl.DrawArrays(OpenGL.GL_POLYGON, 4 * i, 4);
         }
 
-        if (!_isTexturize)
-        {
-            _shaderProgram.Pop(gl, null);
-        }
-        else
-        {
-            _textureProgram.Pop(gl, null);
-        }
-
-        _vao.Unbind(gl);
-
         // Отрисовка нормалей
         if (_isShowNormals)
         {
-            _normalProgram.Push(gl, null);
+            _normalProgram.Use();
 
             modelLoc = _normalProgram.GetUniformLocation("model");
             viewLoc = _normalProgram.GetUniformLocation("view");
@@ -438,24 +466,39 @@ public partial class MainWindow
 
             _normalVao.Bind(gl);
             gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
-            _normalProgram.Pop(gl, null);
-            _normalVao.Unbind(gl);
         }
+
+        _lampProgram.Use();
+
+        viewLoc = _lampProgram.GetUniformLocation("view");
+        gl.UniformMatrix4(viewLoc, 1, false, viewMatrix.to_array());
+
+        projectionLoc = _lampProgram.GetUniformLocation("projection");
+        gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
+
+        var model = mat4.identity();
+        model = glm.translate(model, new(_lightPos.x, _lightPos.y, _lightPos.z));
+        model = glm.scale(model, new(0.2f));
+        modelLoc = _lampProgram.GetUniformLocation("model");
+        gl.UniformMatrix4(modelLoc, 1, false, model.to_array());
+
+        _lightVao.Bind(gl);
+        gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 36);
 
         _deltaTime.Compute();
     }
 
-    private void OpenGLControl_OnMouseMove(object sender, MouseEventArgs e)
+    private void OnMouseMove(object sender, MouseEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed)
         {
             var pos = e.GetPosition(this);
 
-            _mainCamera.LookAt((float)pos.X, (float)pos.Y);
+            _camera.LookAt((float)pos.X, (float)pos.Y);
         }
         else
         {
-            _mainCamera.FirstMouse = true;
+            _camera.FirstMouse = true;
         }
     }
 
@@ -494,11 +537,11 @@ public partial class MainWindow
 
         if (slider!.Name == "CameraSpeed")
         {
-            _mainCamera.Speed = (float)e.NewValue;
+            _camera.Speed = (float)e.NewValue;
         }
         else
         {
-            _mainCamera.Sensitivity = (float)e.NewValue;
+            _camera.Sensitivity = (float)e.NewValue;
         }
     }
 

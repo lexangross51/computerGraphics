@@ -5,16 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280" KeyDown="MainWindow_OnKeyDown">
+        Title="MainWindow" Height="720" Width="1280" KeyDown="OnKeyDown">
     <DockPanel>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <sharpGl:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
-                                   OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
-                                   MouseMove="OpenGLControl_OnMouseMove"
+            <sharpGl:OpenGLControl OpenGLDraw="OnOpenGLDraw"
+                                   OpenGLInitialized="OnOpenGLInitialized"
+                                   MouseMove="OnMouseMove" FrameRate="144"
                                    RenderContextType="FBO" DockPanel.Dock="Left" />
             <Border Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
                     CornerRadius="4">
