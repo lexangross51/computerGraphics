@@ -1,4 +1,4 @@
-﻿namespace cg_2.Source.Extensions;
+﻿namespace cg_2.Model.Source.Extensions;
 
 public static class GlmVectorExtensions
 {

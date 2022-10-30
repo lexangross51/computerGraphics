@@ -8,7 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
 		<PackageReference Include="GlmNet" Version="0.7.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-rc.2.22472.3" />
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
 		<PackageReference Include="SharpGL" Version="3.1.1" />
 		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
@@ -33,17 +36,17 @@
 		<Using Include="SharpGL.SceneGraph.Assets" />
 		<Using Include="SharpGL.VertexBuffers" />
 		<Using Include="Newtonsoft.Json" />
-		<Using Include="cg_2.Source.Camera" />
-		<Using Include="cg_2.Source.Polygon" />
-		<Using Include="cg_2.Source.Extensions" />
-		<Using Include="cg_2.Source.Wrappers" />
+		<Using Include="cg_2.Model.Source.Camera" />
+		<Using Include="cg_2.Model.Source.Polygon" />
+		<Using Include="cg_2.Model.Source.Extensions" />
+		<Using Include="cg_2.Model.Source.Wrappers" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Source\Shaders\shader.frag">
+	  <None Update="Model\Source\Shaders\shader.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\shader.vert">
+	  <None Update="Model\Source\Shaders\shader.vert">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Input\Section.json">
@@ -52,42 +55,43 @@
 	  <None Update="Input\Transform.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Textures\face.png">
+	  <None Update="Model\Textures\face.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\normals.vert">
+	  <None Update="Model\Source\Shaders\normals.vert">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\normals.frag">
+	  <None Update="Model\Source\Shaders\normals.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Resources\Textures\wall.bmp">
+	  <None Update="Model\Resources\Textures\wall.bmp">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Resources\Textures\face.png">
+	  <None Update="Model\Resources\Textures\face.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\textures.frag">
+	  <None Update="Model\Source\Shaders\textures.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\lamp.frag">
+	  <None Update="Model\Source\Shaders\lamp.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\spot.frag">
+	  <None Update="Model\Source\Shaders\spot.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\object.vert">
+	  <None Update="Model\Source\Shaders\object.vert">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\point.frag">
+	  <None Update="Model\Source\Shaders\point.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Source\Shaders\directional.frag">
+	  <None Update="Model\Source\Shaders\directional.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Model" />
 	  <Folder Include="Resources" />
 	</ItemGroup>
 

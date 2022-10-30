@@ -1,21 +1,38 @@
-﻿<Window x:Class="cg_2.MainWindow"
+﻿<Window x:Class="cg_2.Views.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:views="clr-namespace:cg_2.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280" KeyDown="OnKeyDown">
+        Title="MainWindow" Height="720" Width="1280"
+        DataContext="{Binding MainViewModel, Source={StaticResource Locator }}"
+        KeyDown="OnKeyDown">
     <DockPanel>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <sharpGl:OpenGLControl OpenGLDraw="OnOpenGLDraw"
-                                   OpenGLInitialized="OnOpenGLInitialized"
-                                   MouseMove="OnMouseMove" FrameRate="144"
-                                   RenderContextType="FBO" DockPanel.Dock="Left" />
+            <views:OpenGlControl Grid.Column="0" GlControl="{Binding GlControlViewModel.GlControl}"
+                                 DockPanel.Dock="Left">
+                <!-- <sharpGl:OpenGLControl RenderContextType="FBO" FrameRate="144"> -->
+                <!--     <i:Interaction.Triggers> -->
+                <!--         <i:EventTrigger EventName="MouseDoubleClick"> -->
+                <!--             <i:InvokeCommandAction Command="{Binding GlControlViewModel.OnInitializeCommand}" /> -->
+                <!--         </i:EventTrigger> -->
+                <!--         <i:EventTrigger EventName="OpenGLDraw"> -->
+                <!--             <i:InvokeCommandAction Command="{Binding GlControlViewModel.OnRenderCommand}" /> -->
+                <!--         </i:EventTrigger> -->
+                <!--         <i:EventTrigger EventName="MouseMove"> -->
+                <!--             <i:InvokeCommandAction Command="{Binding GlControlViewModel.OnMoveMouseCommand}" /> -->
+                <!--         </i:EventTrigger> -->
+                <!--     </i:Interaction.Triggers> -->
+                <!-- </sharpGl:OpenGLControl> -->
+            </views:OpenGlControl>
+
             <Border Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
                     CornerRadius="4">
                 <StackPanel DockPanel.Dock="Right">

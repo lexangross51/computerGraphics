@@ -1,4 +1,4 @@
-﻿namespace cg_2.Source.Camera;
+﻿namespace cg_2.Model.Source.Camera;
 
 public class DeltaTime
 {

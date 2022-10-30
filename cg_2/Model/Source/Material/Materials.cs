@@ -1,20 +1,7 @@
-﻿namespace cg_2.Source.Material;
+﻿namespace cg_2.Model.Source.Material;
 
-public readonly record struct Material
+public readonly record struct Material(vec3 Ambient, vec3 Diffuse, vec3 Specular, float Shininess)
 {
-    public vec3 Ambient { get; }
-    public vec3 Diffuse { get; }
-    public vec3 Specular { get; }
-    public float Shininess { get; }
-
-    public Material(vec3 ambient, vec3 diffuse, vec3 specular, float shininess)
-    {
-        Ambient = ambient;
-        Diffuse = diffuse;
-        Specular = specular;
-        Shininess = shininess;
-    }
-
     public static Material GoldMaterial
         => new(new(0.24725f, 0.1995f, 0.0745f),
             new(0.75164f, 0.60648f, 0.22648f),

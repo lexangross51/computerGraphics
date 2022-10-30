@@ -1,4 +1,4 @@
-﻿namespace cg_2.Source.Primitives;
+﻿namespace cg_2.Model.Source.Primitives;
 
 public static class Primitives
 {

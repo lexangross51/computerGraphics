@@ -1,4 +1,4 @@
-﻿namespace cg_2.Source.Light;
+﻿namespace cg_2.Model.Source.Light;
 
 public enum LightType
 {
@@ -10,15 +10,15 @@ public enum LightType
 
 public struct Light
 {
-    public vec3 Ambient { get; set; }
-    public vec3 Diffuse { get; set; }
-    public vec3 Specular { get; set; }
-    public float Constant { get; set; }
-    public float Linear { get; set; }
-    public float Quadratic { get; set; }
-    public float CutOff { get; set; }
-    public float OuterCutOff { get; set; }
-    public LightType LightType { get; set; }
+    public vec3 Ambient { get; init; }
+    public vec3 Diffuse { get; init; }
+    public vec3 Specular { get; init; }
+    public float Constant { get; init; }
+    public float Linear { get; init; }
+    public float Quadratic { get; init; }
+    public float CutOff { get; init; }
+    public float OuterCutOff { get; init; }
+    public LightType LightType { get; init; }
 
     public static Light DirectionalLight => new()
     {

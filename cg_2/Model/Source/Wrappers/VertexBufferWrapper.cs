@@ -1,4 +1,4 @@
-﻿namespace cg_2.Source.Wrappers;
+﻿namespace cg_2.Model.Source.Wrappers;
 
 public class VertexBufferWrapper
 {

@@ -1,4 +1,4 @@
-﻿namespace cg_2.Source.Polygon;
+﻿namespace cg_2.Model.Source.Polygon;
 
 public class PolygonSection : ICloneable
 {

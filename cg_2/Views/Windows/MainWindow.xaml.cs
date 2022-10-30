@@ -1,8 +1,8 @@
-﻿using cg_2.Source.Light;
-using cg_2.Source.Primitives;
-using Material = cg_2.Source.Material.Material;
+﻿using cg_2.Model.Source.Light;
+using cg_2.Model.Source.Primitives;
+using Material = cg_2.Model.Source.Material.Material;
 
-namespace cg_2;
+namespace cg_2.Views.Windows;
 
 public partial class MainWindow
 {
@@ -88,10 +88,10 @@ public partial class MainWindow
 
         #region Загрузка шейдеров
 
-        _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/directional.frag", gl);
-        _normalProgram.Initialize("Source/Shaders/normals.vert", "Source/Shaders/normals.frag", gl);
-        _textureProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/textures.frag", gl);
-        _lampProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/lamp.frag", gl);
+        _shaderProgram.Initialize("Model/Source/Shaders/shader.vert", "Model/Source/Shaders/directional.frag", gl);
+        _normalProgram.Initialize("Model/Source/Shaders/normals.vert", "Model/Source/Shaders/normals.frag", gl);
+        _textureProgram.Initialize("Model/Source/Shaders/shader.vert", "Model/Source/Shaders/textures.frag", gl);
+        _lampProgram.Initialize("Model/Source/Shaders/object.vert", "Model/Source/Shaders/lamp.frag", gl);
 
         #endregion
 
@@ -419,7 +419,8 @@ public partial class MainWindow
         gl.Uniform3(lightDirLoc, _lightDir.x, _lightDir.y, _lightDir.z);
         gl.Uniform3(lightAmbLoc, s_lightDictionary[_currentLight].Ambient.x, s_lightDictionary[_currentLight].Ambient.y,
             s_lightDictionary[_currentLight].Ambient.z);
-        gl.Uniform3(lightDiffLoc, s_lightDictionary[_currentLight].Diffuse.x, s_lightDictionary[_currentLight].Diffuse.y,
+        gl.Uniform3(lightDiffLoc, s_lightDictionary[_currentLight].Diffuse.x,
+            s_lightDictionary[_currentLight].Diffuse.y,
             s_lightDictionary[_currentLight].Diffuse.z);
         gl.Uniform3(lightSpecLoc, s_lightDictionary[_currentLight].Specular.x,
             s_lightDictionary[_currentLight].Specular.y, s_lightDictionary[_currentLight].Specular.z);
