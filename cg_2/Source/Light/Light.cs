@@ -35,9 +35,9 @@ public struct Light
 
     public static Light PointLight => new()
     {
-        Ambient = new(1.0f),
-        Diffuse = new(1.0f),
-        Specular = new(1.0f),
+        Ambient = new(0.7f),
+        Diffuse = new(0.7f),
+        Specular = new(0.7f),
         Constant = 1.0f,
         Linear = 0.0f,
         Quadratic = 0.0f,
