@@ -8,6 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0" />
 		<PackageReference Include="GlmNet" Version="0.7.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
 		<PackageReference Include="SharpGL" Version="3.1.1" />
