@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280" KeyDown="OnKeyDown">
@@ -14,7 +15,7 @@
             </Grid.ColumnDefinitions>
             <sharpGl:OpenGLControl OpenGLDraw="OnOpenGLDraw"
                                    OpenGLInitialized="OnOpenGLInitialized"
-                                   MouseMove="OnMouseMove" FrameRate="144"
+                                   MouseMove="OnMouseMove" FrameRate="60"
                                    RenderContextType="FBO" DockPanel.Dock="Left" />
             <Border Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
                     CornerRadius="4">
@@ -74,8 +75,28 @@
                         </StackPanel>
                     </GroupBox>
                     <GroupBox FontSize="11" Header="Текстурирование" Margin="5, 5, 5, 0" Padding="4">
-                        <ComboBox Name="TextureName" SelectionChanged="ComboBoxSelected">
-                        </ComboBox>
+                        <ComboBox Name="TextureName" SelectionChanged="ComboBoxSelected" />
+                    </GroupBox>
+                    <GroupBox FontSize="11" Header="Освещение" Margin="5, 5, 5, 0" Padding="4">
+                        <StackPanel>
+                            <ComboBox Name="LightSourceType" SelectionChanged="ComboBoxSelected"/>
+                            <Label Content="Позиция источника"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="X"/> <xctk:IntegerUpDown Name="XPos" Height="30" Value="2" ValueChanged="UpDownBase_OnValueChanged"/>
+                                    <Label Content="Y"/> <xctk:IntegerUpDown Name="YPos" Height="30" Value="2" ValueChanged="UpDownBase_OnValueChanged"/>
+                                    <Label Content="Z"/> <xctk:IntegerUpDown Name="ZPos" Height="30" Value="-6" ValueChanged="UpDownBase_OnValueChanged"/>
+                                </StackPanel>
+                            
+                            <Label Content="Направление освещения"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="XDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
+                                <Label Content="Y"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="YDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
+                                <Label Content="Z"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="ZDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox FontSize="11" Header="Материалы" Margin="5, 5, 5, 0" Padding="4">
+                        <ComboBox Name="MaterialName" SelectionChanged="ComboBoxSelected" />
                     </GroupBox>
                 </StackPanel>
             </Border>
