@@ -1,13 +1,14 @@
-﻿<Window x:Class="cg_2.MainWindow"
+﻿<Window x:Class="cg_2.Views.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:control="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
+        DataContext="{Binding MainViewModel,Source={StaticResource Locator}}"
         Title="MainWindow" Height="720" Width="1280">
     <DockPanel>
-        <control:GLWpfControl x:Name="OpenTkControl" Render="OnRender" Initialized="OnInitialize"
+        <control:GLWpfControl x:Name="OpenTkControl" Initialized="OnInitialize"
                               MouseMove="OnMouseMove" KeyDown="OnKeyDown" MouseWheel="OnMouseWheel"/>
     </DockPanel>
 </Window>
