@@ -28,7 +28,7 @@ public class MainCamera
     public bool FirstMouse { get; set; }
     public float Sensitivity { get; set; }
     public float Speed { get; set; }
-    public float AspectRatio { get; set; }
+    public float AspectRatio { get; set; } = 1920.0f / 1080.0f; // TODO
 
     public Vector3 Position { get; private set; }
     public Vector3 Front { get; private set; }

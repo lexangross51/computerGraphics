@@ -1,4 +1,5 @@
 ﻿using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace cg_2.Source.Render;
 
@@ -6,23 +7,20 @@ public interface IBaseGraphic
 {
     public float DeltaTime { get; set; }
     public IEnumerable<IRenderable>? RenderObjects { set; }
+    public MainCamera Camera { get; }
 
-    public void Render(MainCamera camera);
+    public void Render();
 }
 
 public class RenderServer : ReactiveObject, IBaseGraphic
 {
-    private float _deltaTime;
-
-    public float DeltaTime
-    {
-        get => _deltaTime;
-        set => this.RaiseAndSetIfChanged(ref _deltaTime, value);
-    }
-
+    [Reactive] public float DeltaTime { get; set; }
     public IEnumerable<IRenderable>? RenderObjects { get; set; }
+    public MainCamera Camera { get; }
+    
+    public RenderServer(MainCamera? camera = null) => Camera = camera ?? new(CameraMode.Perspective);
 
-    public void Render(MainCamera camera)
+    public void Render()
     {
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -31,7 +29,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         {
             renderObject.Vao.Bind();
             renderObject.ShaderProgram.Use();
-            renderObject.UpdateUniform(camera);
+            renderObject.UpdateUniform(Camera);
             GL.DrawArrays(renderObject.PrimitiveType, 0, renderObject.Vertices.Length);
         }
     }

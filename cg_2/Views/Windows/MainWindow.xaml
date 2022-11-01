@@ -8,7 +8,7 @@
         DataContext="{Binding MainViewModel,Source={StaticResource Locator}}"
         Title="MainWindow" Height="720" Width="1280">
     <DockPanel>
-        <control:GLWpfControl x:Name="OpenTkControl" Initialized="OnInitialize"
+        <control:GLWpfControl x:Name="OpenTkControl"
                               MouseMove="OnMouseMove" KeyDown="OnKeyDown" MouseWheel="OnMouseWheel"/>
     </DockPanel>
 </Window>
