@@ -11,41 +11,53 @@ public partial class MainWindow
 
     private readonly VertexBufferArray 
         _vao = new(),
-        _normalVao = new(),
+        // _normalVao = new(),
         _objectVao = new(),
         _lightVao = new();
 
+    private readonly VertexBufferArray[] _normalVao =
+    {
+        new(), // Несглаженные нормали
+        new()  // Сглаженные нормали
+    };
+    
     private readonly VertexBufferWrapper 
-        _vbo = new(new()),
-        _normalVbo = new(new()),
-        _objectVbo = new(new());
+        _vbo = new(new VertexBuffer()),
+        // _normalVbo = new(new VertexBuffer()),
+        _objectVbo = new(new VertexBuffer());
+
+    private readonly VertexBufferWrapper[] _normalVbo =
+    {
+        new(new VertexBuffer()), // несглаженные нормали
+        new(new VertexBuffer())  // сглаженные нормали
+    };
 
     private readonly ShaderProgramWrapper
-        _normalProgram = new(new()),
-        _textureProgram = new(new()),
-        _lampProgram = new(new());
+        _normalProgram = new(new ShaderProgram()),
+        _textureProgram = new(new ShaderProgram()),
+        _lampProgram = new(new ShaderProgram());
 
     private readonly ShaderProgramWrapper[] _shaderPrograms = 
     {
-        new(new()), // обычный
-        new(new()), // направленный
-        new(new()), // точечный
-        new(new()), // точечный с затуханием
-        new(new())  // прожектор
+        new(new ShaderProgram()), // обычный
+        new(new ShaderProgram()), // направленный
+        new(new ShaderProgram()), // точечный
+        new(new ShaderProgram()), // точечный с затуханием
+        new(new ShaderProgram())  // прожектор
     };
 
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
     private readonly List<Transform> _transforms = Transform.ReadJson("Input/Transform.json").ToList();
     private readonly Texture[] _textures = { new(), new() };
 
-    private static readonly Dictionary<string, Material> s_materialDictionary = new()
+    private static readonly Dictionary<string, Material> _materialDictionary = new()
     {
         { "Gold", Material.GoldMaterial },
         { "Pearl", Material.PearlMaterial },
         { "BlackPlastic", Material.BlackPlasticMaterial }
     };
 
-    private static readonly Dictionary<string?, Light> s_lightDictionary = new()
+    private static readonly Dictionary<string, Light> _lightDictionary = new()
     {
         { "None", new() },
         { "Directional", Light.DirectionalLight },
@@ -54,11 +66,11 @@ public partial class MainWindow
         { "Spot", Light.SpotLight }
     };
 
-    private IEnumerable<string?> _lightTypes = s_lightDictionary.Keys;
-    private IEnumerable<string?> _materials = s_materialDictionary.Keys;
+    private IEnumerable<string> _lightTypes = _lightDictionary.Keys;
+    private IEnumerable<string> _materials = _materialDictionary.Keys;
 
     private vec3 _lightPos = new(2.0f, 2.0f, -6.0f);
-    private vec3 _lightDir = new(0.0f, -1.0f, 0.0f); // for spot
+    private vec3 _lightDir = new(0.0f, -1.0f, 0.0f); // for spot and directional
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "No texture", "Texture_1", "Texture_2" };
@@ -71,6 +83,7 @@ public partial class MainWindow
     private bool _isShowNormals;
     private bool _isSmoothedNormals;
     private int _normalsCount;
+    private int _smoothedNormalsCount;
     private string _currentLight = "None";
     private int _currentProgram;
     private string _currentMaterial = "Gold";
@@ -129,11 +142,12 @@ public partial class MainWindow
 
         var sectionsCount = _sections.Count;
         var verticesCount = _sections[0].VertexCount;
-        int k, l, ivertex = 0;
+        int k = 0, l = 0, ivertex = 0;
 
         var listVert = _sections.SelectMany(section => section.Vertices).ToList();
         List<vec3> normals = new();
         List<vec3> normalLines = new();
+        Dictionary<vec3, vec3> smoothedNormalsDictionary = new();
 
         // Формируем список координат сечений и боковых граней
         for (int i = 0; i < sectionsCount - 1; i++)
@@ -201,7 +215,7 @@ public partial class MainWindow
             }
         }
 
-        // Задаем нормали отрезками
+        // Задаем нормали отрезками и сразу считаем сглаженные нормали
         for (k = 0; k < sectionsCount; k++)
         {
             var sectionVert = _sections[k].Vertices;
@@ -210,6 +224,9 @@ public partial class MainWindow
             {
                 normalLines.Add(t);
                 normalLines.Add(t + normals[k]);
+
+                if (smoothedNormalsDictionary.ContainsKey(t)) smoothedNormalsDictionary[t] += normals[k];
+                else smoothedNormalsDictionary.Add(t, normals[k]);
             }
         }
 
@@ -230,6 +247,11 @@ public partial class MainWindow
                     normalLines.Add(vertS2[j] + normals[k]);
                     normalLines.Add(vertS2[0]);
                     normalLines.Add(vertS2[0] + normals[k]);
+                    
+                    smoothedNormalsDictionary[vertS1[j]] += normals[k];
+                    smoothedNormalsDictionary[vertS1[0]] += normals[k];
+                    smoothedNormalsDictionary[vertS2[j]] += normals[k];
+                    smoothedNormalsDictionary[vertS2[0]] += normals[k];                    
                 }
                 else
                 {
@@ -241,18 +263,40 @@ public partial class MainWindow
                     normalLines.Add(vertS2[j] + normals[k]);
                     normalLines.Add(vertS2[j + 1]);
                     normalLines.Add(vertS2[j + 1] + normals[k]);
+                    
+                    smoothedNormalsDictionary[vertS1[j]] += normals[k];
+                    smoothedNormalsDictionary[vertS1[j + 1]] += normals[k];
+                    smoothedNormalsDictionary[vertS2[j]] += normals[k];
+                    smoothedNormalsDictionary[vertS2[j + 1]] += normals[k];
                 }
             }
         }
 
         var normalLinesArray = new float[3 * normalLines.Count];
+        var smoothedNormalsArray = new float[2 * 3 * smoothedNormalsDictionary.Count];
+        
         _normalsCount = normalLinesArray.Length;
+        _smoothedNormalsCount = smoothedNormalsArray.Length;
 
         foreach (var (normal, idx) in normalLines.Select((normal, idx) => (normal, idx)))
         {
             normalLinesArray[3 * idx] = normal.x;
             normalLinesArray[3 * idx + 1] = normal.y;
             normalLinesArray[3 * idx + 2] = normal.z;
+        }
+
+        foreach (var (point, value) in smoothedNormalsDictionary)
+        {
+            var normal = glm.normalize(value);
+
+            smoothedNormalsArray[3 * l] = point.x;
+            smoothedNormalsArray[3 * l + 1] = point.y;
+            smoothedNormalsArray[3 * l + 2] = point.z;
+            l++;
+            smoothedNormalsArray[3 * l] = point.x + normal.x;
+            smoothedNormalsArray[3 * l + 1] = point.y + normal.y;
+            smoothedNormalsArray[3 * l + 2] = point.z + normal.z;
+            l++;
         }
 
         // Формируем текстурные координаты
@@ -343,12 +387,14 @@ public partial class MainWindow
         #region Привязка буферов
 
         _vao.Create(gl);
-        _normalVao.Create(gl);
+        _normalVao[0].Create(gl);
+        _normalVao[1].Create(gl);
         _objectVao.Create(gl);
         _lightVao.Create(gl);
         _vbo.Create(gl);
         _objectVbo.Create(gl);
-        _normalVbo.Create(gl);
+        _normalVbo[0].Create(gl);
+        _normalVbo[1].Create(gl);
 
         _vao.Bind(gl);
         _vbo.Bind(gl);
@@ -357,12 +403,15 @@ public partial class MainWindow
         _vbo.SetData(gl, 1, vertices, false, 3, 8 * sizeof(float), new IntPtr(3 * sizeof(float)));
         _vbo.SetData(gl, 2, vertices, false, 2, 8 * sizeof(float), new IntPtr(6 * sizeof(float)));
         _vao.Unbind(gl);
-
-        // Для отрисовки нормалей
-        _normalVao.Bind(gl);
-        _normalVbo.Bind(gl);
-        _normalVbo.SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
-        _normalVao.Unbind(gl);
+        
+        _normalVao[0].Bind(gl);
+        _normalVbo[0].Bind(gl);
+        _normalVbo[0].SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
+        _normalVao[0].Unbind(gl);
+        _normalVao[1].Bind(gl);
+        _normalVbo[1].Bind(gl);
+        _normalVbo[1].SetData(gl, 0, smoothedNormalsArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
+        _normalVao[1].Unbind(gl);
 
         _objectVao.Bind(gl);
         _objectVbo.Bind(gl);
@@ -431,27 +480,27 @@ public partial class MainWindow
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
-        gl.Uniform3(matAmbLoc, s_materialDictionary[_currentMaterial].Ambient.x,
-            s_materialDictionary[_currentMaterial].Ambient.y, s_materialDictionary[_currentMaterial].Ambient.z);
-        gl.Uniform3(matDiffLoc, s_materialDictionary[_currentMaterial].Diffuse.x,
-            s_materialDictionary[_currentMaterial].Diffuse.y, s_materialDictionary[_currentMaterial].Diffuse.z);
-        gl.Uniform3(matSpecLoc, s_materialDictionary[_currentMaterial].Specular.x,
-            s_materialDictionary[_currentMaterial].Specular.y, s_materialDictionary[_currentMaterial].Specular.z);
-        gl.Uniform1(matShinLoc, s_materialDictionary[_currentMaterial].Shininess);
+        gl.Uniform3(matAmbLoc,  _materialDictionary[_currentMaterial].Ambient.x, _materialDictionary[_currentMaterial].Ambient.y, 
+            _materialDictionary[_currentMaterial].Ambient.z);
+        gl.Uniform3(matDiffLoc, _materialDictionary[_currentMaterial].Diffuse.x, _materialDictionary[_currentMaterial].Diffuse.y,
+            _materialDictionary[_currentMaterial].Diffuse.z);
+        gl.Uniform3(matSpecLoc, _materialDictionary[_currentMaterial].Specular.x, _materialDictionary[_currentMaterial].Specular.y, 
+            _materialDictionary[_currentMaterial].Specular.z);
+        gl.Uniform1(matShinLoc, _materialDictionary[_currentMaterial].Shininess);
 
         gl.Uniform3(lightPosLoc, _lightPos.x, _lightPos.y, _lightPos.z);
         gl.Uniform3(lightDirLoc, _lightDir.x, _lightDir.y, _lightDir.z);
-        gl.Uniform3(lightAmbLoc, s_lightDictionary[_currentLight].Ambient.x, s_lightDictionary[_currentLight].Ambient.y,
-            s_lightDictionary[_currentLight].Ambient.z);
-        gl.Uniform3(lightDiffLoc, s_lightDictionary[_currentLight].Diffuse.x, s_lightDictionary[_currentLight].Diffuse.y,
-            s_lightDictionary[_currentLight].Diffuse.z);
-        gl.Uniform3(lightSpecLoc, s_lightDictionary[_currentLight].Specular.x,
-            s_lightDictionary[_currentLight].Specular.y, s_lightDictionary[_currentLight].Specular.z);
-        gl.Uniform1(lightConstLoc, s_lightDictionary[_currentLight].Constant);
-        gl.Uniform1(lightLinLoc, s_lightDictionary[_currentLight].Linear);
-        gl.Uniform1(lightQuadLoc, s_lightDictionary[_currentLight].Quadratic);
-        gl.Uniform1(lightCutLoc, s_lightDictionary[_currentLight].CutOff);
-        gl.Uniform1(lightOuterLoc, s_lightDictionary[_currentLight].OuterCutOff);
+        gl.Uniform3(lightAmbLoc, _lightDictionary[_currentLight].Ambient.x, _lightDictionary[_currentLight].Ambient.y,
+            _lightDictionary[_currentLight].Ambient.z);
+        gl.Uniform3(lightDiffLoc, _lightDictionary[_currentLight].Diffuse.x, _lightDictionary[_currentLight].Diffuse.y,
+            _lightDictionary[_currentLight].Diffuse.z);
+        gl.Uniform3(lightSpecLoc, _lightDictionary[_currentLight].Specular.x,
+            _lightDictionary[_currentLight].Specular.y, _lightDictionary[_currentLight].Specular.z);
+        gl.Uniform1(lightConstLoc, _lightDictionary[_currentLight].Constant);
+        gl.Uniform1(lightLinLoc, _lightDictionary[_currentLight].Linear);
+        gl.Uniform1(lightQuadLoc, _lightDictionary[_currentLight].Quadratic);
+        gl.Uniform1(lightCutLoc, _lightDictionary[_currentLight].CutOff);
+        gl.Uniform1(lightOuterLoc, _lightDictionary[_currentLight].OuterCutOff);
         gl.Uniform3(viewPosLoc, _camera.Position.x, _camera.Position.y, _camera.Position.z);
 
         var vertexCount = _sections[0].VertexCount;
@@ -488,8 +537,16 @@ public partial class MainWindow
             gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
             gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
-            _normalVao.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
+            if (!_isSmoothedNormals)
+            {
+                _normalVao[0].Bind(gl);
+                gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);   
+            }
+            else
+            {
+                _normalVao[1].Bind(gl);
+                gl.DrawArrays(OpenGL.GL_LINES, 0, _smoothedNormalsCount);
+            }
         }
 
         _lampProgram.Use();
