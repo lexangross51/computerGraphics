@@ -1,6 +1,4 @@
-﻿using System.Windows.Media.Media3D;
-
-namespace cg_2.Source.UniformsContext;
+﻿namespace cg_2.Source.UniformsContext;
 
 public interface IUniformContext
 {
@@ -65,8 +63,8 @@ public class Lighting : IUniformContext
     public (Vector3 Value, string Name) AmbientContext { get; }
     public (Vector3 Value, string Name) DiffuseContext { get; }
     public (Vector3 Value, string Name) SpecularContext { get; }
-    public (Vector3 Value, string Name) LightPosContext { get; }
-    public (Vector3 Value, string Name) LightDirContext { get; }
+    public (Vector3 Value, string Name) LightPosContext { get; set; }
+    public (Vector3 Value, string Name) LightDirContext { get; set; }
     public (Attenuation Value, string NameConst, string NameLin, string NameQuad) AttenuationContext { get; }
     public (Spot Value, string NameCut, string NameOuterCut) SpotContext { get; }
     public string ViewPosName { get; }

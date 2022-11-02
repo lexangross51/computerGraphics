@@ -6,28 +6,42 @@ namespace cg_2.ViewModels;
 public class DrawingViewModel : ReactiveObject
 {
     public IBaseGraphic BaseGraphic { get; }
-    [Reactive] public Vector3 LightDirection { get; set; } = new(1.0f, 0.0f, 0.0f);
-    [Reactive] public Vector3 LightPosition { get; set; } = new(0.0f, 0.0f, 0.0f);
+    public Vector3 LightPosition { get; } // TODO -> reactive attribute dont work, may be need use wrapper
+    public Vector3 LightDirection { get; }
+
+    [Reactive] public float X { get; set; } = 1.0f;
+    [Reactive] public float Y { get; set; } = 0.0f;
+    [Reactive] public float Z { get; set; } = 0.0f;
 
     public DrawingViewModel(IBaseGraphic baseGraphic)
     {
         BaseGraphic = baseGraphic;
-        this.WhenAnyValue(x => x.LightDirection, x => x.LightDirection).Subscribe(_ => UpdateUniforms());
+        LightDirection = new(1.0f, 0.0f, 0.0f);
+        LightPosition = new(0.0f);
+        this.WhenAnyValue(x => x.X, x => x.Y, x => x.Z).Subscribe(_ => UpdateUniforms());
     }
 
     private void UpdateUniforms()
     {
-        throw new NotImplementedException();
+        if (BaseGraphic.RenderObjects is null) return;
+        foreach (var @object in BaseGraphic.RenderObjects)
+        {
+            var uniform = @object.UniformContext.OfType<Lighting>().FirstOrDefault();
+
+            if (uniform is null) return;
+
+            uniform.LightDirContext = uniform.LightDirContext with { Value = new(X, Y, Z) };
+        }
     }
 
     public void OnRender(TimeSpan deltaTime)
     {
         BaseGraphic.DeltaTime = (float)deltaTime.TotalMilliseconds;
-        CreateRenderObjects();
+        BaseGraphic.RenderObjects ??= CreateRenderObjects();
         BaseGraphic.Render();
     }
 
-    private void CreateRenderObjects()
+    private IRenderable[] CreateRenderObjects()
     {
         ShaderProgram lightingProgram = new();
         lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/pointLight.frag");
@@ -78,6 +92,6 @@ public class DrawingViewModel : ReactiveObject
                 new VertexBufferObject<float>());
         }
 
-        BaseGraphic.RenderObjects = renderObjects;
+        return renderObjects;
     }
 }

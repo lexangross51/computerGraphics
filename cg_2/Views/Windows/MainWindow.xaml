@@ -8,7 +8,50 @@
         DataContext="{Binding MainViewModel,Source={StaticResource Locator}}"
         Title="MainWindow" Height="720" Width="1280">
     <DockPanel>
-        <control:GLWpfControl x:Name="OpenTkControl"
-                              MouseMove="OnMouseMove" KeyDown="OnKeyDown" MouseWheel="OnMouseWheel"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width=".25*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <control:GLWpfControl Grid.RowSpan="2" x:Name="OpenTkControl" DockPanel.Dock="Left"
+                                  MouseMove="OnMouseMove" KeyDown="OnKeyDown"
+                                  MouseWheel="OnMouseWheel" />
+            <Border Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
+                    CornerRadius="4">
+                <GroupBox Header="Parameters panel">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="DirX" />
+                            <TextBox Text="{Binding DrawingViewModel.X}"
+                                     VerticalAlignment="Center"
+                                     Width="20" />
+                        </StackPanel>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="DirY" />
+                                <TextBox
+                                    Text="{Binding DrawingViewModel.Y}"
+                                    VerticalAlignment="Center"
+                                    Width="20" />
+                            </StackPanel>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="DirZ" />
+                                    <TextBox
+                                        Text="{Binding DrawingViewModel.Z}"
+                                        VerticalAlignment="Center"
+                                        Width="20" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </Border>
+        </Grid>
     </DockPanel>
 </Window>

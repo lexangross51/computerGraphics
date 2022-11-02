@@ -20,8 +20,8 @@ public partial class MainWindow : IViewFor<MainViewModel>
 
     public MainWindow()
     {
-        ViewModel = App.Current.Services.GetRequiredService<MainViewModel>();
         InitializeComponent();
+        ViewModel = App.Current.Services.GetRequiredService<MainViewModel>();
         var mainSettings = new GLWpfControlSettings();
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new(1920, 1080);
@@ -36,6 +36,8 @@ public partial class MainWindow : IViewFor<MainViewModel>
 
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
+        e.Handled = true;
+
         if (e.KeyboardDevice.IsKeyDown(Key.W)) _camera.Move(CameraMovement.Forward, _deltaTime);
         if (e.KeyboardDevice.IsKeyDown(Key.S)) _camera.Move(CameraMovement.Backward, _deltaTime);
         if (e.KeyboardDevice.IsKeyDown(Key.A)) _camera.Move(CameraMovement.Left, _deltaTime);

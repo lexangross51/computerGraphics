@@ -6,7 +6,7 @@ namespace cg_2.Source.Render;
 public interface IBaseGraphic
 {
     public float DeltaTime { get; set; }
-    public IEnumerable<IRenderable>? RenderObjects { set; }
+    public IEnumerable<IRenderable>? RenderObjects { get; set; }
     public MainCamera Camera { get; }
 
     public void Render();
@@ -17,7 +17,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
     [Reactive] public float DeltaTime { get; set; }
     public IEnumerable<IRenderable>? RenderObjects { get; set; }
     public MainCamera Camera { get; }
-    
+
     public RenderServer(MainCamera? camera = null) => Camera = camera ?? new(CameraMode.Perspective);
 
     public void Render()
