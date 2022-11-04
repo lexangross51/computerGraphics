@@ -1,6 +1,6 @@
 ﻿namespace cg_2.Source.Extensions;
 
-public static class GlmVectorExtensions
+public static class Extensions
 {
     public static Vector3 MassCenter(this IEnumerable<Vector3> collection)
     {

@@ -12,6 +12,12 @@ public interface IBaseGraphic
     public void Render(TimeSpan deltaTime);
 }
 
+public interface IViewable
+{
+    public IRenderable[] CreateRenderObjects();
+    public void UpdateUniforms();
+}
+
 public class RenderServer : ReactiveObject, IBaseGraphic
 {
     [Reactive] public float DeltaTime { get; set; }

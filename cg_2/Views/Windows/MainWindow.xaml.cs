@@ -1,10 +1,4 @@
-﻿using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using cg_2.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI;
-
-namespace cg_2.Views.Windows;
+﻿namespace cg_2.Views.Windows;
 
 #nullable disable
 public partial class MainWindow : IViewFor<MainViewModel>

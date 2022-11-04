@@ -1,10 +1,6 @@
-﻿using System.Reactive;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿namespace cg_2.ViewModels;
 
-namespace cg_2.ViewModels;
-
-public class DrawingViewModel : ReactiveObject
+public class DrawingViewModel : ReactiveObject, IViewable
 {
     public IBaseGraphic BaseGraphic { get; }
     public Vector3 LightPosition { get; } // TODO -> reactive attribute dont work, may be need use wrapper
@@ -28,7 +24,7 @@ public class DrawingViewModel : ReactiveObject
             .Subscribe(_ => UpdateUniforms());
     }
 
-    private void UpdateUniforms()
+    public void UpdateUniforms()
     {
         if (BaseGraphic.RenderObjects is null) return;
         foreach (var @object in BaseGraphic.RenderObjects)
@@ -41,7 +37,7 @@ public class DrawingViewModel : ReactiveObject
         }
     }
 
-    private IRenderable[] CreateRenderObjects()
+    public IRenderable[] CreateRenderObjects()
     {
         ShaderProgram lightingProgram = new();
         lightingProgram.Initialize("Source/Shaders/object.vert", "Source/Shaders/pointLight.frag");

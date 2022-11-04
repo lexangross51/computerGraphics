@@ -1,7 +1,4 @@
-﻿using cg_2.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace cg_2
+﻿namespace cg_2
 {
     ////// <summary>
     /// Interaction logic for App.xaml

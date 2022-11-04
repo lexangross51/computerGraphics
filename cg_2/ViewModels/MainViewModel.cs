@@ -1,6 +1,4 @@
-﻿using ReactiveUI;
-
-namespace cg_2.ViewModels;
+﻿namespace cg_2.ViewModels;
 
 public class MainViewModel : ReactiveObject
 {

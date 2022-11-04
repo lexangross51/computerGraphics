@@ -39,6 +39,11 @@
 		<Using Include="cg_2.Source.Render" />
 		<Using Include="cg_2.Source.UniformsContext" />
 		<Using Include="cg_2.Source.Extensions" />
+		<Using Include="cg_2.ViewModels" />
+		<Using Include="System.Reactive" />
+		<Using Include="ReactiveUI" />
+		<Using Include="ReactiveUI.Fody.Helpers" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
 	</ItemGroup>
 
 	<ItemGroup>

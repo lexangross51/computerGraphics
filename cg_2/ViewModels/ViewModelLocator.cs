@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace cg_2.ViewModels;
+﻿namespace cg_2.ViewModels;
 
 public class ViewModelLocator
 {
