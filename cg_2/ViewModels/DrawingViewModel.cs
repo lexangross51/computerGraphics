@@ -35,7 +35,7 @@ public class DrawingViewModel : ReactiveObject
         {
             var uniform = @object.UniformContext.OfType<Lighting>().FirstOrDefault();
 
-            if (uniform is null) return;
+            if (uniform is null) continue;
 
             uniform.LightDirContext = uniform.LightDirContext with { Value = new(X, Y, Z) };
         }
