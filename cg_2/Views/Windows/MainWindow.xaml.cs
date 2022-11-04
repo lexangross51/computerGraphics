@@ -1,4 +1,5 @@
-﻿using cg_2.ViewModels;
+﻿using System.Reactive.Disposables;
+using cg_2.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
@@ -22,8 +23,11 @@ public partial class MainWindow : IViewFor<MainViewModel>
         var mainSettings = new GLWpfControlSettings();
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new(1920, 1080);
+        ViewModel.DrawingViewModel.BaseGraphic.Camera.AspectRatio =
+            (float)(OpenTkControl.RenderSize.Width / OpenTkControl.RenderSize.Height);
         GL.ClearColor(Color.Black);
         GL.Enable(EnableCap.DepthTest);
+        if (OpenTkControl.IsInitialized) ViewModel.DrawingViewModel.InitializeContextRenderCommand.Execute();
         OpenTkControl.Render += ViewModel.DrawingViewModel.OnRender;
     }
 

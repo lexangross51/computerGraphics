@@ -29,7 +29,7 @@
                             <Label Content="DirX" />
                             <TextBox Text="{Binding DrawingViewModel.X}"
                                      VerticalAlignment="Center"
-                                     Width="20" />
+                                     Width="20" x:Name="TextBox"/>
                         </StackPanel>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">

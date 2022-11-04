@@ -21,14 +21,14 @@ public class MainCamera
     private float _yaw;
     private float _pitch;
     private float _lastX, _lastY;
-    private Vector3 _worldUp;
+    private readonly Vector3 _worldUp;
     private Vector3 _right;
     private float _fov = MathHelper.PiOver2;
 
     public bool FirstMouse { get; set; }
     public float Sensitivity { get; set; }
     public float Speed { get; set; }
-    public float AspectRatio { get; set; } = 1920.0f / 1080.0f; // TODO
+    public float AspectRatio { get; set; }
 
     public Vector3 Position { get; private set; }
     public Vector3 Front { get; private set; }

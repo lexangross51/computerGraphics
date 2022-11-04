@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using System.Reactive;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace cg_2.ViewModels;
@@ -12,13 +13,19 @@ public class DrawingViewModel : ReactiveObject
     [Reactive] public float X { get; set; } = 1.0f;
     [Reactive] public float Y { get; set; } = 0.0f;
     [Reactive] public float Z { get; set; } = 0.0f;
+    public ReactiveCommand<Unit, Unit> InitializeContextRenderCommand { get; }
 
     public DrawingViewModel(IBaseGraphic baseGraphic)
     {
         BaseGraphic = baseGraphic;
         LightDirection = new(1.0f, 0.0f, 0.0f);
         LightPosition = new(0.0f);
-        this.WhenAnyValue(x => x.X, x => x.Y, x => x.Z).Subscribe(_ => UpdateUniforms());
+        InitializeContextRenderCommand = ReactiveCommand.Create(() =>
+        {
+            BaseGraphic.RenderObjects ??= CreateRenderObjects();
+        });
+        this.WhenAnyValue(x => x.X, x => x.Y, x => x.Z)
+            .Subscribe(_ => UpdateUniforms());
     }
 
     private void UpdateUniforms()
