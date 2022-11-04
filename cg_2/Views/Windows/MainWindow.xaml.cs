@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using cg_2.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
@@ -27,8 +28,8 @@ public partial class MainWindow : IViewFor<MainViewModel>
             (float)(OpenTkControl.RenderSize.Width / OpenTkControl.RenderSize.Height);
         GL.ClearColor(Color.Black);
         GL.Enable(EnableCap.DepthTest);
-        if (OpenTkControl.IsInitialized) ViewModel.DrawingViewModel.InitializeContextRenderCommand.Execute();
-        OpenTkControl.Render += ViewModel.DrawingViewModel.OnRender;
+        if (OpenTkControl.IsInitialized) ViewModel.DrawingViewModel.InitializeContextRenderCommand.Execute().Subscribe();
+        OpenTkControl.Render += ViewModel.DrawingViewModel.BaseGraphic.Render;
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)

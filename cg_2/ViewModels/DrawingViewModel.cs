@@ -41,13 +41,6 @@ public class DrawingViewModel : ReactiveObject
         }
     }
 
-    public void OnRender(TimeSpan deltaTime)
-    {
-        BaseGraphic.DeltaTime = (float)deltaTime.TotalMilliseconds;
-        BaseGraphic.RenderObjects ??= CreateRenderObjects();
-        BaseGraphic.Render();
-    }
-
     private IRenderable[] CreateRenderObjects()
     {
         ShaderProgram lightingProgram = new();

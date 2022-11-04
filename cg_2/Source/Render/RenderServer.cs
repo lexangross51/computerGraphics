@@ -9,7 +9,7 @@ public interface IBaseGraphic
     public IEnumerable<IRenderable>? RenderObjects { get; set; }
     public MainCamera Camera { get; }
 
-    public void Render();
+    public void Render(TimeSpan deltaTime);
 }
 
 public class RenderServer : ReactiveObject, IBaseGraphic
@@ -20,8 +20,10 @@ public class RenderServer : ReactiveObject, IBaseGraphic
 
     public RenderServer(MainCamera? camera = null) => Camera = camera ?? new(CameraMode.Perspective);
 
-    public void Render()
+    public void Render(TimeSpan deltaTime)
     {
+        DeltaTime = (float)deltaTime.TotalMilliseconds;
+
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         if (RenderObjects == null) return;
