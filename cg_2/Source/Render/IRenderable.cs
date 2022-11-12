@@ -5,7 +5,7 @@ public interface IRenderable
     public ShaderProgram ShaderProgram { get; }
     public VertexArrayObject? Vao { get; }
     public Vertex[] Vertices { get; }
-    public IUniformContext[] UniformContext { get; }
+    public IUniformContext[] UniformContext { get; set; }
     public PrimitiveType PrimitiveType { get; }
 
     public void Initialize<T>(VertexArrayObject vao, VertexBufferObject<T> vbo) where T : unmanaged;

@@ -8,8 +8,10 @@ public partial class MainWindow : IViewFor<MainViewModel>
         get => ViewModel;
         set => throw new NotImplementedException();
     }
-
+    
+    public IBaseGraphic BaseGraphic { get; }
     public MainViewModel ViewModel { get; set; }
+    public ReactiveCommand<IBaseGraphic, Unit> Draw { get; }
 
     public MainWindow()
     {
@@ -18,31 +20,34 @@ public partial class MainWindow : IViewFor<MainViewModel>
         var mainSettings = new GLWpfControlSettings();
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new(1920, 1080);
-        ViewModel.DrawingViewModel.BaseGraphic.Camera.AspectRatio =
+        
+        BaseGraphic = new RenderServer(new(CameraMode.Perspective));
+        BaseGraphic.Camera.AspectRatio =
             (float)(OpenTkControl.RenderSize.Width / OpenTkControl.RenderSize.Height);
-        GL.ClearColor(Color.Black);
-        GL.Enable(EnableCap.DepthTest);
-        if (OpenTkControl.IsInitialized) ViewModel.DrawingViewModel.InitializeContextRenderCommand.Execute().Subscribe();
-        OpenTkControl.Render += ViewModel.DrawingViewModel.BaseGraphic.Render;
-    }
 
+        Draw = ReactiveCommand.Create<IBaseGraphic>(ViewModel.Draw);
+        
+        Draw.Execute(BaseGraphic).Subscribe();
+        OpenTkControl.Render += BaseGraphic.Render;
+    }
+    
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
         e.Handled = true;
-        var deltaTime = ViewModel.DrawingViewModel.BaseGraphic.DeltaTime;
+        var deltaTime = BaseGraphic.DeltaTime;
 
         if (e.KeyboardDevice.IsKeyDown(Key.W))
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.Move(CameraMovement.Forward, deltaTime);
+            BaseGraphic.Camera.Move(CameraMovement.Forward, deltaTime);
         if (e.KeyboardDevice.IsKeyDown(Key.S))
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.Move(CameraMovement.Backward, deltaTime);
+            BaseGraphic.Camera.Move(CameraMovement.Backward, deltaTime);
         if (e.KeyboardDevice.IsKeyDown(Key.A))
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.Move(CameraMovement.Left, deltaTime);
+            BaseGraphic.Camera.Move(CameraMovement.Left, deltaTime);
         if (e.KeyboardDevice.IsKeyDown(Key.D))
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.Move(CameraMovement.Right, deltaTime);
+            BaseGraphic.Camera.Move(CameraMovement.Right, deltaTime);
         if (e.KeyboardDevice.IsKeyDown(Key.Space))
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.Move(CameraMovement.Up, deltaTime);
+            BaseGraphic.Camera.Move(CameraMovement.Up, deltaTime);
         if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl))
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.Move(CameraMovement.Down, deltaTime);
+            BaseGraphic.Camera.Move(CameraMovement.Down, deltaTime);
     }
 
     private void OnMouseMove(object sender, MouseEventArgs e)
@@ -51,16 +56,16 @@ public partial class MainWindow : IViewFor<MainViewModel>
         {
             var pos = e.GetPosition(this);
 
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.LookAt((float)pos.X, (float)pos.Y);
+            BaseGraphic.Camera.LookAt((float)pos.X, (float)pos.Y);
         }
         else
         {
-            ViewModel.DrawingViewModel.BaseGraphic.Camera.FirstMouse = true;
+            BaseGraphic.Camera.FirstMouse = true;
         }
     }
 
     private void OnMouseWheel(object sender, MouseWheelEventArgs e)
-        => ViewModel.DrawingViewModel.BaseGraphic.Camera.Fov -= e.Delta / 100.0f;
+        => BaseGraphic.Camera.Fov -= e.Delta / 100.0f;
 }
 
 #nullable restore

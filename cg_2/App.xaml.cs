@@ -23,7 +23,6 @@
             var services = new ServiceCollection();
 
             services.AddSingleton<MainViewModel>();
-            services.AddTransient<DrawingViewModel>();
             services.AddTransient<IBaseGraphic, RenderServer>();
 
             return services.BuildServiceProvider();

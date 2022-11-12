@@ -1,44 +1,67 @@
-﻿using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-
-namespace cg_2.Source.Render;
+﻿namespace cg_2.Source.Render;
 
 public interface IBaseGraphic
 {
-    public float DeltaTime { get; set; }
-    public IEnumerable<IRenderable>? RenderObjects { get; set; }
+    public float DeltaTime { get; }
     public MainCamera Camera { get; }
 
-    public void Render(TimeSpan deltaTime);
+    public void Render(TimeSpan obj);
+    public void Draw(IEnumerable<IRenderable> renderObjects);
 }
 
 public interface IViewable
 {
-    public IRenderable[] CreateRenderObjects();
-    public void UpdateUniforms();
+    public void Draw(IBaseGraphic baseGraphic);
 }
 
 public class RenderServer : ReactiveObject, IBaseGraphic
 {
-    [Reactive] public float DeltaTime { get; set; }
-    public IEnumerable<IRenderable>? RenderObjects { get; set; }
+    public float DeltaTime { get; private set; }
     public MainCamera Camera { get; }
+    public IEnumerable<IRenderable>? RenderObjects { get; set; }
 
-    public RenderServer(MainCamera? camera = null) => Camera = camera ?? new(CameraMode.Perspective);
+    public RenderServer(MainCamera? camera = null)
+    {
+        GL.ClearColor(Color.Black);
+        GL.Enable(EnableCap.DepthTest);
+        Camera = camera ?? new(CameraMode.Perspective);
+    }
+
+    public void Draw(IEnumerable<IRenderable> renderObjects)
+    {
+        RenderObjects = renderObjects;
+
+        foreach (var @object in RenderObjects)
+        {
+            @object.Initialize(new VertexArrayObject(VertexAttribType.Float),
+                new VertexBufferObject<float>());
+        }
+
+        Render(TimeSpan.FromMilliseconds(DeltaTime));
+    }
 
     public void Render(TimeSpan deltaTime)
     {
         DeltaTime = (float)deltaTime.TotalMilliseconds;
-
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        if (RenderObjects == null) return;
+        if (RenderObjects is null) return;
         foreach (var renderObject in RenderObjects)
         {
-            renderObject.Vao.Bind();
+            renderObject.Vao!.Bind();
             renderObject.ShaderProgram.Use();
             renderObject.UpdateUniform(Camera);
             GL.DrawArrays(renderObject.PrimitiveType, 0, renderObject.Vertices.Length);
+        }
+    }
+
+    public void UpdateUniforms(IUniformContext[] uniformContexts) // TODO
+    {
+        if (RenderObjects is null) return;
+
+        foreach (var renderObject in RenderObjects)
+        {
+            renderObject.UniformContext = uniformContexts;
         }
     }
 }

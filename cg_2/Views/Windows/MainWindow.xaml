@@ -20,22 +20,22 @@
             <control:GLWpfControl Grid.RowSpan="2" x:Name="OpenTkControl" DockPanel.Dock="Left"
                                   MouseMove="OnMouseMove" KeyDown="OnKeyDown"
                                   MouseWheel="OnMouseWheel" />
-            <Border Grid.Row="0" Grid.RowSpan="2"
+            <Expander Grid.Row="0" Grid.RowSpan="2" Focusable="True"
                     Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
-                    CornerRadius="4">
-                <GroupBox Header="Parameters panel">
+                    >
+                <GroupBox Header="Parameters panel" Focusable="True">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="DirX" />
-                            <TextBox Text="{Binding DrawingViewModel.X}"
+                            <TextBox Text="{Binding DirX}"
                                      VerticalAlignment="Center"
-                                     Width="20" x:Name="TextBox"/>
+                                     Width="20" />
                         </StackPanel>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="DirY" />
                                 <TextBox
-                                    Text="{Binding DrawingViewModel.Y}"
+                                    Text="{Binding DirY}"
                                     VerticalAlignment="Center"
                                     Width="20" />
                             </StackPanel>
@@ -43,7 +43,7 @@
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="DirZ" />
                                     <TextBox
-                                        Text="{Binding DrawingViewModel.Z}"
+                                        Text="{Binding DirZ}"
                                         VerticalAlignment="Center"
                                         Width="20" />
                                 </StackPanel>
@@ -51,7 +51,7 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-            </Border>
+            </Expander>
         </Grid>
     </DockPanel>
 </Window>

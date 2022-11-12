@@ -5,7 +5,7 @@ public class RenderObject : IRenderable
     public ShaderProgram ShaderProgram { get; }
     public VertexArrayObject? Vao { get; private set; }
     public Vertex[] Vertices { get; }
-    public IUniformContext[] UniformContext { get; }
+    public IUniformContext[] UniformContext { get; set; }
     public PrimitiveType PrimitiveType { get; }
     public bool IsInitialized { get; private set; }
 
