@@ -1,0 +1,97 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0" />
+		<PackageReference Include="GlmNet" Version="0.7.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
+		<PackageReference Include="ReactiveUI" Version="18.3.1" />
+		<PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
+		<PackageReference Include="SharpGL" Version="3.1.1" />
+		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
+		<PackageReference Include="SharpGL.WPF" Version="3.1.1" />
+		<PackageReference Include="SOIL2" Version="1.20.0.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="System" />
+		<Using Include="System.Linq" />
+		<Using Include="System.IO" />
+		<Using Include="System.Windows" />
+		<Using Include="System.Diagnostics" />
+		<Using Include="System.Windows.Input" />
+		<Using Include="System.Collections.Generic" />
+		<Using Include="System.Windows.Controls" />
+		<Using Include="GlmNet" />
+		<Using Include="SharpGL" />
+		<Using Include="SharpGL.WPF" />
+		<Using Include="SharpGL.SceneGraph" />
+		<Using Include="SharpGL.SceneGraph.Shaders" />
+		<Using Include="SharpGL.SceneGraph.Assets" />
+		<Using Include="SharpGL.VertexBuffers" />
+		<Using Include="Newtonsoft.Json" />
+		<Using Include="cg_2.Source.Camera" />
+		<Using Include="cg_2.Source.Polygon" />
+		<Using Include="cg_2.Source.Extensions" />
+		<Using Include="cg_2.Source.Wrappers" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Source\Shaders\shader.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\shader.vert">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Input\Section.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Input\Transform.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Textures\face.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\normals.vert">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\normals.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\Textures\wall.bmp">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\Textures\face.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\textures.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\lamp.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\spot.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\object.vert">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\point.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Source\Shaders\directional.frag">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources" />
+	</ItemGroup>
+
+</Project>

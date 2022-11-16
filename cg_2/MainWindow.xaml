@@ -1,0 +1,105 @@
+﻿<Window x:Class="cg_2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="720" Width="1280" KeyDown="OnKeyDown">
+    <DockPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <sharpGl:OpenGLControl OpenGLDraw="OnOpenGLDraw"
+                                   OpenGLInitialized="OnOpenGLInitialized"
+                                   MouseMove="OnMouseMove" FrameRate="60"
+                                   RenderContextType="FBO" DockPanel.Dock="Left" />
+            <Border Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
+                    CornerRadius="4">
+                <StackPanel DockPanel.Dock="Right">
+                    <GroupBox
+                        FontSize="11" Header="Отображение" Padding="4" Margin="5, 0, 5, 0"
+                        Height="130" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="Режим" />
+                            <RadioButton
+                                GroupName="View" x:Name="WireframeMode" IsChecked="False" Content="Каркас"
+                                Checked="RadioButtonChecked" />
+                            <RadioButton GroupName="View" x:Name="LayoutMode" IsChecked="True" Content="Макет"
+                                         Checked="RadioButtonChecked" />
+                            <TextBlock Text="Вид" Margin="0, 15, 0, 0" />
+                            <RadioButton GroupName="Projection" x:Name="PerspectiveMode" IsChecked="True"
+                                         Content="Перспективная проекция" Checked="RadioButtonChecked" />
+                            <RadioButton GroupName="Projection" x:Name="OrthographicMode" IsChecked="False"
+                                         Content="Ортографическая проекция" Checked="RadioButtonChecked" />
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox
+                        FontSize="11"
+                        Header="Настройки камеры"
+                        Margin="5, 5, 5, 0"
+                        Padding="4">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="-5, 0,0, 0" Content="Скорость" />
+                                <Slider x:Name="CameraSpeed"
+                                        Minimum="1"
+                                        Maximum="10"
+                                        TickPlacement="BottomRight"
+                                        TickFrequency="1"
+                                        IsSnapToTickEnabled="True"
+                                        Margin="0, 3, 0, 0"
+                                        Width="178"
+                                        ValueChanged="SliderValueChanged" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="-5, 0,0, 0" Content="Чувствительность" />
+                                <Slider x:Name="CameraSensitivity" Minimum="0.1" Maximum="0.3"
+                                        TickPlacement="BottomRight" TickFrequency="0.01" Margin="0, 3, 0, 0"
+                                        Width="135" ValueChanged="SliderValueChanged" />
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox FontSize="11" Header="Нормали" Padding="4" Margin="5, 5, 5, 0">
+                        <StackPanel>
+                            <CheckBox x:Name="ShowNormalsCheckBox" Checked="CheckBoxChecked"
+                                      Unchecked="CheckBoxChecked" IsChecked="False" FlowDirection="RightToLeft"
+                                      HorizontalAlignment="Left" Content="Показывать нормали" />
+                            <RadioButton GroupName="Normals" x:Name="NormalsButton" Content="Несглаженные нормали"
+                                         IsChecked="True" Checked="RadioButtonChecked" />
+                            <RadioButton GroupName="Normals" x:Name="SmoothedNormalsButton"
+                                         Content="Сглаженные нормали" IsChecked="False" Checked="RadioButtonChecked" />
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox FontSize="11" Header="Текстурирование" Margin="5, 5, 5, 0" Padding="4">
+                        <ComboBox Name="TextureName" SelectionChanged="ComboBoxSelected" />
+                    </GroupBox>
+                    <GroupBox FontSize="11" Header="Освещение" Margin="5, 5, 5, 0" Padding="4">
+                        <StackPanel>
+                            <ComboBox Name="LightSourceType" SelectionChanged="ComboBoxSelected"/>
+                            <Label Content="Позиция источника"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="X"/> <xctk:IntegerUpDown Name="XPos" Height="30" Value="2" ValueChanged="UpDownBase_OnValueChanged"/>
+                                    <Label Content="Y"/> <xctk:IntegerUpDown Name="YPos" Height="30" Value="2" ValueChanged="UpDownBase_OnValueChanged"/>
+                                    <Label Content="Z"/> <xctk:IntegerUpDown Name="ZPos" Height="30" Value="-6" ValueChanged="UpDownBase_OnValueChanged"/>
+                                </StackPanel>
+                            
+                            <Label Content="Направление освещения"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="X"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="XDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
+                                <Label Content="Y"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="YDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
+                                <Label Content="Z"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="ZDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox FontSize="11" Header="Материалы" Margin="5, 5, 5, 0" Padding="4">
+                        <ComboBox Name="MaterialName" SelectionChanged="ComboBoxSelected" />
+                    </GroupBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>

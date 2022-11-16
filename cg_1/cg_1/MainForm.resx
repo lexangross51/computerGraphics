@@ -252,7 +252,7 @@
   <data name="RotateRight.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAA
-        dAAAAHQBMYXlgQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADZSURBVDhPvdGv
+        cwAAAHMBY8FD/gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADZSURBVDhPvdGv
         a4JBHMfxC8PggkarUXBoWbG4bvGfEDGaBescLltcXR2DicVqNJgExahgGjoRQfHH+3Pn1CCGA33Di+e+
         Fx7uec7cqkdkUEYFJWSh/f/iyLnlqSBeMcUOW/wenpoXqCKMN8xxLIo+NvhEGgGoB6RQxxpDfGMJWwQj
         TPCijSs9YwydaKUN1cQfEna6XAwNtNCFXqDT2qNqKGq40hPa6JzRp5oPzKAf6NUAX27pl/6krsQ73eW7
@@ -262,7 +262,7 @@
   <data name="RotateLeft.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAA
-        dAAAAHQBMYXlgQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADbSURBVDhPrdKt
+        cwAAAHMBY8FD/gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADbSURBVDhPrdKt
         a0JRHIfxWxTUMpN91cEMNi1mk/+EaLXK6pioySKYtWrZitW4IFhEsFksmyAiOHx5vufIEKZXPPOBD/zO
         5Xrum949yuPJjqYIcijjDS/IIoyzLVFBFDWssMcOX8dZvvGKPxut0cMUP2ghhQBUEBl0sMUEj/htA11h
         hqQO+KSN5tC5MR1Q2lUbDNHHO+K4VAJ6bJ1nauPzxADP8KsEXTRtVg6FoJfaNCvHuhjb0a0q9C6cq2Nh
@@ -299,7 +299,10 @@
     ние
 4. Клик средней копкой мыши в режиме рисова
     ния или редактирования -&gt; удалить послед
-    нюю точку</value>
+    нюю точку
+5. Вращение колесика мыши -&gt; масштабиро
+    вать выбранный примитив
+</value>
   </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>46</value>
