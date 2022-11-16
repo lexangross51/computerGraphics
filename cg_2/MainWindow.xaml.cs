@@ -1,5 +1,6 @@
 ﻿using cg_2.Source.Light;
 using cg_2.Source.Primitives;
+using ReactiveUI;
 using Xceed.Wpf.Toolkit;
 using Material = cg_2.Source.Material.Material;
 
@@ -9,7 +10,7 @@ public partial class MainWindow
 {
     private readonly Camera _camera = new();
 
-    private readonly VertexBufferArray 
+    private readonly VertexBufferArray
         _vao = new(),
         // _normalVao = new(),
         _objectVao = new(),
@@ -18,10 +19,10 @@ public partial class MainWindow
     private readonly VertexBufferArray[] _normalVao =
     {
         new(), // Несглаженные нормали
-        new()  // Сглаженные нормали
+        new() // Сглаженные нормали
     };
-    
-    private readonly VertexBufferWrapper 
+
+    private readonly VertexBufferWrapper
         _vbo = new(new VertexBuffer()),
         // _normalVbo = new(new VertexBuffer()),
         _objectVbo = new(new VertexBuffer());
@@ -29,7 +30,7 @@ public partial class MainWindow
     private readonly VertexBufferWrapper[] _normalVbo =
     {
         new(new VertexBuffer()), // несглаженные нормали
-        new(new VertexBuffer())  // сглаженные нормали
+        new(new VertexBuffer()) // сглаженные нормали
     };
 
     private readonly ShaderProgramWrapper
@@ -37,13 +38,13 @@ public partial class MainWindow
         _textureProgram = new(new ShaderProgram()),
         _lampProgram = new(new ShaderProgram());
 
-    private readonly ShaderProgramWrapper[] _shaderPrograms = 
+    private readonly ShaderProgramWrapper[] _shaderPrograms =
     {
-        new(new ShaderProgram()), // обычный
-        new(new ShaderProgram()), // направленный
-        new(new ShaderProgram()), // точечный
-        new(new ShaderProgram()), // точечный с затуханием
-        new(new ShaderProgram())  // прожектор
+        new(new()), // обычный
+        new(new()), // направленный
+        new(new()), // точечный
+        new(new()), // точечный с затуханием
+        new(new()) // прожектор
     };
 
     private readonly List<PolygonSection> _sections = new() { PolygonSection.ReadJson("Input/Section.json") };
@@ -52,6 +53,7 @@ public partial class MainWindow
 
     private static readonly Dictionary<string, Material> _materialDictionary = new()
     {
+        { "None", new() },
         { "Gold", Material.GoldMaterial },
         { "Pearl", Material.PearlMaterial },
         { "BlackPlastic", Material.BlackPlasticMaterial }
@@ -71,6 +73,8 @@ public partial class MainWindow
 
     private vec3 _lightPos = new(2.0f, 2.0f, -6.0f);
     private vec3 _lightDir = new(0.0f, -1.0f, 0.0f); // for spot and directional
+
+    private readonly vec3 _objectColor = new(1.0f, 0.5f, 0.31f);
 
     private readonly IEnumerable<string> _collectionTextures = new List<string>
         { "No texture", "Texture_1", "Texture_2" };
@@ -98,13 +102,21 @@ public partial class MainWindow
         LightSourceType.SelectedItem = "None";
 
         MaterialName.ItemsSource = _materials;
-        MaterialName.SelectedItem = "Gold";
+        MaterialName.SelectedItem = "None";
+
+        MaterialName.IsEnabled = false;
+
+        this.WhenAnyValue(x => x.LightSourceType.SelectedItem)
+            .Subscribe(x =>
+            {
+                MaterialName.IsEnabled = x.ToString() != "None";
+            });
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
         e.Handled = true;
-        
+
         if (e.KeyboardDevice.IsKeyDown(Key.W)) _camera.Move(CameraMovement.Forward, _deltaTime.Result);
         if (e.KeyboardDevice.IsKeyDown(Key.S)) _camera.Move(CameraMovement.Backward, _deltaTime.Result);
         if (e.KeyboardDevice.IsKeyDown(Key.A)) _camera.Move(CameraMovement.Left, _deltaTime.Result);
@@ -247,11 +259,11 @@ public partial class MainWindow
                     normalLines.Add(vertS2[j] + normals[k]);
                     normalLines.Add(vertS2[0]);
                     normalLines.Add(vertS2[0] + normals[k]);
-                    
+
                     smoothedNormalsDictionary[vertS1[j]] += normals[k];
                     smoothedNormalsDictionary[vertS1[0]] += normals[k];
                     smoothedNormalsDictionary[vertS2[j]] += normals[k];
-                    smoothedNormalsDictionary[vertS2[0]] += normals[k];                    
+                    smoothedNormalsDictionary[vertS2[0]] += normals[k];
                 }
                 else
                 {
@@ -263,7 +275,7 @@ public partial class MainWindow
                     normalLines.Add(vertS2[j] + normals[k]);
                     normalLines.Add(vertS2[j + 1]);
                     normalLines.Add(vertS2[j + 1] + normals[k]);
-                    
+
                     smoothedNormalsDictionary[vertS1[j]] += normals[k];
                     smoothedNormalsDictionary[vertS1[j + 1]] += normals[k];
                     smoothedNormalsDictionary[vertS2[j]] += normals[k];
@@ -274,7 +286,7 @@ public partial class MainWindow
 
         var normalLinesArray = new float[3 * normalLines.Count];
         var smoothedNormalsArray = new float[2 * 3 * smoothedNormalsDictionary.Count];
-        
+
         _normalsCount = normalLinesArray.Length;
         _smoothedNormalsCount = smoothedNormalsArray.Length;
 
@@ -403,7 +415,7 @@ public partial class MainWindow
         _vbo.SetData(gl, 1, vertices, false, 3, 8 * sizeof(float), new IntPtr(3 * sizeof(float)));
         _vbo.SetData(gl, 2, vertices, false, 2, 8 * sizeof(float), new IntPtr(6 * sizeof(float)));
         _vao.Unbind(gl);
-        
+
         _normalVao[0].Bind(gl);
         _normalVbo[0].Bind(gl);
         _normalVbo[0].SetData(gl, 0, normalLinesArray, false, 3, 3 * sizeof(float), IntPtr.Zero);
@@ -480,11 +492,27 @@ public partial class MainWindow
         gl.UniformMatrix4(projectionLoc, 1, false, projectionMatrix.to_array());
         gl.UniformMatrix4(modelLoc, 1, false, modelMatrix.to_array());
 
-        gl.Uniform3(matAmbLoc,  _materialDictionary[_currentMaterial].Ambient.x, _materialDictionary[_currentMaterial].Ambient.y, 
+        var objectColorPos = _shaderPrograms[_currentProgram].GetUniformLocation("objectColor");
+        var useMaterialPos = _shaderPrograms[_currentProgram].GetUniformLocation("useMaterial");
+
+        if (_currentMaterial == "None")
+        {
+            gl.Uniform3(objectColorPos, _objectColor.x, _objectColor.y, _objectColor.z);
+            gl.Uniform1(useMaterialPos, 0);
+        }
+        else
+        {
+            gl.Uniform1(useMaterialPos, 1);
+        }
+
+        gl.Uniform3(matAmbLoc, _materialDictionary[_currentMaterial].Ambient.x,
+            _materialDictionary[_currentMaterial].Ambient.y,
             _materialDictionary[_currentMaterial].Ambient.z);
-        gl.Uniform3(matDiffLoc, _materialDictionary[_currentMaterial].Diffuse.x, _materialDictionary[_currentMaterial].Diffuse.y,
+        gl.Uniform3(matDiffLoc, _materialDictionary[_currentMaterial].Diffuse.x,
+            _materialDictionary[_currentMaterial].Diffuse.y,
             _materialDictionary[_currentMaterial].Diffuse.z);
-        gl.Uniform3(matSpecLoc, _materialDictionary[_currentMaterial].Specular.x, _materialDictionary[_currentMaterial].Specular.y, 
+        gl.Uniform3(matSpecLoc, _materialDictionary[_currentMaterial].Specular.x,
+            _materialDictionary[_currentMaterial].Specular.y,
             _materialDictionary[_currentMaterial].Specular.z);
         gl.Uniform1(matShinLoc, _materialDictionary[_currentMaterial].Shininess);
 
@@ -540,7 +568,7 @@ public partial class MainWindow
             if (!_isSmoothedNormals)
             {
                 _normalVao[0].Bind(gl);
-                gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);   
+                gl.DrawArrays(OpenGL.GL_LINES, 0, _normalsCount);
             }
             else
             {
@@ -639,9 +667,9 @@ public partial class MainWindow
 
         switch (comboBox!.Name)
         {
-            case "TextureName" :
+            case "TextureName":
                 var value = comboBox!.SelectedItem.ToString();
-                
+
                 if (value == "No texture")
                 {
                     _isTexturize = false;
@@ -651,19 +679,20 @@ public partial class MainWindow
                     _isTexturize = true;
                     _textureId = value == "Texture_1" ? 0 : 1;
                 }
+
                 break;
-            
-            case "LightSourceType" :
+
+            case "LightSourceType":
                 _currentProgram = comboBox.SelectedIndex;
-                _currentLight = comboBox!.SelectedItem.ToString()!;
+                _currentLight = comboBox.SelectedItem.ToString()!;
                 break;
-            
+
             case "MaterialName":
-                _currentMaterial = comboBox!.SelectedItem.ToString()!;
+                _currentMaterial = comboBox.SelectedItem.ToString()!;
                 break;
         }
     }
-    
+
     private void UpDownBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         var upDown = sender as IntegerUpDown;
@@ -690,7 +719,7 @@ public partial class MainWindow
                 break;
         }
     }
-    
+
     #endregion
 
     #region Тиражирование
