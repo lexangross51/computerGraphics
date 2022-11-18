@@ -107,10 +107,9 @@ public partial class MainWindow
         MaterialName.IsEnabled = false;
 
         this.WhenAnyValue(x => x.LightSourceType.SelectedItem)
-            .Subscribe(x =>
-            {
-                MaterialName.IsEnabled = x.ToString() != "None";
-            });
+            .Subscribe(x => { MaterialName.IsEnabled = x.ToString() != "None"; });
+        this.WhenAnyValue(x => x.TextureName.SelectionBoxItem)
+            .Subscribe(_ => MaterialName.IsEnabled = false);
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)
