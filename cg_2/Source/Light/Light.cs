@@ -8,7 +8,7 @@ public enum LightType
     Spot
 }
 
-public struct Light
+public class Light
 {
     public vec3 Ambient { get; set; }
     public vec3 Diffuse { get; set; }
