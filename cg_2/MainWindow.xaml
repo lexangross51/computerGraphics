@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280" KeyDown="OnKeyDown">
     <DockPanel>
@@ -93,6 +94,94 @@
                                 <Label Content="Y"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="YDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
                                 <Label Content="Z"/> <xctk:IntegerUpDown Maximum="1" Minimum="-1" Name="ZDir" Height="30" Value="0" ValueChanged="UpDownBase_OnValueChanged"/>
                             </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Фоновое"/>
+                                <Slider x:Name="AmbientSlider"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        TickPlacement="BottomRight"
+                                        TickFrequency="0.1"
+                                        IsSnapToTickEnabled="True"
+                                        Margin="0, 3, 0, 0"
+                                        Width="123"
+                                        ValueChanged="SliderValueChanged" />
+                                <TextBlock Text="{Binding ElementName=AmbientSlider, Path=Value}" />
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Диффузное"/>
+                                <Slider x:Name="DiffuseSlider"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        TickPlacement="BottomRight"
+                                        TickFrequency="0.00001"
+                                        IsSnapToTickEnabled="True"
+                                        Margin="0, 3, 0, 0"
+                                        Width="110"
+                                        ValueChanged="SliderValueChanged"/>
+                                <TextBlock Text="{Binding ElementName=DiffuseSlider, Path=Value}" />
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Бликовое"/>
+                                <Slider x:Name="SpecularSlider"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        TickPlacement="BottomRight"
+                                        TickFrequency="0.1"
+                                        IsSnapToTickEnabled="True"
+                                        Margin="0, 3, 0, 0"
+                                        Width="119"
+                                        ValueChanged="SliderValueChanged" />
+                                <TextBlock Text="{Binding ElementName=SpecularSlider, Path=Value}" />
+                            </StackPanel>
+                            
+                            <Expander Header="Точечный с затуханием" x:Name="expander" IsEnabled="False">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Константный" />
+                                        <Slider x:Name="ConstantSlider"
+                                                Minimum="0"
+                                                Maximum="1"
+                                                TickPlacement="BottomRight"
+                                                TickFrequency="0.1"
+                                                IsSnapToTickEnabled="True"
+                                                Margin="0, 3, 0, 0"
+                                                Width="123"
+                                                ValueChanged="SliderValueChanged" />
+                                        <TextBlock Text="{Binding ElementName=ConstantSlider, Path=Value}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Линейный" />
+                                        <Slider x:Name="LinearSlider"
+                                                Minimum="0"
+                                                Maximum="1"
+                                                TickPlacement="BottomRight"
+                                                TickFrequency="0.1"
+                                                IsSnapToTickEnabled="True"
+                                                Margin="0, 3, 0, 0"
+                                                Width="110"
+                                                ValueChanged="SliderValueChanged" />
+                                        <TextBlock Text="{Binding ElementName=LinearSlider, Path=Value}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Квадратичный" />
+                                        <Slider x:Name="QuadraticSlider"
+                                                Minimum="0"
+                                                Maximum="1"
+                                                TickPlacement="BottomRight"
+                                                TickFrequency="0.1"
+                                                IsSnapToTickEnabled="True"
+                                                Margin="0, 3, 0, 0"
+                                                Width="119"
+                                                ValueChanged="SliderValueChanged" />
+                                        <TextBlock Text="{Binding ElementName=QuadraticSlider, Path=Value}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox FontSize="11" Header="Материалы" Margin="5, 5, 5, 0" Padding="4">

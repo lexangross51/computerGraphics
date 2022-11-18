@@ -1,4 +1,6 @@
-﻿using cg_2.Source.Light;
+﻿using System.Reactive.Linq;
+using System.Windows.Shapes;
+using cg_2.Source.Light;
 using cg_2.Source.Primitives;
 using ReactiveUI;
 using Xceed.Wpf.Toolkit;
@@ -106,10 +108,19 @@ public partial class MainWindow
 
         MaterialName.IsEnabled = false;
 
-        this.WhenAnyValue(x => x.LightSourceType.SelectedItem)
-            .Subscribe(x => { MaterialName.IsEnabled = x.ToString() != "None"; });
-        this.WhenAnyValue(x => x.TextureName.SelectionBoxItem)
-            .Subscribe(_ => MaterialName.IsEnabled = false);
+        this.WhenAnyValue(x => x.LightSourceType.SelectedItem, x => x.TextureName.SelectedItem)
+            .Subscribe(x =>
+            {
+                var key = x.Item1.ToString()!;
+                MaterialName.IsEnabled = key != "None" && TextureName.SelectedItem.ToString() == "No texture";
+                AmbientSlider.Value = _lightDictionary[key].Ambient.x;
+                DiffuseSlider.Value = _lightDictionary[key].Diffuse.x;
+                SpecularSlider.Value = _lightDictionary[key].Specular.x;
+                expander.IsEnabled = key == "PointWithAttenuation";
+                ConstantSlider.Value = _lightDictionary[key].Constant;
+                LinearSlider.Value = _lightDictionary[key].Linear;
+                ConstantSlider.Value = _lightDictionary[key].Quadratic;
+            });
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)
@@ -643,13 +654,50 @@ public partial class MainWindow
     {
         var slider = sender as Slider;
 
-        if (slider!.Name == "CameraSpeed")
+        switch (slider!.Name)
         {
-            _camera.Speed = (float)e.NewValue;
-        }
-        else
-        {
-            _camera.Sensitivity = (float)e.NewValue;
+            case "CameraSpeed":
+                _camera.Speed = (float)e.NewValue;
+                break;
+            case "CameraSensitivity":
+                _camera.Sensitivity = (float)e.NewValue;
+                break;
+            case "AmbientSlider":
+            {
+                var light = _lightDictionary[_currentLight];
+                light.Ambient = new vec3((float)AmbientSlider.Value);
+                break;
+            }
+            case "DiffuseSlider":
+            {
+                var light = _lightDictionary[_currentLight];
+                light.Diffuse = new vec3((float)DiffuseSlider.Value);
+                break;
+            }
+            case "SpecularSlider":
+            {
+                var light = _lightDictionary[_currentLight];
+                light.Specular = new vec3((float)SpecularSlider.Value);
+                break;
+            }
+            case "ConstantSlider":
+            {
+                var light = _lightDictionary[_currentLight];
+                light.Constant = (float)ConstantSlider.Value;
+                break;
+            }
+            case "LinearSlider":
+            {
+                var light = _lightDictionary[_currentLight];
+                light.Linear = (float)LinearSlider.Value;
+                break;
+            }
+            case "QuadraticSlider":
+            {
+                var light = _lightDictionary[_currentLight];
+                light.Quadratic = (float)QuadraticSlider.Value;
+                break;
+            }
         }
     }
 
