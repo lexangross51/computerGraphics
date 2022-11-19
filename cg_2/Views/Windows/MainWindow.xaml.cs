@@ -1,4 +1,6 @@
-﻿namespace cg_2.Views.Windows;
+﻿using System.Reactive.Disposables;
+
+namespace cg_2.Views.Windows;
 
 #nullable disable
 public partial class MainWindow : IViewFor<MainViewModel>
@@ -8,7 +10,7 @@ public partial class MainWindow : IViewFor<MainViewModel>
         get => ViewModel;
         set => throw new NotImplementedException();
     }
-    
+
     public IBaseGraphic BaseGraphic { get; }
     public MainViewModel ViewModel { get; set; }
     public ReactiveCommand<IBaseGraphic, Unit> Draw { get; }
@@ -20,17 +22,21 @@ public partial class MainWindow : IViewFor<MainViewModel>
         var mainSettings = new GLWpfControlSettings();
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new(1920, 1080);
-        
+
         BaseGraphic = new RenderServer(new(CameraMode.Perspective));
         BaseGraphic.Camera.AspectRatio =
             (float)(OpenTkControl.RenderSize.Width / OpenTkControl.RenderSize.Height);
-
-        Draw = ReactiveCommand.Create<IBaseGraphic>(ViewModel.Draw);
         
-        Draw.Execute(BaseGraphic).Subscribe();
-        OpenTkControl.Render += BaseGraphic.Render;
+        Draw = ReactiveCommand.Create<IBaseGraphic>(ViewModel.Draw);
+        BaseGraphic.RenderOn = ReactiveCommand.Create<TimeSpan>(_ => OpenTkControl.Render += BaseGraphic.Render);
+
+        this.WhenActivated(disposables =>
+        {
+            Draw.Execute(BaseGraphic).Subscribe().DisposeWith(disposables);
+            BaseGraphic.RenderOn.Execute().Subscribe().DisposeWith(disposables);
+        });
     }
-    
+
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
         e.Handled = true;

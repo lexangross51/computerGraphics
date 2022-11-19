@@ -7,51 +7,64 @@
         mc:Ignorable="d"
         DataContext="{Binding MainViewModel,Source={StaticResource Locator}}"
         Title="MainWindow" Height="720" Width="1280">
-    <DockPanel>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width=".25*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <control:GLWpfControl Grid.RowSpan="2" x:Name="OpenTkControl" DockPanel.Dock="Left"
-                                  MouseMove="OnMouseMove" KeyDown="OnKeyDown"
-                                  MouseWheel="OnMouseWheel" />
-            <Expander Grid.Row="0" Grid.RowSpan="2" Focusable="True"
-                    Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1"
-                    >
-                <GroupBox Header="Parameters panel" Focusable="True">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Content="DirX" />
-                            <TextBox Text="{Binding DirX}"
-                                     VerticalAlignment="Center"
-                                     Width="20" />
-                        </StackPanel>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="DirY" />
-                                <TextBox
-                                    Text="{Binding DirY}"
-                                    VerticalAlignment="Center"
-                                    Width="20" />
-                            </StackPanel>
+    <TabControl>
+        <TabItem Header="Tab1">
+            <DockPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width=".25*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <control:GLWpfControl Grid.RowSpan="2" x:Name="OpenTkControl" DockPanel.Dock="Left"
+                                          MouseMove="OnMouseMove" KeyDown="OnKeyDown"
+                                          MouseWheel="OnMouseWheel" />
+                    <Expander Grid.Row="0" Grid.RowSpan="2" Focusable="True"
+                              Grid.Column="1" Padding="5" BorderBrush="LightGray" BorderThickness="1">
+                        <GroupBox Header="Parameters panel" Focusable="True">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                    <Label Content="DirZ" />
-                                    <TextBox
-                                        Text="{Binding DirZ}"
-                                        VerticalAlignment="Center"
-                                        Width="20" />
+                                    <Label Content="DirX" />
+                                    <TextBox Text="{Binding DirX}"
+                                             VerticalAlignment="Center"
+                                             Width="20" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="DirY" />
+                                        <TextBox
+                                            Text="{Binding DirY}"
+                                            VerticalAlignment="Center"
+                                            Width="20" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Content="DirZ" />
+                                            <TextBox
+                                                Text="{Binding DirZ}"
+                                                VerticalAlignment="Center"
+                                                Width="20" />
+                                            <Button Command="{Binding OpenWindow}" Width="30"  Height="30"/>
+                                        </StackPanel>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </StackPanel>
-                </GroupBox>
-            </Expander>
-        </Grid>
-    </DockPanel>
+                        </GroupBox>
+                    </Expander>
+                </Grid>
+            </DockPanel>
+        </TabItem>
+        <TabItem Header="Tab2">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <Label Content="Hello" />
+                    <Button Width="10" Height="10" Command="{Binding OpenWindow}" />
+                </StackPanel>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+
 </Window>
