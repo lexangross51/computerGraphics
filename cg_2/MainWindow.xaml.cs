@@ -117,6 +117,7 @@ public partial class MainWindow
                 DiffuseSlider.Value = _lightDictionary[key].Diffuse.x;
                 SpecularSlider.Value = _lightDictionary[key].Specular.x;
                 expander.IsEnabled = key == "PointWithAttenuation";
+                expander.IsExpanded = key == "PointWithAttenuation";
                 ConstantSlider.Value = _lightDictionary[key].Constant;
                 LinearSlider.Value = _lightDictionary[key].Linear;
                 ConstantSlider.Value = _lightDictionary[key].Quadratic;
