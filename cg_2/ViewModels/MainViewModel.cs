@@ -11,7 +11,7 @@ public class MainViewModel : ReactiveObject, IViewable
         OpenWindow = ReactiveCommand.Create(() =>
         {
             var dlg = new Window1();
-            dlg.ShowDialog();
+            dlg.Show();
         });
     }
 

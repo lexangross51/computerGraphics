@@ -1,4 +1,8 @@
 ﻿using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Windows.Forms;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace cg_2.Views.Windows;
 
@@ -13,7 +17,6 @@ public partial class MainWindow : IViewFor<MainViewModel>
 
     public IBaseGraphic BaseGraphic { get; }
     public MainViewModel ViewModel { get; set; }
-    public ReactiveCommand<IBaseGraphic, Unit> Draw { get; }
 
     public MainWindow()
     {
@@ -27,14 +30,14 @@ public partial class MainWindow : IViewFor<MainViewModel>
         BaseGraphic.Camera.AspectRatio =
             (float)(OpenTkControl.RenderSize.Width / OpenTkControl.RenderSize.Height);
         
-        Draw = ReactiveCommand.Create<IBaseGraphic>(ViewModel.Draw);
-        BaseGraphic.RenderOn = ReactiveCommand.Create<TimeSpan>(_ => OpenTkControl.Render += BaseGraphic.Render);
+        ViewModel.Draw(BaseGraphic); // initialize objects
+        
+        var observable = Observable.FromEvent<TimeSpan>(
+            handler => OpenTkControl.Render += handler,
+            handler => OpenTkControl.Render -= handler);
 
-        this.WhenActivated(disposables =>
-        {
-            Draw.Execute(BaseGraphic).Subscribe().DisposeWith(disposables);
-            BaseGraphic.RenderOn.Execute().Subscribe().DisposeWith(disposables);
-        });
+        this.WhenActivated(disposables 
+            => observable.Subscribe(ts => BaseGraphic.Render(ts)).DisposeWith(disposables));
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)

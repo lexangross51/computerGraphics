@@ -4,8 +4,7 @@ public interface IBaseGraphic
 {
     public float DeltaTime { get; }
     public MainCamera Camera { get; }
-    public ReactiveCommand<TimeSpan, Unit> RenderOn { get; set; }
-
+    
     public void Render(TimeSpan obj);
     public void Draw(IEnumerable<IRenderable> renderObjects);
 }
@@ -20,7 +19,6 @@ public class RenderServer : ReactiveObject, IBaseGraphic
     public float DeltaTime { get; private set; }
     public MainCamera Camera { get; }
     public IEnumerable<IRenderable>? RenderObjects { get; set; }
-    public ReactiveCommand<TimeSpan, Unit> RenderOn { get; set; }
 
     public RenderServer(MainCamera? camera = null)
     {
@@ -35,11 +33,9 @@ public class RenderServer : ReactiveObject, IBaseGraphic
 
         foreach (var @object in RenderObjects)
         {
-            @object.Initialize(new VertexArrayObject(VertexAttribType.Float),
+            @object.Initialize(new(VertexAttribType.Float),
                 new VertexBufferObject<float>());
         }
-
-        Render(TimeSpan.FromMilliseconds(DeltaTime));
     }
 
     public void Render(TimeSpan deltaTime)
