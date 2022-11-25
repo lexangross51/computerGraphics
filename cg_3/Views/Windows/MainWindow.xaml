@@ -8,11 +8,6 @@
         Title="MainWindow" Height="450" Width="800"
         DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
     <DockPanel>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <control:GLWpfControl x:Name="OpenTkControl" />
-        </Grid>
+        <control:GLWpfControl x:Name="OpenTkControl" />
     </DockPanel>
 </Window>

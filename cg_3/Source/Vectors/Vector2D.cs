@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace cg_3.Source.Vectors;
@@ -32,10 +33,11 @@ public class Vector2DJsonConverter : JsonConverter
 }
 
 [JsonConverter(typeof(Vector2DJsonConverter))]
-public readonly record struct Vector2D(float X, float Y)
+[StructLayout(LayoutKind.Explicit)]
+public readonly record struct Vector2D([field: FieldOffset(0)] float X, [field: FieldOffset(4)] float Y)
 {
-    public float Norm { get; } = (float)Math.Sqrt(X * X + Y * Y);
-    public static int Size => 2;
+    public float Norm => (float)Math.Sqrt(X * X + Y * Y);
+    public static int Size => 4 + 4; // size of struct in bytes
     public static readonly Vector2D Zero = default;
 
     public static float Distance(Vector2D a, Vector2D b) => (a - b).Norm;

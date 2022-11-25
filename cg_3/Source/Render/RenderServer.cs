@@ -55,7 +55,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         GL.VertexArrayAttribBinding(_vao.Handle, 0, 0);
         GL.EnableVertexArrayAttrib(_vao.Handle, 0);
         GL.VertexArrayAttribFormat(_vao.Handle, 0, 2, _vao.VertexAttributeType, false, 0);
-        GL.VertexArrayVertexBuffer(_vao.Handle, 0, vbo.Handle, IntPtr.Zero, Vector2D.Size * 4);
+        GL.VertexArrayVertexBuffer(_vao.Handle, 0, vbo.Handle, IntPtr.Zero, Vector2D.Size);
 
         _shaderProgram = new();
         _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/shader.frag",
@@ -69,8 +69,8 @@ public class RenderServer : ReactiveObject, IBaseGraphic
 
         if (Points is null) return;
 
-        _vao!.Bind();
         _shaderProgram!.Use();
+        _vao!.Bind();
         GL.DrawArrays(PrimitiveType.Points, 0, Points!.Count());
     }
 }
