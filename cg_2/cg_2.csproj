@@ -11,9 +11,9 @@
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0" />
 		<PackageReference Include="GlmNet" Version="0.7.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
-		<PackageReference Include="ReactiveUI" Version="18.3.1" />
-		<PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+		<PackageReference Include="ReactiveUI" Version="18.4.1" />
+		<PackageReference Include="ReactiveUI.WPF" Version="18.4.1" />
 		<PackageReference Include="SharpGL" Version="3.1.1" />
 		<PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
 		<PackageReference Include="SharpGL.WPF" Version="3.1.1" />
