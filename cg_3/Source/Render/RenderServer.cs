@@ -39,16 +39,19 @@ public class RenderServer : ReactiveObject, IBaseGraphic
     {
         GL.ClearColor(Color.White);
         GL.Enable(EnableCap.DepthTest);
+        GL.Enable(EnableCap.ProgramPointSize);
+        GL.Enable(EnableCap.LineSmooth);
     }
 
     public void DrawPoints(IEnumerable<Vector2D> points)
     {
         _vao = new(VertexAttribType.Float);
         var vbo = new VertexBufferObject<float>();
-        Points = points;
+        var vector2Ds = points as Vector2D[] ?? points.ToArray();
+        Points = vector2Ds;
 
         vbo.Bind();
-        vbo.BufferData(points.ToArray());
+        vbo.BufferData(vector2Ds.ToArray());
 
         _vao.Bind();
 
@@ -71,6 +74,6 @@ public class RenderServer : ReactiveObject, IBaseGraphic
 
         _shaderProgram!.Use();
         _vao!.Bind();
-        GL.DrawArrays(PrimitiveType.Points, 0, Points!.Count());
+        GL.DrawArrays(PrimitiveType.LineStrip, 0, Points.Count());
     }
 }
