@@ -4,10 +4,30 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:control="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
+        xmlns:converters="clr-namespace:cg_3.Infrastructure.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
+    <Window.Resources>
+        <converters:Vector2DToStringConverter x:Key="Vector2DToStringConverter" />
+    </Window.Resources>
     <DockPanel>
-        <control:GLWpfControl x:Name="OpenTkControl" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="0.25*" />
+            </Grid.ColumnDefinitions>
+            <control:GLWpfControl x:Name="OpenTkControl" />
+            <DockPanel Grid.Column="1">
+                <GroupBox Header="Control points">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="P0" />
+                            <TextBox Text="{Binding Wrapper.P0, Converter={StaticResource Vector2DToStringConverter}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </DockPanel>
+        </Grid>
     </DockPanel>
 </Window>

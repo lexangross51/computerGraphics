@@ -15,7 +15,11 @@ public class BezierWrapper : ReactiveObject
     [Reactive] public Vector2D P3 { get; set; }
     public IEnumerable<Vector2D>? Points => _bezierCurve.Points;
 
-    public BezierWrapper(CubicBezier bezierCurve) => _bezierCurve = bezierCurve;
+    public BezierWrapper(CubicBezier bezierCurve)
+    {
+        _bezierCurve = bezierCurve;
+        P0 = new(2.0f, 3.0f);
+    }
 
-    public void GenCurve() => _bezierCurve.CurveGen(20);
+    public void GenCurve() => _bezierCurve.CurveGen(16);
 }
