@@ -2,6 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using cg_3.Models;
 using cg_3.Source.Render;
 using cg_3.Source.Vectors;
@@ -55,39 +56,38 @@ public partial class MainWindow : IViewFor<MainViewModel>
         {
             observable.Subscribe(ts => _baseGraphic.Render(ts)).DisposeWith(disposables);
 
-            this.WhenAnyValue(t => t._bezierObject.BezierWrapper.P3).Where(t => t != Vector2D.Zero).Subscribe(_ =>
-            {
-                // _bezierObject.BezierWrapper = new(new(-0.9f, 0.0f),
-                //     (-0.5f, 0.5f), (0.0f, -0.5f),
-                //     (1.0f, 0.0f));
-
-                for (int i = 0; i < 20; i++)
+            this.WhenAnyValue(t => t._bezierObject.BezierWrapper.P3)
+                .Subscribe(_ =>
                 {
-                    var t = i / 20.0f;
-                    ViewModel.PlaneView.Plane.AddPoint(_bezierObject.BezierWrapper.GenCurve(t));
-                }
+                    ViewModel.PlaneView.Plane.Points.Clear();
 
-                ViewModel.PlaneView.Draw(_baseGraphic);
-            });
+                    for (int i = 0; i < 20; i++)
+                    {
+                        var t = i / 20.0f;
 
-            OpenTkControl.Events().MouseWheel
-                .Subscribe(args =>
-                {
-                    if (args.Delta > 0)
-                    {
-                        _scale *= 1.1f;
-                    }
-                    else
-                    {
-                        _scale *= 0.9f;
+                        ViewModel.PlaneView.Plane.Points.AddOrUpdate(_bezierObject.BezierWrapper.GenCurve(t));
                     }
 
-                    for (var i = 0; i < ViewModel.PlaneView.Plane.Points.Count; i++)
-                    {
-                        var point = ViewModel.PlaneView.Plane.Points[i];
-                        ViewModel.PlaneView.Plane.Points.Replace(point, point * _scale);
-                    }
-                }).DisposeWith(disposables);
+                    ViewModel.PlaneView.Draw(_baseGraphic);
+                });
+
+            // OpenTkControl.Events().MouseWheel
+            //     .Subscribe(args =>
+            //     {
+            //         if (args.Delta > 0)
+            //         {
+            //             _scale *= 1.1f;
+            //         }
+            //         else
+            //         {
+            //             _scale *= 0.9f;
+            //         }
+            //
+            //         foreach (var point in ViewModel.PlaneView.Plane.Points)
+            //         {
+            //             ViewModel.PlaneView.Plane.ReplacePoint(point * _scale);
+            //         }
+            // }).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseDown.Subscribe(args =>
             {
@@ -100,18 +100,22 @@ public partial class MainWindow : IViewFor<MainViewModel>
                 {
                     case 0:
                         _bezierObject.BezierWrapper.P0 = (x, y);
+                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
                         _step++;
                         break;
                     case 1:
                         _bezierObject.BezierWrapper.P1 = (x, y);
+                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
                         _step++;
                         break;
                     case 2:
                         _bezierObject.BezierWrapper.P2 = (x, y);
+                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
                         _step++;
                         break;
                     case 3:
                         _bezierObject.BezierWrapper.P3 = (x, y);
+                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
                         _step = 0;
                         break;
                 }
@@ -121,11 +125,13 @@ public partial class MainWindow : IViewFor<MainViewModel>
             {
                 var point = args.GetPosition(OpenTkControl);
 
-                // var x = -1.0f + 2 * point.X / OpenTkControl.RenderSize.Width;
-                // var y = 1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height;
+                var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
+                var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
 
-                MousePositionX.Text = point.X.ToString("G7", CultureInfo.InvariantCulture);
-                MousePositionY.Text = point.Y.ToString("G7", CultureInfo.InvariantCulture);
+                MousePositionX.Text = x.ToString("G7", CultureInfo.InvariantCulture);
+                MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
+
+                ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
             }).DisposeWith(disposables);
         });
     }

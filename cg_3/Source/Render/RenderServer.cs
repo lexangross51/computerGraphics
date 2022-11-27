@@ -73,6 +73,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
             Model = (modelMatrix, "model")
         };
     }
+    
 
     public void Render(TimeSpan deltaTime)
     {
