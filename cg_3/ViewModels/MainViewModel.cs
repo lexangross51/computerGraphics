@@ -5,11 +5,9 @@ using ReactiveUI.Fody.Helpers;
 
 namespace cg_3.ViewModels;
 
-public class MainViewModel : ReactiveObject, IViewable
+public class MainViewModel : ReactiveObject
 {
     public PlaneView PlaneView { get; }
 
     public MainViewModel() => PlaneView = new();
-    
-    public void Draw(IBaseGraphic baseGraphic) => baseGraphic.DrawPoints(PlaneView.Plane.Points);
 }

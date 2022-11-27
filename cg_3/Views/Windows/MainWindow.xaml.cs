@@ -27,7 +27,6 @@ public partial class MainWindow : IViewFor<MainViewModel>
     public MainViewModel ViewModel { get; set; }
     private readonly IBaseGraphic _baseGraphic;
 
-
     public MainWindow()
     {
         InitializeComponent();
@@ -37,10 +36,13 @@ public partial class MainWindow : IViewFor<MainViewModel>
         OpenTkControl.RenderSize = new(1920, 1080);
 
         _baseGraphic = new RenderServer();
+        _baseGraphic.Camera.AspectRatio =
+            (float)(OpenTkControl.RenderSize.Width / OpenTkControl.RenderSize.Height);
+
         var observable = Observable.FromEvent<TimeSpan>(
             handler => OpenTkControl.Render += handler,
             handler => OpenTkControl.Render -= handler);
-        
+
         this.WhenActivated(disposables =>
         {
             observable.Subscribe(ts => _baseGraphic.Render(ts)).DisposeWith(disposables);
@@ -56,12 +58,14 @@ public partial class MainWindow : IViewFor<MainViewModel>
                         }
                     }
 
-                    ViewModel.Draw(_baseGraphic);
+                    ViewModel.PlaneView.Draw(_baseGraphic);
                 }).DisposeWith(disposables);
-            
-            MouseDoubleClick += (_, _) =>  ViewModel.PlaneView.AddWrapper.Execute(new((-0.9f, 0.0f),
+
+            MouseDoubleClick += (_, _) => ViewModel.PlaneView.AddWrapper.Execute(new((-0.9f, 0.0f),
                 (-0.5f, 0.5f), (0.0f, -0.5f),
                 (1.0f, 0.0f))).Subscribe();
+
+            OpenTkControl.MouseWheel += (_, e) => _baseGraphic.Camera.Fov -= e.Delta / 100.0f;
         });
     }
 }

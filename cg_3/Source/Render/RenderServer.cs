@@ -1,7 +1,9 @@
 ﻿using System.Drawing;
+using cg_3.Source.Camera;
 using cg_3.Source.Vectors;
 using cg_3.Source.Wrappers;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using ReactiveUI;
 
 namespace cg_3.Source.Render;
@@ -9,6 +11,7 @@ namespace cg_3.Source.Render;
 public interface IBaseGraphic
 {
     public float DeltaTime { get; }
+    public MainCamera Camera { get; }
 
     public void Render(TimeSpan obj);
     public void DrawPoints(IEnumerable<Vector2D> points);
@@ -21,26 +24,21 @@ public interface IViewable
 
 public class RenderServer : ReactiveObject, IBaseGraphic
 {
+    private IUniformContext? _uniformContext;
     private VertexArrayObject? _vao;
     private ShaderProgram? _shaderProgram;
     public float DeltaTime { get; private set; }
 
-    // public MainCamera Camera { get; }
+    public MainCamera Camera { get; }
     public IEnumerable<Vector2D>? Points { get; set; }
 
-    // public RenderServer(MainCamera? camera = null)
-    // {
-    //     GL.ClearColor(Color.Black);
-    //     GL.Enable(EnableCap.DepthTest);
-    //     Camera = camera ?? new(CameraMode.Perspective);
-    // }
-
-    public RenderServer()
+    public RenderServer(MainCamera? camera = null)
     {
         GL.ClearColor(Color.White);
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.ProgramPointSize);
         GL.Enable(EnableCap.LineSmooth);
+        Camera ??= new(CameraMode.Perspective);
     }
 
     public void DrawPoints(IEnumerable<Vector2D> points)
@@ -63,6 +61,17 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         _shaderProgram = new();
         _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/shader.frag",
             "Source/Shaders/shader.geom");
+
+        var projectionMatrix = Camera.GetProjectionMatrix();
+        var viewMatrix = Camera.GetViewMatrix();
+        var modelMatrix = Matrix4.Identity;
+
+        _uniformContext = new Transformation
+        {
+            View = (viewMatrix, "view"),
+            Projection = (projectionMatrix, "projection"),
+            Model = (modelMatrix, "model")
+        };
     }
 
     public void Render(TimeSpan deltaTime)
@@ -73,6 +82,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         if (Points is null) return;
 
         _shaderProgram!.Use();
+        _uniformContext!.Update(_shaderProgram, Camera);
         _vao!.Bind();
         GL.DrawArrays(PrimitiveType.LineStrip, 0, Points.Count());
     }
