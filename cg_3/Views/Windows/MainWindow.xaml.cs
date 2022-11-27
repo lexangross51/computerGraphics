@@ -93,26 +93,25 @@ public partial class MainWindow : IViewFor<MainViewModel>
             {
                 var point = args.GetPosition(OpenTkControl);
 
+                var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
+                var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
+
                 switch (_step)
                 {
                     case 0:
-                        _bezierObject.BezierWrapper.P0 = ((float)point.X,
-                            (float)point.Y);
+                        _bezierObject.BezierWrapper.P0 = (x, y);
                         _step++;
                         break;
                     case 1:
-                        _bezierObject.BezierWrapper.P1 = ((float)point.X,
-                            (float)point.Y);
+                        _bezierObject.BezierWrapper.P1 = (x, y);
                         _step++;
                         break;
                     case 2:
-                        _bezierObject.BezierWrapper.P2 = ((float)point.X,
-                            (float)point.Y);
+                        _bezierObject.BezierWrapper.P2 = (x, y);
                         _step++;
                         break;
                     case 3:
-                        _bezierObject.BezierWrapper.P3 = ((float)point.X,
-                            (float)point.Y);
+                        _bezierObject.BezierWrapper.P3 = (x, y);
                         _step = 0;
                         break;
                 }
@@ -122,11 +121,11 @@ public partial class MainWindow : IViewFor<MainViewModel>
             {
                 var point = args.GetPosition(OpenTkControl);
 
-                var x = (int)point.X;
-                var y = (int)(1080.0  - point.Y);
+                // var x = -1.0f + 2 * point.X / OpenTkControl.RenderSize.Width;
+                // var y = 1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height;
 
-                MousePositionX.Text = x.ToString("G7", CultureInfo.InvariantCulture);
-                MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
+                MousePositionX.Text = point.X.ToString("G7", CultureInfo.InvariantCulture);
+                MousePositionY.Text = point.Y.ToString("G7", CultureInfo.InvariantCulture);
             }).DisposeWith(disposables);
         });
     }
