@@ -12,6 +12,16 @@
         <converters:Vector2DToStringConverter x:Key="Vector2DToStringConverter" />
     </Window.Resources>
     <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch">
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="X"/>
+                    <TextBox x:Name="MousePositionX" Margin="0, 5, 0, 5" IsReadOnly="True"/>
+                    <Label Content="Y"/>
+                    <TextBox x:Name="MousePositionY" Margin="0, 5, 0, 5" IsReadOnly="True"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -26,7 +36,7 @@
                             <TextBox Text="{Binding Wrapper.P0, Converter={StaticResource Vector2DToStringConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <Label Content="P1"/>
+                            <Label Content="P1" />
                             <TextBox />
                         </StackPanel>
                     </StackPanel>

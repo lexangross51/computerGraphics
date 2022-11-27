@@ -1,10 +1,9 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Globalization;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows.Input;
+using System.Windows;
 using cg_3.Source.Render;
 using cg_3.ViewModels;
-using DynamicData;
-using DynamicData.Binding;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTK.Wpf;
 using ReactiveUI;
@@ -61,11 +60,21 @@ public partial class MainWindow : IViewFor<MainViewModel>
                     ViewModel.PlaneView.Draw(_baseGraphic);
                 }).DisposeWith(disposables);
 
-            MouseDoubleClick += (_, _) => ViewModel.PlaneView.AddWrapper.Execute(new((-0.9f, 0.0f),
+            OpenTkControl.Events().MouseWheel.Select(args => args)
+                .Subscribe(args => _baseGraphic.Camera.Fov -= args.Delta / 100.0f).DisposeWith(disposables);
+            
+            OpenTkControl.Events().MouseDown.Select(_ => new BezierWrapper(new(-0.9f, 0.0f),
                 (-0.5f, 0.5f), (0.0f, -0.5f),
-                (1.0f, 0.0f))).Subscribe();
+                (1.0f, 0.0f)))
+                .InvokeCommand(ViewModel, vm => vm.PlaneView.AddWrapper).DisposeWith(disposables);
 
-            OpenTkControl.MouseWheel += (_, e) => _baseGraphic.Camera.Fov -= e.Delta / 100.0f;
+            OpenTkControl.Events().MouseMove.Select(args => args).Subscribe(args =>
+            {
+                var point = args.GetPosition(OpenTkControl);
+
+                MousePositionX.Text = point.X.ToString("G7", CultureInfo.InvariantCulture);
+                MousePositionY.Text = point.Y.ToString("G7", CultureInfo.InvariantCulture);
+            }).DisposeWith(disposables);
         });
     }
 }

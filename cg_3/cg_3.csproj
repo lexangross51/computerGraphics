@@ -15,6 +15,7 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
       <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.2" />
       <PackageReference Include="ReactiveUI" Version="18.4.1" />
+      <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.1" />
       <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
       <PackageReference Include="ReactiveUI.WPF" Version="18.4.1" />
     </ItemGroup>
