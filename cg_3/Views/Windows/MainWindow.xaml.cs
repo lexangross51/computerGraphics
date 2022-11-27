@@ -1,7 +1,10 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using cg_3.Source.Render;
 using cg_3.ViewModels;
+using DynamicData;
+using DynamicData.Binding;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTK.Wpf;
 using ReactiveUI;
@@ -22,8 +25,9 @@ public partial class MainWindow : IViewFor<MainViewModel>
     }
 
     public MainViewModel ViewModel { get; set; }
-    public IBaseGraphic BaseGraphic { get; }
-    
+    private readonly IBaseGraphic _baseGraphic;
+
+
     public MainWindow()
     {
         InitializeComponent();
@@ -32,16 +36,34 @@ public partial class MainWindow : IViewFor<MainViewModel>
         OpenTkControl.Start(mainSettings);
         OpenTkControl.RenderSize = new(1920, 1080);
 
-        BaseGraphic = new RenderServer();
-        ViewModel.Draw(BaseGraphic); // initialize
-        
+        _baseGraphic = new RenderServer();
         var observable = Observable.FromEvent<TimeSpan>(
             handler => OpenTkControl.Render += handler,
             handler => OpenTkControl.Render -= handler);
+        
+        this.WhenActivated(disposables =>
+        {
+            observable.Subscribe(ts => _baseGraphic.Render(ts)).DisposeWith(disposables);
+            this.WhenAnyValue(t => t.ViewModel.PlaneView.Wrappers.Count)
+                .Subscribe(_ =>
+                {
+                    foreach (var wrapper in ViewModel.PlaneView.Wrappers)
+                    {
+                        for (int i = 0; i < 20; i++)
+                        {
+                            var t = i / 20.0f;
+                            ViewModel.PlaneView.Plane.Points.Add(wrapper.GenCurve(t));
+                        }
+                    }
 
-        this.WhenActivated(disposables 
-            => observable.Subscribe(ts => BaseGraphic.Render(ts)).DisposeWith(disposables));
+                    ViewModel.Draw(_baseGraphic);
+                }).DisposeWith(disposables);
+            
+            MouseDoubleClick += (_, _) =>  ViewModel.PlaneView.AddWrapper.Execute(new((-0.9f, 0.0f),
+                (-0.5f, 0.5f), (0.0f, -0.5f),
+                (1.0f, 0.0f))).Subscribe();
+        });
     }
 }
 
-#nullable  restore
+#nullable restore

@@ -25,6 +25,10 @@
                             <Label Content="P0" />
                             <TextBox Text="{Binding Wrapper.P0, Converter={StaticResource Vector2DToStringConverter}}" />
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="P1"/>
+                            <TextBox />
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
             </DockPanel>
