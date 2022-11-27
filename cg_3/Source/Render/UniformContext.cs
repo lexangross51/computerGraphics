@@ -1,4 +1,5 @@
-﻿using cg_3.Source.Camera;
+﻿using System.Windows.Media;
+using cg_3.Source.Camera;
 using cg_3.Source.Wrappers;
 using OpenTK.Mathematics;
 
@@ -17,9 +18,9 @@ public class Transformation : IUniformContext
 
     public void Update(ShaderProgram shaderProgram, MainCamera camera)
     {
-        Projection = (camera.GetProjectionMatrix(), Projection.Name);
-        View = (camera.GetViewMatrix(), View.Name);
-
+        Projection = (Matrix4.CreateOrthographic(1920.0f, 1080.0f, -1.0f, 1.0f), Projection.Name);
+        View = (Matrix4.)
+        
         shaderProgram.SetUniform(View.Name, View.ViewMatrix);
         shaderProgram.SetUniform(Projection.Name, Projection.ProjectionMatrix);
         shaderProgram.SetUniform(Model.Name, Model.ModelMatrix);

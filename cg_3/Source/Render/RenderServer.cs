@@ -62,8 +62,8 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         _shaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/shader.frag",
             "Source/Shaders/shader.geom");
 
-        var projectionMatrix = Camera.GetProjectionMatrix();
-        var viewMatrix = Camera.GetViewMatrix();
+        var projectionMatrix = Matrix4.Identity;
+        var viewMatrix = Matrix4.Identity;
         var modelMatrix = Matrix4.Identity;
 
         _uniformContext = new Transformation
