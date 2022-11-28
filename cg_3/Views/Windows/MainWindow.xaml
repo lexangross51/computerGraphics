@@ -15,10 +15,10 @@
         <StatusBar DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
-                    <Label Content="X"/>
-                    <TextBox x:Name="MousePositionX" Margin="0, 5, 0, 5" IsReadOnly="True"/>
-                    <Label Content="Y"/>
-                    <TextBox x:Name="MousePositionY" Margin="0, 5, 0, 5" IsReadOnly="True"/>
+                    <Label Content="X" />
+                    <TextBox x:Name="MousePositionX" Margin="0, 5, 0, 5" IsReadOnly="True" />
+                    <Label Content="Y" />
+                    <TextBox x:Name="MousePositionY" Margin="0, 5, 0, 5" IsReadOnly="True" />
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
@@ -27,17 +27,29 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="0.25*" />
             </Grid.ColumnDefinitions>
-            <control:GLWpfControl x:Name="OpenTkControl"/>
+            <control:GLWpfControl x:Name="OpenTkControl" />
             <DockPanel Grid.Column="1">
                 <GroupBox Header="Control points">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="P0" />
-                            <TextBox />
+                            <TextBox
+                                Text="{Binding BezierWrapper.P0, Converter={StaticResource Vector2DToStringConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="P1" />
-                            <TextBox />
+                            <TextBox
+                                Text="{Binding BezierWrapper.P1, Converter={StaticResource Vector2DToStringConverter}}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="P2" />
+                            <TextBox
+                                Text="{Binding BezierWrapper.P2, Converter={StaticResource Vector2DToStringConverter}}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="P3" />
+                            <TextBox
+                                Text="{Binding BezierWrapper.P3, Converter={StaticResource Vector2DToStringConverter}}" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>

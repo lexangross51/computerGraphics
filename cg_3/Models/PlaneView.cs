@@ -1,59 +1,73 @@
-﻿using System.Collections.ObjectModel;
-using System.Reactive;
-using cg_3.Source.Render;
+﻿using cg_3.Source.Render;
 using cg_3.Source.Vectors;
 using cg_3.ViewModels;
 using DynamicData;
+using OpenTK.Graphics.OpenGL4;
 using ReactiveUI;
 
 namespace cg_3.Models;
 
-public class PlaneView : IViewable
+public class PlaneView : ReactiveObject, IViewable
 {
-    public SourceCache<BezierWrapper, BezierWrapper> WrappersAsSourceCache { get; } = new(w => w);
-    public Plane Plane { get; }
-    public ReactiveCommand<BezierWrapper, Unit> AddWrapper { get; }
-
-    public PlaneView()
-    {
-        Plane = new();
-        AddWrapper = ReactiveCommand.Create<BezierWrapper>(wrapper => WrappersAsSourceCache.AddOrUpdate(wrapper));
-    }
+    public Plane Plane { get; } = new();
+    public SourceCache<BezierWrapper, Guid> Wrappers { get; } = new(w => w.Guid);
 
     public void Draw(IBaseGraphic baseGraphic)
     {
-        baseGraphic.DrawLines(Plane.SelectedPoints);
+        baseGraphic.DrawLines(Plane.SelectedCurves, PrimitiveType.LineStrip);
         baseGraphic.DrawPoints(Plane.ControlPoints.Items);
+        baseGraphic.DrawLines(Plane.Curves, PrimitiveType.LinesAdjacency);
     }
 }
 
 public class Plane
 {
-    public SourceCache<Vector2D, Vector2D> ControlPoints { get; } = new(p => p);
-    public List<Vector2D> SelectedPoints { get; } = new();
-    public List<Vector2D> Curves { get; set; }
+    public SourceList<Vector2D> ControlPoints { get; } = new();
+    public List<Vector2D> SelectedCurves { get; } = new();
+    public List<Vector2D> Curves { get; } = new();
 }
 
 public class ViewableBezierObject
 {
     private readonly PlaneView _planeView;
-    public BezierWrapper BezierWrapper { get; set; }
+    private byte _step;
 
-    public ViewableBezierObject(PlaneView planeView, Vector2D point)
+    public BezierWrapper BezierWrapper { get; }
+
+    public ViewableBezierObject(Vector2D point, PlaneView planeView)
     {
-        _planeView = planeView;
         BezierWrapper = new(point, point, point, point);
+        _planeView = planeView;
+        _planeView.Wrappers.AddOrUpdate(BezierWrapper);
     }
 
-    public void AddPoint(Vector2D point)
+    public Task AddPoint(Vector2D point, ref bool value)
     {
-        BezierWrapper.P0 = point;
-        // _planeView.Plane.AddPoint(point);
-    }
+        switch (_step)
+        {
+            case 0:
+                BezierWrapper.P0 = point;
+                _planeView.Plane.ControlPoints.Add(point);
+                _step++;
+                break;
+            case 1:
+                BezierWrapper.P1 = point;
+                _step++;
+                _planeView.Plane.ControlPoints.Add(point);
+                break;
+            case 2:
+                BezierWrapper.P2 = point;
+                _step++;
+                _planeView.Plane.ControlPoints.Add(point);
+                break;
+            case 3:
+                BezierWrapper.P3 = point;
+                _planeView.Plane.ControlPoints.Add(point);
+                _step = 0;
+                value = false;
+                break;
+        }
 
-    public void MovePoint(Vector2D point)
-    {
-        BezierWrapper.P3 = point;
-        // _planeView.Plane.AddPoint(point);
+        return Task.CompletedTask;
     }
 }

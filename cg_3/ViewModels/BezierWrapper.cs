@@ -7,6 +7,7 @@ namespace cg_3.ViewModels;
 
 public class BezierWrapper : ReactiveObject
 {
+    public Guid Guid { get; }
     [Reactive] public Vector2D P0 { get; set; }
     [Reactive] public Vector2D P1 { get; set; }
     [Reactive] public Vector2D P2 { get; set; }
@@ -18,6 +19,7 @@ public class BezierWrapper : ReactiveObject
         P1 = p1;
         P2 = p2;
         P3 = p3;
+        Guid = Guid.NewGuid();
     }
 
     public Vector2D GenCurve(float t) => AsBezierObject().CurveGen(t);

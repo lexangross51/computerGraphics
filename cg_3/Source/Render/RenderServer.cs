@@ -14,7 +14,7 @@ public interface IBaseGraphic
     public MainCamera Camera { get; }
 
     public void Render(TimeSpan obj);
-    public void DrawLines(IEnumerable<Vector2D> points);
+    public void DrawLines(IEnumerable<Vector2D> points, PrimitiveType primitiveType);
     public void DrawPoints(IEnumerable<Vector2D> points);
 }
 
@@ -44,8 +44,8 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         _renderables.Add(new RenderObject.RenderObject1().Initialize(points));
     }
 
-    public void DrawLines(IEnumerable<Vector2D> points)
-        => _renderables.Add(new RenderObject(primitiveType: PrimitiveType.LineStrip).Initialize(points));
+    public void DrawLines(IEnumerable<Vector2D> points, PrimitiveType primitiveType)
+        => _renderables.Add(new RenderObject(primitiveType: primitiveType).Initialize(points));
 
     public void Render(TimeSpan deltaTime)
     {
