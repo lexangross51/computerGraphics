@@ -70,7 +70,7 @@ public partial class MainWindow : IViewFor<MainViewModel>
 
                 var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
                 var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
-                
+
                 if (!_create)
                 {
                     _bezierObject = new((x, y), ViewModel.PlaneView);
@@ -79,6 +79,9 @@ public partial class MainWindow : IViewFor<MainViewModel>
 
                 await _bezierObject.AddPoint((x, y), ref _create);
             }).DisposeWith(disposables);
+
+            ViewModel.PlaneView.Plane.ControlPoints.CountChanged.Subscribe(_ =>
+                baseGraphic.DrawPoints(ViewModel.PlaneView.Plane.ControlPoints.Items));
 
             OpenTkControl.Events().MouseMove.Subscribe(args =>
             {
