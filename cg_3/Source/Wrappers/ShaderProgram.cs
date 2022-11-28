@@ -4,6 +4,28 @@ using OpenTK.Mathematics;
 
 namespace cg_3.Source.Wrappers;
 
+public static class ShadersResource
+{
+    public const string VertexShader = """
+                                        #version 330 core
+                                        layout (location = 0) in vec2 position;
+                                        uniform mat4 model;
+                                        uniform mat4 view;
+                                        uniform mat4 projection;
+                                        void main() {
+                                            gl_Position = projection * view * model * vec4(position, 0.0f, 1.0f);
+                                        }
+                                        """;
+
+    public const string FragmentShader = """ 
+                                        #version 330 core 
+                                        out vec4 FragColor;
+                                        void main() {
+                                        FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+                                        } 
+                                        """;
+}
+
 public class ShaderProgram : IDisposable
 {
     private readonly Dictionary<string, int> _uniformLocations = new();
@@ -43,7 +65,7 @@ public class ShaderProgram : IDisposable
             {
                 shaderSource = sr.ReadToEnd();
             }
-            
+
             geometryShader = GL.CreateShader(ShaderType.GeometryShader);
             GL.ShaderSource(geometryShader.Value, shaderSource);
             CompileShader(geometryShader.Value);
@@ -145,4 +167,33 @@ public class ShaderProgram : IDisposable
     }
 
     public void Dispose() => GL.DeleteProgram(Handle);
+
+    public static ShaderProgram StandartProgram()
+    {
+        ShaderProgram shaderProgram = new();
+        var shaderSource = ShadersResource.VertexShader;
+
+        var vertexShader = GL.CreateShader(ShaderType.VertexShader);
+        GL.ShaderSource(vertexShader, shaderSource);
+
+        shaderSource = ShadersResource.FragmentShader;
+
+        var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+        GL.ShaderSource(fragmentShader, shaderSource);
+
+        CompileShader(vertexShader);
+        CompileShader(fragmentShader);
+
+        GL.AttachShader(shaderProgram.Handle, vertexShader);
+        GL.AttachShader(shaderProgram.Handle, fragmentShader);
+
+        LinkProgram(shaderProgram.Handle);
+
+        GL.DetachShader(shaderProgram.Handle, vertexShader);
+        GL.DetachShader(shaderProgram.Handle, fragmentShader);
+        GL.DeleteShader(fragmentShader);
+        GL.DeleteShader(vertexShader);
+
+        return shaderProgram;
+    }
 }

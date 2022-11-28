@@ -20,7 +20,7 @@ public class PlaneView : IViewable
         AddWrapper = ReactiveCommand.Create<BezierWrapper>(wrapper => WrappersAsSourceCache.AddOrUpdate(wrapper));
     }
 
-    public void Draw(IBaseGraphic baseGraphic) => baseGraphic.DrawPoints(Plane.Points.Items);
+    public void Draw(IBaseGraphic baseGraphic) => baseGraphic.DrawLines(Plane.Points.Items);
 }
 
 public class Plane
