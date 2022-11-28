@@ -20,12 +20,18 @@ public class PlaneView : IViewable
         AddWrapper = ReactiveCommand.Create<BezierWrapper>(wrapper => WrappersAsSourceCache.AddOrUpdate(wrapper));
     }
 
-    public void Draw(IBaseGraphic baseGraphic) => baseGraphic.DrawLines(Plane.Points.Items);
+    public void Draw(IBaseGraphic baseGraphic)
+    {
+        baseGraphic.DrawLines(Plane.SelectedPoints);
+        baseGraphic.DrawPoints(Plane.ControlPoints.Items);
+    }
 }
 
 public class Plane
 {
-    public SourceCache<Vector2D, Vector2D> Points { get; } = new(p => p);
+    public SourceCache<Vector2D, Vector2D> ControlPoints { get; } = new(p => p);
+    public List<Vector2D> SelectedPoints { get; } = new();
+    public List<Vector2D> Curves { get; set; }
 }
 
 public class ViewableBezierObject

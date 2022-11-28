@@ -40,7 +40,9 @@ public class RenderServer : ReactiveObject, IBaseGraphic
     }
 
     public void DrawPoints(IEnumerable<Vector2D> points)
-        => _renderables.Add(new RenderObject().Initialize(points));
+    {
+        _renderables.Add(new RenderObject.RenderObject1().Initialize(points));
+    }
 
     public void DrawLines(IEnumerable<Vector2D> points)
         => _renderables.Add(new RenderObject(primitiveType: PrimitiveType.LineStrip).Initialize(points));

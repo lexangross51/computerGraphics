@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
@@ -55,19 +56,17 @@ public partial class MainWindow : IViewFor<MainViewModel>
         this.WhenActivated(disposables =>
         {
             observable.Subscribe(ts => _baseGraphic.Render(ts)).DisposeWith(disposables);
-
-            this.WhenAnyValue(t => t._bezierObject.BezierWrapper.P3)
+            
+            ViewModel.PlaneView.Plane.ControlPoints.CountChanged.Where(c => c % 4 == 0 && c != 0)
                 .Subscribe(_ =>
                 {
-                    ViewModel.PlaneView.Plane.Points.Clear();
-
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i <= 20; i++)
                     {
                         var t = i / 20.0f;
 
-                        ViewModel.PlaneView.Plane.Points.AddOrUpdate(_bezierObject.BezierWrapper.GenCurve(t));
+                        ViewModel.PlaneView.Plane.SelectedPoints.Add(_bezierObject.BezierWrapper.GenCurve(t));
                     }
-
+                    
                     ViewModel.PlaneView.Draw(_baseGraphic);
                 });
 
@@ -100,23 +99,24 @@ public partial class MainWindow : IViewFor<MainViewModel>
                 {
                     case 0:
                         _bezierObject.BezierWrapper.P0 = (x, y);
-                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
+                        ViewModel.PlaneView.Plane.ControlPoints.AddOrUpdate((x, y));
                         _step++;
                         break;
                     case 1:
                         _bezierObject.BezierWrapper.P1 = (x, y);
-                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
+                        ViewModel.PlaneView.Plane.ControlPoints.AddOrUpdate((x, y));
                         _step++;
                         break;
                     case 2:
                         _bezierObject.BezierWrapper.P2 = (x, y);
-                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
+                        ViewModel.PlaneView.Plane.ControlPoints.AddOrUpdate((x, y));
                         _step++;
                         break;
                     case 3:
                         _bezierObject.BezierWrapper.P3 = (x, y);
-                        ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
+                        ViewModel.PlaneView.Plane.ControlPoints.AddOrUpdate((x, y));
                         _step = 0;
+                        // Debug.WriteLine(ViewModel.PlaneView.Plane.Points.Items.Count());
                         break;
                 }
             }).DisposeWith(disposables);
@@ -131,7 +131,7 @@ public partial class MainWindow : IViewFor<MainViewModel>
                 MousePositionX.Text = x.ToString("G7", CultureInfo.InvariantCulture);
                 MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
 
-                ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
+                // ViewModel.PlaneView.Plane.Points.AddOrUpdate((x, y));
             }).DisposeWith(disposables);
         });
     }
