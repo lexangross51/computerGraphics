@@ -29,8 +29,8 @@ public static class ShadersResource
 
 public class ShaderProgram : IDisposable
 {
-    private readonly Dictionary<string, int> _uniformLocations = new();
     public int Handle { get; }
+    public Dictionary<string, int> UniformLocation { get; } = new();
 
     public ShaderProgram() => Handle = GL.CreateProgram();
 
@@ -98,7 +98,7 @@ public class ShaderProgram : IDisposable
         {
             var key = GL.GetActiveUniform(Handle, i, out _, out _);
             var location = GL.GetUniformLocation(Handle, key);
-            _uniformLocations.Add(key, location);
+            UniformLocation.Add(key, location);
         }
     }
 
@@ -127,44 +127,44 @@ public class ShaderProgram : IDisposable
 
     public void SetUniform(string name, int value)
     {
-        if (!_uniformLocations.ContainsKey(name)) throw new($"{name} uniform not found on shader");
-        GL.Uniform1(_uniformLocations[name], value);
+        if (!UniformLocation.ContainsKey(name)) throw new($"{name} uniform not found on shader");
+        GL.Uniform1(UniformLocation[name], value);
     }
 
     public void SetUniform(string name, float value)
     {
-        if (!_uniformLocations.ContainsKey(name)) throw new($"{name} uniform not found on shader");
-        GL.Uniform1(_uniformLocations[name], value);
+        if (!UniformLocation.ContainsKey(name)) throw new($"{name} uniform not found on shader");
+        GL.Uniform1(UniformLocation[name], value);
     }
 
     public void SetUniform(string name, float x, float y, float z)
     {
-        if (!_uniformLocations.ContainsKey(name)) throw new($"{name} uniform not found on shader");
-        GL.Uniform3(_uniformLocations[name], x, y, z);
+        if (!UniformLocation.ContainsKey(name)) throw new($"{name} uniform not found on shader");
+        GL.Uniform3(UniformLocation[name], x, y, z);
     }
 
     public void SetUniform(string name, float x, float y, float z, float w)
     {
-        if (!_uniformLocations.ContainsKey(name)) throw new($"{name} uniform not found on shader");
-        GL.Uniform4(_uniformLocations[name], x, y, z, w);
+        if (!UniformLocation.ContainsKey(name)) throw new($"{name} uniform not found on shader");
+        GL.Uniform4(UniformLocation[name], x, y, z, w);
     }
 
     public void SetUniform(string name, Vector3 value)
     {
-        if (!_uniformLocations.ContainsKey(name)) throw new($"{name} uniform not found on shader");
-        GL.Uniform3(_uniformLocations[name], value);
+        if (!UniformLocation.ContainsKey(name)) throw new($"{name} uniform not found on shader");
+        GL.Uniform3(UniformLocation[name], value);
     }
 
     public void SetUniform(string name, Color4 color)
     {
-        if (!_uniformLocations.ContainsKey(name)) throw new($"{name} uniform not found on shader");
-        GL.Uniform3(_uniformLocations[name], new(color.R, color.G, color.B));
+        if (!UniformLocation.ContainsKey(name)) throw new($"{name} uniform not found on shader");
+        GL.Uniform3(UniformLocation[name], new(color.R, color.G, color.B));
     }
 
     public void SetUniform(string name, Matrix4 value)
     {
-        if (!_uniformLocations.ContainsKey(name)) throw new($"{name} uniform not found on shader");
-        GL.UniformMatrix4(_uniformLocations[name], false, ref value);
+        if (!UniformLocation.ContainsKey(name)) throw new($"{name} uniform not found on shader");
+        GL.UniformMatrix4(UniformLocation[name], false, ref value);
     }
 
     public void Dispose() => GL.DeleteProgram(Handle);
@@ -194,6 +194,15 @@ public class ShaderProgram : IDisposable
         GL.DetachShader(shaderProgram.Handle, fragmentShader);
         GL.DeleteShader(fragmentShader);
         GL.DeleteShader(vertexShader);
+
+        GL.GetProgram(shaderProgram.Handle, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
+
+        for (int i = 0; i < numberOfUniforms; i++)
+        {
+            var key = GL.GetActiveUniform(shaderProgram.Handle, i, out _, out _);
+            var location = GL.GetUniformLocation(shaderProgram.Handle, key);
+            shaderProgram.UniformLocation.Add(key, location);
+        }
 
         return shaderProgram;
     }

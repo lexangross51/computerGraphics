@@ -14,9 +14,9 @@ public class PlaneView : ReactiveObject, IViewable
 
     public void Draw(IBaseGraphic baseGraphic)
     {
-        baseGraphic.DrawLines(Plane.SelectedCurves, PrimitiveType.LineStrip);
+        baseGraphic.Draw(Plane.SelectedCurves, PrimitiveType.LineStrip);
         baseGraphic.DrawPoints(Plane.ControlPoints.Items);
-        baseGraphic.DrawLines(Plane.Curves, PrimitiveType.LinesAdjacency);
+        baseGraphic.Draw(Plane.Curves, PrimitiveType.LinesAdjacency);
     }
 }
 

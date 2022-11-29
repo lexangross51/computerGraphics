@@ -10,12 +10,13 @@ namespace cg_3.Source.Render;
 
 public interface IBaseGraphic
 {
-    public float DeltaTime { get; }
-    public MainCamera Camera { get; }
+    float DeltaTime { get; }
+    MainCamera Camera { get; }
 
-    public void Render(TimeSpan obj);
-    public void DrawLines(IEnumerable<Vector2D> points, PrimitiveType primitiveType);
-    public void DrawPoints(IEnumerable<Vector2D> points);
+    void Render(TimeSpan obj);
+    void Draw(RenderUnit renderUnit);
+    void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType);
+    void DrawPoints(IEnumerable<Vector2D> points);
 }
 
 public interface IViewable
@@ -39,13 +40,25 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         _renderables = new();
     }
 
-    public void DrawPoints(IEnumerable<Vector2D> points)
+    public void Draw(RenderUnit renderUnit) => _renderables.Add(renderUnit);
+
+    public void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType)
     {
-        _renderables.Add(new RenderObject.RenderObject1().Initialize(points));
+        RenderUnit @object = new RenderObject(primitiveType: primitiveType);
+        @object.Initialize(points);
+        _renderables.Add(@object);
     }
 
-    public void DrawLines(IEnumerable<Vector2D> points, PrimitiveType primitiveType)
-        => _renderables.Add(new RenderObject(primitiveType: primitiveType).Initialize(points));
+    public void DrawPoints(IEnumerable<Vector2D> points)
+    {
+        ShaderProgram shaderProgram = new();
+        shaderProgram.Initialize("Source/Shaders/shader1.vert", "Source/Shaders/shader.frag");
+
+        RenderUnit @object = new RenderObject(shaderProgram: shaderProgram);
+        @object.Initialize(points);
+
+        _renderables.Add(@object);
+    }
 
     public void Render(TimeSpan deltaTime)
     {
