@@ -17,7 +17,7 @@ public class PlaneView : ReactiveObject, IViewable
     public void Draw(IBaseGraphic baseGraphic)
     {
         baseGraphic.Draw(Plane.SelectedCurves, PrimitiveType.LineStrip);
-        baseGraphic.DrawPoints(Plane.ControlPoints.Items);
+        baseGraphic.DrawPoints(Plane.ControlPoints.Items, 7, Color4.Black);
         baseGraphic.Draw(Plane.Curves, PrimitiveType.LinesAdjacency);
     }
 
@@ -25,8 +25,8 @@ public class PlaneView : ReactiveObject, IViewable
     {
         foreach (var wrapper in Wrappers.Items)
         {
-            if (wrapper.Points.Any(p => Vector2D.Distance(point, p) < 0.5) ||
-                wrapper.ControlPoints.Any(p => Vector2D.Distance(point, p) < 0.5)) return wrapper.Guid;
+            if (wrapper.Points.Any(p => Vector2D.Distance(point, p) < 1E-02) ||
+                wrapper.ControlPoints.Any(p => Vector2D.Distance(point, p) < 1E-02)) return wrapper.Guid;
         }
 
         return Guid.Empty;

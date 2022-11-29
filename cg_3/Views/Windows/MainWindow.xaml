@@ -7,7 +7,7 @@
         xmlns:converters="clr-namespace:cg_3.Infrastructure.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
+        DataContext="{Binding PlaneViewModel, Source={StaticResource Locator}}">
     <Window.Resources>
         <converters:Vector2DToStringConverter x:Key="Vector2DToStringConverter" />
     </Window.Resources>

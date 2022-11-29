@@ -1,4 +1,5 @@
-﻿using cg_3.Source.Camera;
+﻿using System.Drawing;
+using cg_3.Source.Camera;
 using cg_3.Source.Wrappers;
 using OpenTK.Mathematics;
 
@@ -27,5 +28,31 @@ public class Transformation : IUniformContext
         View = (Matrix4.Identity, "view"),
         Projection = (Matrix4.Identity, "projection"),
         Model = (Matrix4.Identity, "model")
+    };
+}
+
+public class ColorUniform : IUniformContext
+{
+    public required (Color4 Color, string Name) Context { get; set; }
+
+    public void Update(ShaderProgram shaderProgram, MainCamera camera)
+        => shaderProgram.SetUniform(Context.Name, new Vector3(Context.Color.R, Context.Color.G, Context.Color.B));
+
+    public static IUniformContext DefaultUniformColorContext => new ColorUniform
+    {
+        Context = (Color4.Black, "color")
+    };
+}
+
+public class PointSizeUniform : IUniformContext
+{
+    public required (int Size, string Name) Context { get; set; }
+
+    public void Update(ShaderProgram shaderProgram, MainCamera camera)
+        => shaderProgram.SetUniform(Context.Name, Context.Size);
+
+    public static IUniformContext DefaultPointSizeUniformContext => new PointSizeUniform
+    {
+        Context = (2, "size")
     };
 }

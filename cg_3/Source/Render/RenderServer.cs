@@ -17,7 +17,8 @@ public interface IBaseGraphic
     void Render(TimeSpan obj);
     void Draw(RenderUnit renderUnit);
     void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType);
-    void DrawPoints(IEnumerable<Vector2D> points);
+    void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType, Color4 color);
+    void DrawPoints(IEnumerable<Vector2D> points, int pointSize, Color4 color);
 }
 
 public interface IViewable
@@ -52,14 +53,36 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         _renderables.Add(@object);
     }
 
-    public void DrawPoints(IEnumerable<Vector2D> points)
+    public void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType, Color4 color)
+    {
+        RenderUnit @object = new RenderObject(primitiveType: primitiveType, uniformContexts: new[]
+        {
+            Transformation.DefaultUniformTransformationContext, new ColorUniform
+            {
+                Context = (color, "color")
+            }
+        });
+        @object.Initialize(points);
+        _renderables.Add(@object);
+    }
+
+    public void DrawPoints(IEnumerable<Vector2D> points, int pointsSize, Color4 color)
     {
         ShaderProgram shaderProgram = new();
-        shaderProgram.Initialize("Source/Shaders/shader1.vert", "Source/Shaders/shader.frag");
+        shaderProgram.Initialize("Source/Shaders/pointsShader.vert", "Source/Shaders/shader.frag");
 
-        RenderUnit @object = new RenderObject(shaderProgram: shaderProgram);
+        RenderUnit @object = new RenderObject(shaderProgram: shaderProgram, uniformContexts: new[]
+        {
+            Transformation.DefaultUniformTransformationContext, new ColorUniform
+            {
+                Context = (color, "color")
+            },
+            new PointSizeUniform
+            {
+                Context = (pointsSize, "size")
+            }
+        });
         @object.Initialize(points);
-
         _renderables.Add(@object);
     }
 
@@ -73,7 +96,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         foreach (var renderable in _renderables)
         {
             renderable.ShaderProgram!.Use();
-            renderable.UniformContext.Update(renderable.ShaderProgram, Camera);
+            renderable.UpdateUniforms(Camera);
             renderable.Vao.Bind();
             GL.DrawArrays(renderable.PrimitiveType, 0, renderable.VerticesSize);
         }

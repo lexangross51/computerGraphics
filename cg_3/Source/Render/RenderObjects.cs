@@ -1,4 +1,5 @@
-﻿using cg_3.Source.Vectors;
+﻿using cg_3.Source.Camera;
+using cg_3.Source.Vectors;
 using cg_3.Source.Wrappers;
 using OpenTK.Graphics.OpenGL4;
 
@@ -8,37 +9,45 @@ public interface IRenderable
 {
     VertexArrayObject Vao { get; }
     ShaderProgram? ShaderProgram { get; }
-    IUniformContext UniformContext { get; }
+    IUniformContext[] UniformContexts { get; }
     PrimitiveType PrimitiveType { get; }
     int VerticesSize { get; }
 
     void Initialize(IEnumerable<Vector2D> points);
+    void UpdateUniforms(MainCamera camera);
 }
 
 public abstract class RenderUnit : IRenderable
 {
     public VertexArrayObject Vao { get; }
     public ShaderProgram? ShaderProgram { get; }
-    public IUniformContext UniformContext { get; }
+    public IUniformContext[] UniformContexts { get; }
     public PrimitiveType PrimitiveType { get; }
     public int VerticesSize { get; protected set; }
-    public abstract void Initialize(IEnumerable<Vector2D> points);
 
     protected RenderUnit(VertexArrayObject? vao = null, ShaderProgram? shaderProgram = null,
-        IUniformContext? uniformContext = null, PrimitiveType primitiveType = PrimitiveType.Points)
+        IUniformContext[]? uniformContexts = null, PrimitiveType primitiveType = PrimitiveType.Points)
     {
         Vao = vao ?? new VertexArrayObject(VertexAttribType.Float);
         ShaderProgram = shaderProgram ?? ShaderProgram.StandartProgram();
-        UniformContext = uniformContext ?? Transformation.DefaultUniformTransformationContext;
+        UniformContexts = uniformContexts ?? new[]
+            { Transformation.DefaultUniformTransformationContext, ColorUniform.DefaultUniformColorContext };
         PrimitiveType = primitiveType;
     }
+
+    public abstract void Initialize(IEnumerable<Vector2D> points);
+
+    public void UpdateUniforms(MainCamera camera) =>
+        Array.ForEach(UniformContexts,
+            uniform => uniform.Update(ShaderProgram ??
+                                      throw new ArgumentNullException(nameof(ShaderProgram)), camera));
 }
 
 public class RenderObject : RenderUnit
 {
     public RenderObject(VertexArrayObject? vao = null, ShaderProgram? shaderProgram = null,
-        IUniformContext? uniformContext = null, PrimitiveType primitiveType = PrimitiveType.Points) : base(vao,
-        shaderProgram, uniformContext,
+        IUniformContext[]? uniformContexts = null, PrimitiveType primitiveType = PrimitiveType.Points) : base(vao,
+        shaderProgram, uniformContexts,
         primitiveType)
     {
     }

@@ -27,7 +27,7 @@ public partial class App
     {
         var services = new ServiceCollection();
 
-        services.AddSingleton<MainViewModel>();
+        services.AddSingleton<PlaneViewModel>();
         // services.AddTransient<IBaseGraphic, RenderServer>();
 
         return services.BuildServiceProvider();

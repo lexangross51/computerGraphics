@@ -30,7 +30,7 @@
       <None Update="Source\Shaders\shader.vert">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Source\Shaders\shader1.vert">
+      <None Update="Source\Shaders\pointsShader.vert">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
