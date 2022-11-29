@@ -16,9 +16,8 @@ public interface IBaseGraphic
     void Clear();
     void Render(TimeSpan obj);
     void Draw(RenderUnit renderUnit);
-    void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType);
-    void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType, Color4 color);
-    void DrawPoints(IEnumerable<Vector2D> points, int pointSize, Color4 color);
+    void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType, Color4? color = null);
+    void DrawPoints(IEnumerable<Vector2D> points, int pointSize = 2, Color4? color = null);
 }
 
 public interface IViewable
@@ -46,27 +45,20 @@ public class RenderServer : ReactiveObject, IBaseGraphic
 
     public void Draw(RenderUnit renderUnit) => _renderables.Add(renderUnit);
 
-    public void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType)
-    {
-        RenderUnit @object = new RenderObject(primitiveType: primitiveType);
-        @object.Initialize(points);
-        _renderables.Add(@object);
-    }
-
-    public void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType, Color4 color)
+    public void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType, Color4? color = null)
     {
         RenderUnit @object = new RenderObject(primitiveType: primitiveType, uniformContexts: new[]
         {
             Transformation.DefaultUniformTransformationContext, new ColorUniform
             {
-                Context = (color, "color")
+                Context = (color ?? Color4.Black, "color")
             }
         });
         @object.Initialize(points);
         _renderables.Add(@object);
     }
 
-    public void DrawPoints(IEnumerable<Vector2D> points, int pointsSize, Color4 color)
+    public void DrawPoints(IEnumerable<Vector2D> points, int pointsSize = 2, Color4? color = null)
     {
         ShaderProgram shaderProgram = new();
         shaderProgram.Initialize("Source/Shaders/pointsShader.vert", "Source/Shaders/shader.frag");
@@ -75,7 +67,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         {
             Transformation.DefaultUniformTransformationContext, new ColorUniform
             {
-                Context = (color, "color")
+                Context = (color ?? Color4.Black, "color")
             },
             new PointSizeUniform
             {
