@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
@@ -24,10 +25,10 @@ public partial class MainWindow : IViewFor<MainViewModel>
         set => throw new NotImplementedException();
     }
 
-    public MainViewModel ViewModel { get; set; }
     private ViewableBezierObject _bezierObject;
     private bool _create;
-
+    public MainViewModel ViewModel { get; set; }
+    
     public MainWindow()
     {
         InitializeComponent();
