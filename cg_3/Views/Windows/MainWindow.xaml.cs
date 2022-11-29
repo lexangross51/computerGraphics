@@ -55,9 +55,9 @@ public partial class MainWindow : IViewFor<MainViewModel>
                     ViewModel.PlaneView.Plane.Curves.AddRange(ViewModel.PlaneView.Plane.SelectedCurves);
                     ViewModel.PlaneView.Plane.SelectedCurves.Clear();
 
-                    for (int i = 0; i <= 20; i++)
+                    for (int i = 0; i <= 19; i++)
                     {
-                        var t = i / 20.0f;
+                        var t = i / 19.0f;
 
                         ViewModel.PlaneView.Plane.SelectedCurves.Add(_bezierObject.BezierWrapper.GenCurve(t));
                     }

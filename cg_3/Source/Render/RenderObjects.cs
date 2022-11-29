@@ -49,8 +49,7 @@ public class RenderObject : RenderUnit
         Vao.Bind();
 
         ShaderProgram = new(); // TODO
-        ShaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/shader.frag",
-            "Source/Shaders/shader.geom");
+        ShaderProgram.Initialize("Source/Shaders/shader.vert", "Source/Shaders/shader.frag");
 
         GL.VertexArrayAttribBinding(Vao.Handle, 0, 0);
         GL.EnableVertexArrayAttrib(Vao.Handle, 0);
