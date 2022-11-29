@@ -1,12 +1,13 @@
 ﻿using System.Globalization;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
-using cg_3.Models;
+using System.Windows.Forms;
 using cg_3.Source.Render;
 using cg_3.ViewModels;
+using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Wpf;
 using ReactiveUI;
 
@@ -28,7 +29,7 @@ public partial class MainWindow : IViewFor<MainViewModel>
     private ViewableBezierObject _bezierObject;
     private bool _create;
     public MainViewModel ViewModel { get; set; }
-    
+
     public MainWindow()
     {
         InitializeComponent();
@@ -49,7 +50,8 @@ public partial class MainWindow : IViewFor<MainViewModel>
         {
             observable.Subscribe(ts => baseGraphic.Render(ts)).DisposeWith(disposables);
 
-            ViewModel.PlaneView.Plane.ControlPoints.CountChanged.Where(c => c % 4 == 0 && c != 0)
+            ViewModel.PlaneView.Plane.ControlPoints.CountChanged
+                .Where(c => c % 4 == 0 && c != 0 && ViewModel.IsDrawingMode)
                 .Subscribe(_ =>
                 {
                     ViewModel.PlaneView.Plane.Curves.AddRange(ViewModel.PlaneView.Plane.SelectedCurves);
@@ -62,6 +64,8 @@ public partial class MainWindow : IViewFor<MainViewModel>
                         ViewModel.PlaneView.Plane.SelectedCurves.Add(_bezierObject.BezierWrapper.GenCurve(t));
                     }
 
+                    ViewModel.PlaneView.Wrappers.Lookup(_bezierObject.BezierWrapper.Guid).Value.Points
+                        .AddRange(ViewModel.PlaneView.Plane.SelectedCurves);
                     ViewModel.PlaneView.Draw(baseGraphic);
                 });
 
@@ -72,6 +76,17 @@ public partial class MainWindow : IViewFor<MainViewModel>
                 var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
                 var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
 
+                if (!ViewModel.IsDrawingMode) return;
+                if (ViewModel.IsSelectSegmentMode)
+                {
+                    var key = ViewModel.PlaneView.FindWrapper((x, y));
+                    if (key == Guid.Empty) return;
+                    baseGraphic.Clear();
+                    baseGraphic.Draw(ViewModel.PlaneView.Wrappers.Lookup(key).Value.Points, PrimitiveType.Lines);
+                    baseGraphic.DrawPoints(ViewModel.PlaneView.Wrappers.Lookup(key).Value.ControlPoints);
+                    return;
+                }
+
                 if (!_create)
                 {
                     _bezierObject = new((x, y), ViewModel.PlaneView);
@@ -81,7 +96,7 @@ public partial class MainWindow : IViewFor<MainViewModel>
                 await _bezierObject.AddPoint((x, y), ref _create);
             }).DisposeWith(disposables);
 
-            ViewModel.PlaneView.Plane.ControlPoints.CountChanged.Subscribe(_ =>
+            ViewModel.PlaneView.Plane.ControlPoints.CountChanged.Where(_ => ViewModel.IsDrawingMode).Subscribe(_ =>
                 baseGraphic.DrawPoints(ViewModel.PlaneView.Plane.ControlPoints.Items));
 
             OpenTkControl.Events().MouseMove.Subscribe(args =>

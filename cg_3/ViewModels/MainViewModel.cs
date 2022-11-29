@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using cg_3.Models;
 using cg_3.Source.Render;
+using cg_3.Views;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;

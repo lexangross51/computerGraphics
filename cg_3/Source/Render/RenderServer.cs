@@ -13,6 +13,7 @@ public interface IBaseGraphic
     float DeltaTime { get; }
     MainCamera Camera { get; }
 
+    void Clear();
     void Render(TimeSpan obj);
     void Draw(RenderUnit renderUnit);
     void Draw(IEnumerable<Vector2D> points, PrimitiveType primitiveType);
@@ -39,6 +40,8 @@ public class RenderServer : ReactiveObject, IBaseGraphic
         Camera ??= new(CameraMode.Perspective);
         _renderables = new();
     }
+
+    public void Clear() => _renderables.Clear();
 
     public void Draw(RenderUnit renderUnit) => _renderables.Add(renderUnit);
 
