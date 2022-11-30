@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.ObjectModel;
 using cg_3.Source.Render;
 using cg_3.Source.Vectors;
 using cg_3.ViewModels;
@@ -16,7 +17,7 @@ public class PlaneView : ReactiveObject, IViewable
 
     public void Draw(IBaseGraphic baseGraphic)
     {
-        baseGraphic.Draw(Plane.SelectedCurves, PrimitiveType.LineStrip);
+        baseGraphic.Draw(Plane.SelectedSegment, PrimitiveType.LineStrip);
         baseGraphic.DrawPoints(Plane.ControlPoints.Items, 7, Color4.Black);
         baseGraphic.Draw(Plane.Curves, PrimitiveType.LinesAdjacency);
     }
@@ -36,8 +37,10 @@ public class PlaneView : ReactiveObject, IViewable
 public class Plane
 {
     public SourceList<Vector2D> ControlPoints { get; } = new();
-    public List<Vector2D> SelectedCurves { get; } = new();
+    public List<Vector2D> SelectedSegment { get; } = new();
     public List<Vector2D> Curves { get; } = new();
+    public Dictionary<Guid, IEnumerable<Vector2D>> SelectedSegments { get; } = new();
+    public Dictionary<Guid, IEnumerable<Vector2D>> SelectedPoints { get; } = new();
 }
 
 public class ViewableBezierObject
@@ -82,5 +85,37 @@ public class ViewableBezierObject
         }
 
         return Task.CompletedTask;
+    }
+
+    public Task MovePoint(Vector2D point)
+    {
+        switch (_step)
+        {
+            case 1:
+                BezierWrapper.P3 = point;
+                BezierWrapper.P1 = point;
+                break;
+            case 2:
+                BezierWrapper.P3 = point;
+                BezierWrapper.P2 = BezierWrapper.P3;
+                break;
+            default:
+                BezierWrapper.P3 = point;
+                break;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public void GenerateSegment()
+    {
+        _planeView.Plane.SelectedSegment.Clear();
+
+        for (int i = 0; i <= 19; i++)
+        {
+            var t = i / 19.0f;
+
+            _planeView.Plane.SelectedSegment.Add(BezierWrapper.GenCurve(t));
+        }
     }
 }

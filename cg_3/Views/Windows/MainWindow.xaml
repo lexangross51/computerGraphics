@@ -11,7 +11,7 @@
     <Window.Resources>
         <converters:Vector2DToStringConverter x:Key="Vector2DToStringConverter" />
     </Window.Resources>
-    <DockPanel>
+    <DockPanel Background="LavenderBlush">
         <StatusBar DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">

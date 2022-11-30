@@ -1,12 +1,9 @@
-﻿using System.Drawing;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using cg_3.Source.Render;
 using cg_3.ViewModels;
-using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -53,24 +50,23 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
         {
             observable.Subscribe(ts => baseGraphic.Render(ts)).DisposeWith(disposables);
 
-            _planeView.Plane.ControlPoints.CountChanged
-                .Where(c => c % 4 == 0 && c != 0 && ViewModel.IsDrawingMode)
-                .Subscribe(_ =>
-                {
-                    _planeView.Plane.Curves.AddRange(_planeView.Plane.SelectedCurves);
-                    _planeView.Plane.SelectedCurves.Clear();
-
-                    for (int i = 0; i <= 19; i++)
-                    {
-                        var t = i / 19.0f;
-
-                        _planeView.Plane.SelectedCurves.Add(_bezierObject.BezierWrapper.GenCurve(t));
-                    }
-
-                    _planeView.Wrappers.Lookup(_bezierObject.BezierWrapper.Guid).Value.Points
-                        .AddRange(_planeView.Plane.SelectedCurves);
-                    _planeView.Draw(baseGraphic);
-                });
+            // _planeView.Plane.ControlPoints.CountChanged
+            //     .Where(c => c % 4 == 0 && c != 0 && ViewModel.IsDrawingMode)
+            //     .Subscribe(_ =>
+            //     {
+            //         _planeView.Plane.Curves.AddRange(_planeView.Plane.SelectedCurves);
+            //         _planeView.Plane.SelectedCurves.Clear();
+            //
+            //         for (int i = 0; i <= 19; i++)
+            //         {
+            //             var t = i / 19.0f;
+            //
+            //             _planeView.Plane.SelectedCurves.Add(_bezierObject.BezierWrapper.GenCurve(t));
+            //         }
+            //
+            //         _planeView.Wrappers.Lookup(_bezierObject.BezierWrapper.Guid).Value.Points
+            //             .AddRange(_planeView.Plane.SelectedCurves);
+            //         _planeView.Draw(baseGraphic);
 
             OpenTkControl.Events().MouseDown.Subscribe(async args =>
             {
@@ -103,9 +99,9 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
             }).DisposeWith(disposables);
 
             _planeView.Plane.ControlPoints.CountChanged.Where(_ => ViewModel.IsDrawingMode).Subscribe(_ =>
-                baseGraphic.DrawPoints(_planeView.Plane.ControlPoints.Items, 7, Color4.Black));
+                baseGraphic.DrawPoints(_planeView.Plane.ControlPoints.Items, 4, Color4.Black));
 
-            OpenTkControl.Events().MouseMove.Subscribe(args =>
+            OpenTkControl.Events().MouseMove.Subscribe(async args =>
             {
                 var point = args.GetPosition(OpenTkControl);
 
@@ -114,6 +110,16 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
 
                 MousePositionX.Text = x.ToString("G7", CultureInfo.InvariantCulture);
                 MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
+
+                if (_planeView.Plane.ControlPoints.Count == 0) return;
+
+                await _bezierObject.MovePoint((x, y));
+
+                baseGraphic.Clear();
+                _bezierObject.GenerateSegment();
+
+                baseGraphic.Draw(_planeView.Plane.SelectedSegment, PrimitiveType.LineStrip);
+                baseGraphic.DrawPoints(_planeView.Plane.ControlPoints.Items, pointSize: 4);
             }).DisposeWith(disposables);
         });
     }

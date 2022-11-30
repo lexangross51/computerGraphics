@@ -33,7 +33,7 @@ public class RenderServer : ReactiveObject, IBaseGraphic
 
     public RenderServer(MainCamera? camera = null)
     {
-        GL.ClearColor(Color.White);
+        GL.ClearColor(Color4.WhiteSmoke);
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.ProgramPointSize);
         GL.Enable(EnableCap.LineSmooth);
