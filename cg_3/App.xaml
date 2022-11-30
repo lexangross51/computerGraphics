@@ -1,11 +1,9 @@
 ﻿<Application x:Class="cg_3.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:viewModels="clr-namespace:cg_3.ViewModels"
-             StartupUri="/Views/Windows/MainWindow.xaml">
+             xmlns:local="clr-namespace:cg_3"
+             StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <ResourceDictionary>
-            <viewModels:ViewModelLocator x:Key="Locator" />
-        </ResourceDictionary>
+         
     </Application.Resources>
 </Application>

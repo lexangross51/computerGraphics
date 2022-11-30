@@ -1,0 +1,35 @@
+﻿<Window x:Class="cg_3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
+        mc:Ignorable="d"
+        Title="Кривая Безье" Height="450" Width="800" KeyDown="OnKeyDown">
+    <DockPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <sharpGl:OpenGLControl Grid.Column="0" Margin="2, 2, 2, 20" 
+                                    OpenGLDraw="OnOpenGLDraw"
+                                   OpenGLInitialized="OnOpenGLInitialized"
+                                   Resized="OnOpenGLResized"
+                                   MouseLeftButtonDown="OnMouseLeftButtonDown"
+                                   MouseRightButtonDown="OnMouseRightButtonDown"
+                                   MouseMove="OnMouseMove" FrameRate="60"
+                                   MouseWheel="OnMouseWheel"
+                                   RenderContextType="FBO" DockPanel.Dock="Left" />
+            
+            <StackPanel Grid.Column="1">
+                <GroupBox Header="Режимы" FontSize="10">
+                    <StackPanel>
+                        <RadioButton x:Name="DrawingModeButton" GroupName="Regims" Content="Рисование" Checked="RadioButton_OnChecked"/>
+                        <RadioButton x:Name="ViewModeButton" GroupName="Regims" Content="Просмотр" Checked="RadioButton_OnChecked"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
