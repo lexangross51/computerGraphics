@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using cg_3.Source.Render;
 using cg_3.ViewModels;
@@ -60,17 +61,13 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
                 var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
 
-                // if (ViewModel.IsSelectSegmentMode)
-                // {
-                //     var key = _planeView.FindWrapper((x, y));
-                //     if (key == Guid.Empty) return;
-                //     baseGraphic.Clear();
-                //     baseGraphic.Draw(_planeView.Plane.Curves, PrimitiveType.LineStrip);
-                //     baseGraphic.Draw(_planeView.Wrappers.Lookup(key).Value.Points, PrimitiveType.LineStrip,
-                //         Color4.Chartreuse);
-                //     baseGraphic.DrawPoints(_planeView.Wrappers.Lookup(key).Value.ControlPoints, 7, Color4.Chartreuse);
-                //     return;
-                // }
+                if (ViewModel.IsSelectSegmentMode)
+                {
+                    var key = _planeView.FindWrapper((x, y));
+                    if (key == Guid.Empty) return;
+                    _planeView.DrawSelected(baseGraphic, key);
+                    return;
+                }
 
                 if (!ViewModel.IsDrawingMode) return;
 
@@ -101,13 +98,19 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
 
                 if (_planeView.Plane.SelectedPoints.Count == 0) return;
+                if (ViewModel.IsSelectSegmentMode)
+                {
+                    _planeView.Plane.ClearSelected();
+                    _planeView.Draw(baseGraphic);
+                    return;
+                }
 
                 await _bezierObject.MovePoint((x, y));
                 _bezierObject.GenerateSegment();
                 _planeView.Draw(baseGraphic);
             }).DisposeWith(disposables);
 
-            this.Events().KeyUp
+            this.Events().KeyDown
                 .Where(x => x.Key == Key.Z && x.KeyboardDevice.IsKeyDown(Key.LeftCtrl))
                 .Subscribe(_ =>
                 {

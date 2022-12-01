@@ -11,7 +11,6 @@ namespace cg_3.Source.Render;
 
 public interface IBaseGraphic
 {
-    float DeltaTime { get; }
     MainCamera Camera { get; }
 
     void Clear();

@@ -36,18 +36,35 @@ public class PlaneView : ReactiveObject, IViewable
         baseGraphic.Draw(Plane.SelectedSegment, PrimitiveType.LineStrip, Color4.Coral);
         baseGraphic.DrawPoints(Plane.SelectedPoints.Items, pointSize: 6);
 
-        foreach (var points in Wrappers.Items)
+        foreach (var wrapper in Wrappers.Items)
         {
-            baseGraphic.Draw(points.Points, PrimitiveType.LineStrip);
+            baseGraphic.Draw(wrapper.Points, PrimitiveType.LineStrip);
         }
+    }
+
+    public void DrawSelected(IBaseGraphic baseGraphic, Guid key)
+    {
+        baseGraphic.Clear();
+        baseGraphic.Draw(Plane.SelectedSegment, PrimitiveType.LineStrip, Color4.Coral);
+        baseGraphic.DrawPoints(Plane.SelectedPoints.Items, pointSize: 6);
+
+        foreach (var wrapper in Wrappers.Items.Where(wrapper => wrapper.Guid != key))
+        {
+            baseGraphic.Draw(wrapper.Points, PrimitiveType.LineStrip);
+        }
+
+        var selected = Wrappers.Lookup(key);
+
+        baseGraphic.Draw(selected.Value.Points, PrimitiveType.LineStrip, Color4.Coral);
+        baseGraphic.DrawPoints(selected.Value.ControlPoints, color: Color4.Coral,
+            pointSize: 6); // TODO figure out blend 
     }
 
     public Guid FindWrapper(Vector2D point)
     {
         foreach (var wrapper in Wrappers.Items)
         {
-            if (wrapper.Points.Any(p => Vector2D.Distance(point, p) < 1E-02) ||
-                wrapper.ControlPoints.Any(p => Vector2D.Distance(point, p) < 1E-02)) return wrapper.Guid;
+            if (wrapper.Points.Any(p => Vector2D.Distance(point, p) < 1E-01)) return wrapper.Guid;
         }
 
         return Guid.Empty;
