@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Input;
 using cg_3.Source.Render;
 using cg_3.ViewModels;
 using DynamicData;
@@ -104,6 +106,15 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 _bezierObject.GenerateSegment();
                 _planeView.Draw(baseGraphic);
             }).DisposeWith(disposables);
+
+            this.Events().KeyUp
+                .Where(x => x.Key == Key.Z && x.KeyboardDevice.IsKeyDown(Key.LeftCtrl))
+                .Subscribe(_ =>
+                {
+                    _planeView.Cancel.Execute().Subscribe();
+                    _planeView.Draw(baseGraphic);
+                })
+                .DisposeWith(disposables);
         });
     }
 }

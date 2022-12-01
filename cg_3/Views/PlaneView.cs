@@ -1,4 +1,5 @@
-﻿using cg_3.Source.Render;
+﻿using System.Reactive;
+using cg_3.Source.Render;
 using cg_3.Source.Vectors;
 using cg_3.ViewModels;
 using DynamicData;
@@ -13,6 +14,21 @@ public class PlaneView : ReactiveObject, IViewable
     public Plane Plane { get; } = new();
     public SourceCache<BezierWrapper, Guid> Wrappers { get; } = new(w => w.Guid);
     public bool HaveViewableObject { get; set; }
+    public ReactiveCommand<Unit, Unit> Cancel { get; }
+
+    public PlaneView()
+    {
+        Cancel = ReactiveCommand.Create(() =>
+        {
+            Plane.ClearSelected();
+            Wrappers.Edit(wrappers =>
+            {
+                var list = wrappers.Items.ToList();
+                wrappers.Clear();
+                wrappers.AddOrUpdate(list.SkipLast(1));
+            });
+        });
+    }
 
     public void Draw(IBaseGraphic baseGraphic)
     {
@@ -70,6 +86,7 @@ public class ViewableBezierObject
         BezierWrapper = new(point, point, point, point);
         _planeView = planeView;
         _planeView.Wrappers.AddOrUpdate(BezierWrapper);
+        _step = 0;
     }
 
     public Task AddPoint(Vector2D point)
@@ -77,15 +94,6 @@ public class ViewableBezierObject
         switch (_step)
         {
             case 0:
-                if (_planeView.Plane.SelectedPoints.Items.Count() == 1)
-                {
-                    State = StateViewableObject.Started;
-                    BezierWrapper.P1 = point;
-                    _planeView.Plane.SelectedPoints.Add(point);
-                    _step += 2;
-                    break;
-                }
-
                 State = StateViewableObject.Started;
                 BezierWrapper.P0 = point;
                 _planeView.Plane.SelectedPoints.Add(point);
@@ -153,5 +161,7 @@ public class ViewableBezierObject
         State = StateViewableObject.NotStarted;
         _planeView.Plane.ClearSelected();
         _planeView.Plane.SelectedPoints.Add(point);
+        State = StateViewableObject.Started;
+        _step = 1;
     }
 }
