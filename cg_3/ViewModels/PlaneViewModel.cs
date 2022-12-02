@@ -1,4 +1,6 @@
-﻿namespace cg_3.ViewModels;
+﻿using System.Windows.Documents;
+
+namespace cg_3.ViewModels;
 
 public enum Mode
 {
@@ -51,8 +53,6 @@ public class PlaneViewModel : ReactiveObject, IViewable
     public void DrawSelected(IBaseGraphic baseGraphic, Guid key)
     {
         baseGraphic.Clear();
-        baseGraphic.Draw(Plane.SelectedSegment, PrimitiveType.LineStrip, Color4.Coral);
-        baseGraphic.DrawPoints(Plane.SelectedPoints.Items, pointSize: 6);
 
         foreach (var wrapper in Wrappers.Items.Where(wrapper => wrapper.Guid != key))
         {
@@ -90,7 +90,7 @@ public class ViewableBezierObject
     private byte _step;
 
     public BezierWrapper BezierWrapper { get; private set; }
-    public StateViewableObject State { get; private set; } = StateViewableObject.NotStarted;
+    public StateViewableObject State { get; set; } = StateViewableObject.NotStarted;
 
     public ViewableBezierObject(Vector2D point, PlaneViewModel planeView)
     {
@@ -163,6 +163,25 @@ public class ViewableBezierObject
 
             _planeView.Plane.SelectedSegment.Add(BezierWrapper.GenCurve(t));
         }
+    }
+
+    public void GenerateSegmentWithUpdate(Guid key)
+    {
+        var points = new List<Vector2D>();
+        var selected = _planeView.Wrappers.Lookup(key);
+
+        for (int i = 0; i <= 19; i++)
+        {
+            var t = i / 19.0f;
+
+            points.Add(selected.Value.GenCurve(t));
+        }
+
+        _planeView.Wrappers.Edit(wrappers =>
+        {
+            var lookup = wrappers.Lookup(key);
+            lookup.Value.Points = points;
+        });
     }
 
     public void Restart(Vector2D point)

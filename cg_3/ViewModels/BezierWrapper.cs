@@ -3,7 +3,7 @@
 public class BezierWrapper : ReactiveObject
 {
     public Guid Guid { get; }
-    public List<Vector2D> Points { get; }
+    public List<Vector2D> Points { get; set; }
     public Vector2D[] ControlPoints { get; }
     [Reactive] public Vector2D P0 { get; set; }
     [Reactive] public Vector2D P1 { get; set; }

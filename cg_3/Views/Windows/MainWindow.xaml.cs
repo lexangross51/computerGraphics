@@ -17,6 +17,8 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
     public MainWindow()
     {
         InitializeComponent();
+        PreviewMouseDown += PreviewMouseDownEventHandler;
+        KeyDown += WindowKeyDownHandler;
         ViewModel = App.Current.Services.GetRequiredService<PlaneViewModel>();
         var mainSettings = new GLWpfControlSettings();
         OpenTkControl.Start(mainSettings);
@@ -35,8 +37,22 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
             observable.Subscribe(ts => baseGraphic.Render(ts)).DisposeWith(disposables);
 
             this.WhenAnyValue(t => t.ViewModel!.Mode)
-                .Subscribe(_ => ViewModel.HaveViewableObject = false)
+                .Subscribe(_ =>
+                {
+                    ViewModel.HaveViewableObject = false;
+                    if (_bezierObject != null) _bezierObject.State = StateViewableObject.NotStarted;
+                })
                 .DisposeWith(disposables);
+
+            this.WhenAnyValue(t => t.ViewModel!.SelectedWrapper!.P0,
+                    t => t.ViewModel!.SelectedWrapper!.P1,
+                    t => t.ViewModel!.SelectedWrapper!.P2,
+                    t => t.ViewModel!.SelectedWrapper!.P3)
+                .Where(_ => _bezierObject?.State is StateViewableObject.NotStarted).Subscribe(_ =>
+                {
+                    _bezierObject?.GenerateSegmentWithUpdate(ViewModel!.SelectedWrapper!.Guid);
+                    ViewModel.DrawSelected(baseGraphic, ViewModel!.SelectedWrapper!.Guid);
+                }).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseDown.Subscribe(async args =>
             {
@@ -107,5 +123,21 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 })
                 .DisposeWith(disposables);
         });
+    }
+
+    private static void ClearFocus()
+    {
+        var elementWithFocus = Keyboard.FocusedElement as UIElement;
+        if (elementWithFocus is not System.Windows.Controls.TextBox) return;
+        if (Keyboard.FocusedElement == null) return;
+        Keyboard.FocusedElement.RaiseEvent(new(LostFocusEvent));
+        Keyboard.ClearFocus();
+    }
+
+    private static void PreviewMouseDownEventHandler(object sender, MouseButtonEventArgs e) => ClearFocus();
+
+    private static void WindowKeyDownHandler(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) ClearFocus();
     }
 }
