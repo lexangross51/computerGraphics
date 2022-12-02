@@ -1,8 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace cg_3.Source.Vectors;
+﻿namespace cg_3.Source.Vectors;
 
 public class Vector2DJsonConverter : JsonConverter
 {

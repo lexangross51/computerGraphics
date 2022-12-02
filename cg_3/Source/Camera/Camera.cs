@@ -1,6 +1,4 @@
-﻿using OpenTK.Mathematics;
-
-namespace cg_3.Source.Camera;
+﻿namespace cg_3.Source.Camera;
 
 public enum CameraMovement
 {

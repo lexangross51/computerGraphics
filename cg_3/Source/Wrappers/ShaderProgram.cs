@@ -1,8 +1,4 @@
-﻿using System.IO;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-
-namespace cg_3.Source.Wrappers;
+﻿namespace cg_3.Source.Wrappers;
 
 public static class ShadersResource
 {

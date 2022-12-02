@@ -1,7 +1,4 @@
-﻿using cg_3.Source.Vectors;
-using DynamicData;
-
-namespace cg_3.Models;
+﻿namespace cg_3.Models;
 
 public class Plane
 {

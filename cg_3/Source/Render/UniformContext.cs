@@ -1,9 +1,4 @@
-﻿using System.Drawing;
-using cg_3.Source.Camera;
-using cg_3.Source.Wrappers;
-using OpenTK.Mathematics;
-
-namespace cg_3.Source.Render;
+﻿namespace cg_3.Source.Render;
 
 public interface IUniformContext
 {

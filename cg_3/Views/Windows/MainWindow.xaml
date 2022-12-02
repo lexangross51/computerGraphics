@@ -38,7 +38,10 @@
                     </Grid.RowDefinitions>
                     <GroupBox>
                         <StackPanel>
-                            <Button Content="Selection mode" Command="{Binding SetSelectSegmentMode}"/>
+                            <RadioButton Name="DrawButton" Content="Draw" Command="{Binding SetMode}"
+                                         CommandParameter="{Binding ElementName=DrawButton, Path=Content}" />
+                            <RadioButton Name="SelectButton" Content="Select" Command="{Binding SetMode}"
+                                         CommandParameter="{Binding ElementName=SelectButton, Path=Content}" />
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="Bezier segment">
@@ -66,7 +69,7 @@
                                          Text="{Binding SelectedWrapper.P2, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
                                 <Label Grid.Row="3" Grid.Column="0" Content="EndPoint" />
                                 <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
-                                         Text="{Binding SelectedWrapper.P3, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}"/>
+                                         Text="{Binding SelectedWrapper.P3, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
                             </Grid>
                         </StackPanel>
                     </GroupBox>

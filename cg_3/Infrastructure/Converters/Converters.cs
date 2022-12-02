@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Windows.Data;
-using cg_3.Source.Vectors;
-
-namespace cg_3.Infrastructure.Converters;
+﻿namespace cg_3.Infrastructure.Converters;
 
 [ValueConversion(typeof(Vector2D), typeof(string))]
 public class Vector2DToStringConverter : IValueConverter

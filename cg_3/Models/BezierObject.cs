@@ -1,6 +1,4 @@
-﻿using cg_3.Source.Vectors;
-
-namespace cg_3.Models;
+﻿namespace cg_3.Models;
 
 public class BezierObject
 {

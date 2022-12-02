@@ -1,15 +1,4 @@
-﻿using System.Globalization;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Windows;
-using System.Windows.Input;
-using cg_3.Source.Render;
-using cg_3.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
-using OpenTK.Wpf;
-using ReactiveUI;
-
-namespace cg_3.Views.Windows;
+﻿namespace cg_3.Views.Windows;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
@@ -45,6 +34,10 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
         {
             observable.Subscribe(ts => baseGraphic.Render(ts)).DisposeWith(disposables);
 
+            this.WhenAnyValue(t => t.ViewModel!.Mode)
+                .Subscribe(_ => ViewModel.HaveViewableObject = false)
+                .DisposeWith(disposables);
+
             OpenTkControl.Events().MouseDown.Subscribe(async args =>
             {
                 var point = args.GetPosition(OpenTkControl);
@@ -52,13 +45,18 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
                 var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
 
-                if (ViewModel.Mode == Mode.Select)
+                switch (ViewModel.Mode)
                 {
-                    var key = ViewModel.FindWrapper((x, y));
-                    if (key == Guid.Empty) return;
-                    ViewModel.SelectedWrapper = ViewModel.Wrappers.Lookup(key).Value;
-                    ViewModel.DrawSelected(baseGraphic, key);
-                    return;
+                    case Mode.None:
+                        return;
+                    case Mode.Select:
+                    {
+                        var key = ViewModel.FindWrapper((x, y));
+                        if (key == Guid.Empty) return;
+                        ViewModel.SelectedWrapper = ViewModel.Wrappers.Lookup(key).Value;
+                        ViewModel.DrawSelected(baseGraphic, key);
+                        return;
+                    }
                 }
 
                 if (!ViewModel.HaveViewableObject)

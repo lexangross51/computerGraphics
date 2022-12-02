@@ -11,28 +11,55 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-      <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.2" />
-      <PackageReference Include="ReactiveUI" Version="18.4.1" />
-      <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.1" />
-      <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
-      <PackageReference Include="ReactiveUI.WPF" Version="18.4.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
+        <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.2"/>
+        <PackageReference Include="ReactiveUI" Version="18.4.1"/>
+        <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.1"/>
+        <PackageReference Include="ReactiveUI.Fody" Version="18.4.1"/>
+        <PackageReference Include="ReactiveUI.WPF" Version="18.4.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Source\Shaders\shader.frag">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Source\Shaders\shader.geom">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Source\Shaders\shader.vert">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Source\Shaders\pointsShader.vert">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+        <Using Include="System.Reactive"/>
+        <Using Include="System.Reactive.Linq"/>
+        <Using Include="System.Reactive.Disposables"/>
+        <Using Include="ReactiveUI"/>
+        <Using Include="ReactiveUI.Fody.Helpers"/>
+        <Using Include="DynamicData"/>
+        <Using Include="OpenTK.Graphics.OpenGL4"/>
+        <Using Include="OpenTK.Mathematics"/>
+        <Using Include="cg_3.Models"/>
+        <Using Include="cg_3.Source.Render"/>
+        <Using Include="cg_3.Source.Vectors"/>
+        <Using Include="cg_3.Source.Camera"/>
+        <Using Include="cg_3.Source.Wrappers"/>
+        <Using Include="cg_3.ViewModels"/>
+        <Using Include="System.Windows.Data"/>
+        <Using Include="System.Globalization"/>
+        <Using Include="System.Runtime.InteropServices"/>
+        <Using Include="System.IO"/>
+        <Using Include="System.Windows.Input"/>
+        <Using Include="System.Windows"/>
+        <Using Include="Newtonsoft.Json"/>
+        <Using Include="Newtonsoft.Json.Linq"/>
+        <Using Include="Microsoft.Extensions.DependencyInjection"/>
+        <Using Include="OpenTK.Wpf"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Source\Shaders\shader.frag">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Source\Shaders\shader.geom">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Source\Shaders\shader.vert">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Source\Shaders\pointsShader.vert">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

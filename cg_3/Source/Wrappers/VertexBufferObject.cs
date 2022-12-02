@@ -1,8 +1,4 @@
-﻿using cg_3.Source.Vectors;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-
-namespace cg_3.Source.Wrappers;
+﻿namespace cg_3.Source.Wrappers;
 
 public class VertexBufferObject<T> : IDisposable where T : unmanaged
 {

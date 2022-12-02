@@ -1,11 +1,5 @@
-﻿using System.Drawing;
-using System.Reactive;
-using cg_3.Source.Camera;
-using cg_3.Source.Vectors;
+﻿using cg_3.Source.Camera;
 using cg_3.Source.Wrappers;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using ReactiveUI;
 
 namespace cg_3.Source.Render;
 

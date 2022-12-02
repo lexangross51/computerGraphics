@@ -1,20 +1,8 @@
-﻿using System.Diagnostics;
-using System.Reactive;
-using System.Reactive.Linq;
-using cg_3.Models;
-using cg_3.Source.Render;
-using cg_3.Source.Vectors;
-using cg_3.Views;
-using DynamicData;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-
-namespace cg_3.ViewModels;
+﻿namespace cg_3.ViewModels;
 
 public enum Mode
 {
+    None,
     Draw,
     Select
 }
@@ -22,10 +10,10 @@ public enum Mode
 public class PlaneViewModel : ReactiveObject, IViewable
 {
     private readonly ObservableAsPropertyHelper<Mode> _mode;
-    public ReactiveCommand<Unit, Mode> SetSelectSegmentMode { get; }
+    public ReactiveCommand<string, Mode> SetMode { get; }
     public ReactiveCommand<Unit, Unit> Cancel { get; }
     public Mode Mode => _mode.Value;
-    [Reactive] public BezierWrapper? SelectedWrapper { get;  set; }
+    [Reactive] public BezierWrapper? SelectedWrapper { get; set; }
     public Plane Plane { get; } = new();
     public SourceCache<BezierWrapper, Guid> Wrappers { get; } = new(w => w.Guid);
     public bool HaveViewableObject { get; set; }
@@ -43,8 +31,8 @@ public class PlaneViewModel : ReactiveObject, IViewable
             });
         });
 
-        SetSelectSegmentMode = ReactiveCommand.Create<Unit, Mode>(_ => Mode.Select);
-        SetSelectSegmentMode.ToProperty(this, nameof(Mode), out _mode);
+        SetMode = ReactiveCommand.Create<string, Mode>(str => (Mode)Enum.Parse(typeof(Mode), str));
+        SetMode.ToProperty(this, nameof(Mode), out _mode);
         Wrappers.Connect().OnItemAdded(wrapper => SelectedWrapper = wrapper).Subscribe();
     }
 

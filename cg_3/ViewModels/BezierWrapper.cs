@@ -1,15 +1,9 @@
-﻿using cg_3.Models;
-using cg_3.Source.Vectors;
-using OpenTK.Mathematics;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-
-namespace cg_3.ViewModels;
+﻿namespace cg_3.ViewModels;
 
 public class BezierWrapper : ReactiveObject
 {
     public Guid Guid { get; }
-    public List<Vector2D> Points { get; init; }
+    public List<Vector2D> Points { get; }
     public Vector2D[] ControlPoints { get; }
     [Reactive] public Vector2D P0 { get; set; }
     [Reactive] public Vector2D P1 { get; set; }
