@@ -3,30 +3,85 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:sharpGl="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
+        xmlns:cg3="clr-namespace:cg_3"
         mc:Ignorable="d"
-        Title="Кривая Безье" Height="450" Width="800" KeyDown="OnKeyDown">
+        Title="Кривая Безье" Height="450" Width="1000" KeyDown="OnKeyDown">
     <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock Width="60" x:Name="xPosition"/> 
+            <TextBlock Width="60" x:Name="yPosition"/> 
+        </StatusBar>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="5*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <sharpGl:OpenGLControl Grid.Column="0" Margin="2, 2, 2, 20" 
-                                    OpenGLDraw="OnOpenGLDraw"
+            
+            <sharpGl:OpenGLControl Grid.Column="0" Margin="10, 10, 10, 10"
+                                   BorderBrush="Black" BorderThickness="2, 0, 0, 2"
+                                   OpenGLDraw="OnOpenGLDraw"
                                    OpenGLInitialized="OnOpenGLInitialized"
-                                   Resized="OnOpenGLResized"
                                    MouseLeftButtonDown="OnMouseLeftButtonDown"
                                    MouseRightButtonDown="OnMouseRightButtonDown"
+                                   MouseLeftButtonUp="OnMouseLeftButtonUp"
+                                   MouseRightButtonUp="OnMouseRightButtonUp"
                                    MouseMove="OnMouseMove" FrameRate="60"
                                    MouseWheel="OnMouseWheel"
                                    RenderContextType="FBO" DockPanel.Dock="Left" />
-            
-            <StackPanel Grid.Column="1">
+
+            <StackPanel Grid.Column="1" Margin="-5, 0, 5, 0">
                 <GroupBox Header="Режимы" FontSize="10">
                     <StackPanel>
-                        <RadioButton x:Name="DrawingModeButton" GroupName="Regims" Content="Рисование" Checked="RadioButton_OnChecked"/>
-                        <RadioButton x:Name="ViewModeButton" GroupName="Regims" Content="Просмотр" Checked="RadioButton_OnChecked"/>
+                        <CheckBox x:Name="EditMode" Content="Редактировать"
+                                  Checked="EditMode_OnChecked"
+                                  Unchecked="EditMode_OnChecked"/>
+                    </StackPanel>
+                </GroupBox>
+                
+                <GroupBox Header="Параметры кривой" 
+                          Margin="0, 2, 0, 0"
+                          Padding="-5, 0, 0, 0"
+                          FontSize="10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Текущая кривая: "/>
+                            <xctk:IntegerUpDown x:Name="CurrentCurve" Minimum="0"
+                                                Margin="6, 0, 0, 0"
+                                                ValueChanged="CurrentCurve_OnValueChanged"/> 
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Цвет кривой: "/>
+                            <xctk:ColorPicker x:Name="ColorPicker"
+                                              Width="41"
+                                              Margin="21, 0, 0, 0"
+                                              SelectedColorChanged="ColorPicker_OnSelectedColorChanged"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                
+                <GroupBox Header="Настройка сетки"
+                          Margin="0, 2, 0, 0"
+                          Padding="-5, 0, 0, 0"
+                          FontSize="10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Разбиения по X:" />
+                            <Slider x:Name="XGridSplitSlider" Width="100" Minimum="5" Maximum="30" Value="20"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    ValueChanged="XGridSplitSlider_OnValueChanged"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Разбиения по Y:" />
+                            <Slider x:Name="YGridSplitSlider" Width="100" Minimum="5" Maximum="30" Value="12"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    ValueChanged="YGridSplitSlider_OnValueChanged"/>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>

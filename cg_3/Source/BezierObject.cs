@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Numerics;
-using GlmNet;
 
 namespace cg_3.Source;
 

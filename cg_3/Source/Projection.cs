@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using SharpGL.RenderContextProviders;
 
 namespace cg_3.Source;
 
@@ -16,6 +17,9 @@ public struct Projection
     public float Width => Right - Left;
     public float Height => Top - Bottom;
 
-    public Vector2 ToScreenCoordinate(float x, float y)
-        => new Vector2(Left + Width * x, Top - Height * y);
+    public Vector2 ToProjectionCoordinate(float x, float y, IRenderContextProvider contextProvider)
+        => new(Left + Width * x / contextProvider.Width, Top - Height * y / contextProvider.Height);
+
+    public Vector2 ToScreenCoordinates(float x, float y, IRenderContextProvider contextProvider)
+        => new((x - Left) * contextProvider.Width / Width, (y - Bottom) * contextProvider.Height / Height);
 }
