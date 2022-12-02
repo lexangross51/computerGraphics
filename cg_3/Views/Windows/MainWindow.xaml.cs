@@ -1,13 +1,10 @@
 ﻿using System.Globalization;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using cg_3.Source.Render;
 using cg_3.ViewModels;
-using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTK.Wpf;
 using ReactiveUI;
@@ -28,7 +25,6 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
     }
 
     private ViewableBezierObject _bezierObject;
-    private readonly PlaneView _planeView = new();
     public PlaneViewModel ViewModel { get; set; }
 
     public MainWindow()
@@ -49,9 +45,6 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
 
         this.WhenActivated(disposables =>
         {
-            _planeView.Wrappers.Connect().OnItemAdded(wrapper => ViewModel.BezierWrapper = wrapper).Subscribe()
-                .DisposeWith(disposables);
-
             observable.Subscribe(ts => baseGraphic.Render(ts)).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseDown.Subscribe(async args =>
@@ -63,29 +56,29 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
 
                 if (ViewModel.IsSelectSegmentMode)
                 {
-                    var key = _planeView.FindWrapper((x, y));
+                    var key = ViewModel.FindWrapper((x, y));
                     if (key == Guid.Empty) return;
-                    _planeView.DrawSelected(baseGraphic, key);
+                    ViewModel.DrawSelected(baseGraphic, key);
                     return;
                 }
 
                 if (!ViewModel.IsDrawingMode) return;
 
-                if (!_planeView.HaveViewableObject)
+                if (!ViewModel.HaveViewableObject)
                 {
-                    _bezierObject = new((x, y), _planeView);
-                    _planeView.HaveViewableObject = true;
+                    _bezierObject = new((x, y), ViewModel);
+                    ViewModel.HaveViewableObject = true;
                 }
 
                 await _bezierObject.AddPoint((x, y));
+                ViewModel.Draw(baseGraphic);
 
                 if (_bezierObject.State != StateViewableObject.Completed) return;
                 _bezierObject.Restart((x, y));
-                _planeView.Draw(baseGraphic);
             }).DisposeWith(disposables);
 
-            _planeView.Plane.SelectedPoints.CountChanged.Where(_ => ViewModel.IsDrawingMode)
-                .Subscribe(_ => _planeView.Draw(baseGraphic));
+            ViewModel.Plane.SelectedPoints.CountChanged.Where(_ => ViewModel.IsDrawingMode)
+                .Subscribe(_ => ViewModel.Draw(baseGraphic));
 
             OpenTkControl.Events().MouseMove.Subscribe(async args =>
             {
@@ -97,25 +90,25 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 MousePositionX.Text = x.ToString("G7", CultureInfo.InvariantCulture);
                 MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
 
-                if (_planeView.Plane.SelectedPoints.Count == 0) return;
+                if (ViewModel.Plane.SelectedPoints.Count == 0) return;
                 if (ViewModel.IsSelectSegmentMode)
                 {
-                    _planeView.Plane.ClearSelected();
-                    _planeView.Draw(baseGraphic);
+                    ViewModel.Plane.ClearSelected();
+                    ViewModel.Draw(baseGraphic);
                     return;
                 }
 
                 await _bezierObject.MovePoint((x, y));
                 _bezierObject.GenerateSegment();
-                _planeView.Draw(baseGraphic);
+                ViewModel.Draw(baseGraphic);
             }).DisposeWith(disposables);
 
             this.Events().KeyDown
                 .Where(x => x.Key == Key.Z && x.KeyboardDevice.IsKeyDown(Key.LeftCtrl))
                 .Subscribe(_ =>
                 {
-                    _planeView.Cancel.Execute().Subscribe();
-                    _planeView.Draw(baseGraphic);
+                    ViewModel.Cancel.Execute().Subscribe();
+                    ViewModel.Draw(baseGraphic);
                 })
                 .DisposeWith(disposables);
         });
