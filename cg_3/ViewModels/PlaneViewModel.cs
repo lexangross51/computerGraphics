@@ -1,4 +1,5 @@
-﻿using System.Reactive;
+﻿using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Linq;
 using cg_3.Models;
 using cg_3.Source.Render;
@@ -12,19 +13,22 @@ using ReactiveUI.Fody.Helpers;
 
 namespace cg_3.ViewModels;
 
-public class PlaneViewModel : ReactiveObject
+public enum Mode
 {
-    private readonly ObservableAsPropertyHelper<bool> _isDrawingMode;
-    private readonly ObservableAsPropertyHelper<bool> _isSelectSegmentMode;
-    public ReactiveCommand<Unit, bool> SetDrawingMode { get; }
-    public ReactiveCommand<Unit, bool> SetSelectSegmentMode { get; }
-    public bool IsDrawingMode => _isDrawingMode.Value;
-    public bool IsSelectSegmentMode => _isSelectSegmentMode.Value;
-    [Reactive] public BezierWrapper? SelectedWrapper { get; set; }
+    Draw,
+    Select
+}
+
+public class PlaneViewModel : ReactiveObject, IViewable
+{
+    private readonly ObservableAsPropertyHelper<Mode> _mode;
+    public ReactiveCommand<Unit, Mode> SetSelectSegmentMode { get; }
+    public ReactiveCommand<Unit, Unit> Cancel { get; }
+    public Mode Mode => _mode.Value;
+    [Reactive] public BezierWrapper? SelectedWrapper { get;  set; }
     public Plane Plane { get; } = new();
     public SourceCache<BezierWrapper, Guid> Wrappers { get; } = new(w => w.Guid);
     public bool HaveViewableObject { get; set; }
-    public ReactiveCommand<Unit, Unit> Cancel { get; }
 
     public PlaneViewModel()
     {
@@ -39,11 +43,8 @@ public class PlaneViewModel : ReactiveObject
             });
         });
 
-        SetDrawingMode = ReactiveCommand.CreateFromObservable<Unit, bool>(_ => Observable.Return(!IsDrawingMode));
-        SetDrawingMode.ToProperty(this, t => t.IsDrawingMode, out _isDrawingMode);
-        SetSelectSegmentMode =
-            ReactiveCommand.CreateFromObservable<Unit, bool>(_ => Observable.Return(!IsSelectSegmentMode));
-        SetSelectSegmentMode.ToProperty(this, t => t.IsSelectSegmentMode, out _isSelectSegmentMode);
+        SetSelectSegmentMode = ReactiveCommand.Create<Unit, Mode>(_ => Mode.Select);
+        SetSelectSegmentMode.ToProperty(this, nameof(Mode), out _mode);
         Wrappers.Connect().OnItemAdded(wrapper => SelectedWrapper = wrapper).Subscribe();
     }
 

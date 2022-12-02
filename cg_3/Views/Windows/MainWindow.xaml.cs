@@ -11,21 +11,19 @@ using ReactiveUI;
 
 namespace cg_3.Views.Windows;
 
-#nullable disable
-
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : IViewFor<PlaneViewModel>
 {
-    object IViewFor.ViewModel
+    object? IViewFor.ViewModel
     {
         get => ViewModel;
         set => throw new NotImplementedException();
     }
 
-    private ViewableBezierObject _bezierObject;
-    public PlaneViewModel ViewModel { get; set; }
+    private ViewableBezierObject? _bezierObject;
+    public PlaneViewModel? ViewModel { get; set; }
 
     public MainWindow()
     {
@@ -54,15 +52,14 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
                 var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
 
-                if (ViewModel.IsSelectSegmentMode)
+                if (ViewModel.Mode == Mode.Select)
                 {
                     var key = ViewModel.FindWrapper((x, y));
                     if (key == Guid.Empty) return;
+                    ViewModel.SelectedWrapper = ViewModel.Wrappers.Lookup(key).Value;
                     ViewModel.DrawSelected(baseGraphic, key);
                     return;
                 }
-
-                if (!ViewModel.IsDrawingMode) return;
 
                 if (!ViewModel.HaveViewableObject)
                 {
@@ -70,14 +67,14 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                     ViewModel.HaveViewableObject = true;
                 }
 
-                await _bezierObject.AddPoint((x, y));
+                await _bezierObject!.AddPoint((x, y));
                 ViewModel.Draw(baseGraphic);
 
                 if (_bezierObject.State != StateViewableObject.Completed) return;
                 _bezierObject.Restart((x, y));
             }).DisposeWith(disposables);
 
-            ViewModel.Plane.SelectedPoints.CountChanged.Where(_ => ViewModel.IsDrawingMode)
+            ViewModel.Plane.SelectedPoints.CountChanged.Where(_ => ViewModel.Mode is not Mode.Select)
                 .Subscribe(_ => ViewModel.Draw(baseGraphic));
 
             OpenTkControl.Events().MouseMove.Subscribe(async args =>
@@ -91,14 +88,14 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
 
                 if (ViewModel.Plane.SelectedPoints.Count == 0) return;
-                if (ViewModel.IsSelectSegmentMode)
+                if (ViewModel.Mode == Mode.Select)
                 {
                     ViewModel.Plane.ClearSelected();
                     ViewModel.Draw(baseGraphic);
                     return;
                 }
 
-                await _bezierObject.MovePoint((x, y));
+                await _bezierObject!.MovePoint((x, y));
                 _bezierObject.GenerateSegment();
                 ViewModel.Draw(baseGraphic);
             }).DisposeWith(disposables);
@@ -114,23 +111,3 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
         });
     }
 }
-
-// OpenTkControl.Events().MouseWheel
-//     .Subscribe(args =>
-//     {
-//         if (args.Delta > 0)
-//         {
-//             _scale *= 1.1f;
-//         }
-//         else
-//         {
-//             _scale *= 0.9f;
-//         }
-//
-//         foreach (var point in ViewModel.PlaneView.Plane.Points)
-//         {
-//             ViewModel.PlaneView.Plane.ReplacePoint(point * _scale);
-//         }
-// }).DisposeWith(disposables);
-
-#nullable restore

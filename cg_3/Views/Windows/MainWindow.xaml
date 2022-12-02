@@ -6,7 +6,7 @@
         xmlns:control="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         xmlns:converters="clr-namespace:cg_3.Infrastructure.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="{Binding Mode}" Height="450" Width="800"
         DataContext="{Binding PlaneViewModel, Source={StaticResource Locator}}">
     <Window.Resources>
         <converters:Vector2DToStringConverter x:Key="Vector2DToStringConverter" />
@@ -38,7 +38,6 @@
                     </Grid.RowDefinitions>
                     <GroupBox>
                         <StackPanel>
-                            <Button Content="Draw mode" Command="{Binding SetDrawingMode}" />
                             <Button Content="Selection mode" Command="{Binding SetSelectSegmentMode}"/>
                         </StackPanel>
                     </GroupBox>
