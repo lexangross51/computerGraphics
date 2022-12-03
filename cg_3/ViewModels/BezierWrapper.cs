@@ -2,35 +2,51 @@
 
 public class BezierWrapper : ReactiveObject
 {
-    public Guid Guid { get; }
-    public List<Vector2D> Points { get; set; }
-    public Vector2D[] ControlPoints { get; }
-    [Reactive] public Vector2D P0 { get; set; }
-    [Reactive] public Vector2D P1 { get; set; }
-    [Reactive] public Vector2D P2 { get; set; }
-    [Reactive] public Vector2D P3 { get; set; }
+    public BezierObject Curve { get; }
 
-    public BezierWrapper(Vector2D p0, Vector2D p1, Vector2D p2, Vector2D p3)
+    public Vector2D P0
     {
-        P0 = p0;
-        P1 = p1;
-        P2 = p2;
-        P3 = p3;
-        Guid = Guid.NewGuid();
-        Points = new();
-        ControlPoints = new[] { p0, p1, p2, p3 };
-
-        this.WhenAnyValue(t => t.P0, t => t.P1, t => t.P2, t => t.P3)
-            .Subscribe(points =>
-            {
-                ControlPoints[0] = points.Item1;
-                ControlPoints[1] = points.Item2;
-                ControlPoints[2] = points.Item3;
-                ControlPoints[3] = points.Item4;
-            });
+        get => Curve[0];
+        set
+        {
+            if (Curve[0] == value) return;
+            Curve[0] = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    
+    public Vector2D P1
+    {
+        get => Curve[1];
+        set
+        {
+            if (Curve[1] == value) return;
+            Curve[1] = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    
+    public Vector2D P2
+    {
+        get => Curve[2];
+        set
+        {
+            if (Curve[2] == value) return;
+            Curve[2] = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    
+    public Vector2D P3
+    {
+        get => Curve[3];
+        set
+        {
+            if (Curve[3] == value) return;
+            Curve[3] = value;
+            this.RaisePropertyChanged();
+        }
     }
 
-    public Vector2D GenCurve(float t) => AsBezierObject().CurveGen(t);
-
-    public BezierObject AsBezierObject() => new(P0, P1, P2, P3);
+    public BezierWrapper(BezierObject curve) => Curve = curve;
 }

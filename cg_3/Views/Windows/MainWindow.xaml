@@ -38,8 +38,7 @@
                     </Grid.RowDefinitions>
                     <GroupBox>
                         <StackPanel>
-                            <RadioButton Name="DrawButton" Content="Draw" Command="{Binding SetMode}"
-                                         CommandParameter="{Binding ElementName=DrawButton, Path=Content}" />
+                            <Button Name="DrawButton" Content="Draw" Command="{Binding CreateObject}" />
                             <RadioButton Name="SelectButton" Content="Select" Command="{Binding SetMode}"
                                          CommandParameter="{Binding ElementName=SelectButton, Path=Content}" />
                         </StackPanel>

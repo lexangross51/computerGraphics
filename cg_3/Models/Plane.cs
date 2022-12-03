@@ -2,12 +2,13 @@
 
 public class Plane
 {
-    public SourceList<Vector2D> SelectedPoints { get; } = new();
-    public List<Vector2D> SelectedSegment { get; } = new();
+    public SourceCache<BezierObject, BezierObject> SelectedSegments { get; }
+    public SourceList<Vector2D> SelectedPoints { get; }
 
-    public void ClearSelected()
+    public Plane()
     {
-        SelectedPoints.Clear();
-        SelectedSegment.Clear();
+        SelectedSegments = new(obj => obj);
+        SelectedPoints = new(); // p0, p1, p2, p3
+        SelectedPoints.CountChanged.Where(t => t == 3).Subscribe(_ => SelectedPoints.Clear());
     }
 }

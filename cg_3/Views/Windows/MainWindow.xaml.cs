@@ -1,18 +1,24 @@
-﻿namespace cg_3.Views.Windows;
+﻿using System.Diagnostics;
+using cg_3.Extensions;
+
+namespace cg_3.Views.Windows;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : IViewFor<PlaneViewModel>
 {
-    object? IViewFor.ViewModel
+#nullable disable
+
+    object IViewFor.ViewModel
     {
         get => ViewModel;
         set => throw new NotImplementedException();
     }
 
-    private ViewableBezierObject? _bezierObject;
-    public PlaneViewModel? ViewModel { get; set; }
+    public PlaneViewModel ViewModel { get; set; }
+
+#nullable restore
 
     public MainWindow()
     {
@@ -36,107 +42,39 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
         {
             observable.Subscribe(ts => baseGraphic.Render(ts)).DisposeWith(disposables);
 
-            this.WhenAnyValue(t => t.ViewModel!.Mode)
-                .Subscribe(_ =>
-                {
-                    ViewModel.HaveViewableObject = false;
-                    if (_bezierObject != null) _bezierObject.State = StateViewableObject.NotStarted;
-                })
+            #region Logic redraw
+
+            ViewModel.Plane.SelectedPoints.Connect().OnItemAdded(_ => ViewModel.Draw(baseGraphic)).Subscribe()
                 .DisposeWith(disposables);
 
-            this.WhenAnyValue(t => t.ViewModel!.Mode)
-                .Where(mode => mode.HasFlag(Mode.Select) && ViewModel.Wrappers.Count != 0)
-                .Subscribe(_ =>
-                    ViewModel.Wrappers.Remove(ViewModel!.SelectedWrapper!.Guid))
-                .DisposeWith(disposables); // delete last wrapper if was restart
+            // ViewModel.Plane.SelectedSegments.Connect().WhenPropertyChanged(t => t.CompletedPoints.Items)
+            //     .Subscribe(_ =>
+            //     {
+            //         ViewModel.Draw(baseGraphic);
+            //         // Debug.WriteLine("Changed");
+            //     }).DisposeWith(disposables);
 
-            this.WhenAnyValue(t => t.ViewModel!.SelectedWrapper!.P0,
-                    t => t.ViewModel!.SelectedWrapper!.P1,
-                    t => t.ViewModel!.SelectedWrapper!.P2,
-                    t => t.ViewModel!.SelectedWrapper!.P3)
-                .Where(_ => _bezierObject?.State is StateViewableObject.NotStarted).Subscribe(_ =>
+            #endregion
+
+            OpenTkControl.Events().MouseDown
+                .Select(args => (args.ToScreenCoordinates(OpenTkControl), MouseButtonState.Pressed))
+                .InvokeCommand(ViewModel, vm => vm.AddPoint).DisposeWith(disposables);
+
+            OpenTkControl.Events().MouseMove
+                .Select(args => (args.ToScreenCoordinates(OpenTkControl), MouseButtonState.Pressed))
+                .Subscribe(parameters =>
                 {
-                    _bezierObject?.GenerateSegmentWithUpdate(ViewModel!.SelectedWrapper!.Guid);
-                    ViewModel.DrawSelected(baseGraphic, ViewModel!.SelectedWrapper!.Guid);
+                    ViewModel.MovePoint.Execute((parameters.Item1, parameters.Item2));
+                    ViewModel.Draw(baseGraphic);
                 }).DisposeWith(disposables);
 
-            OpenTkControl.Events().MouseDown.Subscribe(async args =>
+            OpenTkControl.Events().MouseMove.Subscribe(args =>
             {
-                var point = args.GetPosition(OpenTkControl);
+                var point = args.ToScreenCoordinates(OpenTkControl);
 
-                var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
-                var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
-
-                switch (ViewModel.Mode)
-                {
-                    case Mode.None:
-                        return;
-                    case Mode.Select:
-                    {
-                        // if (_bezierObject?.State == StateViewableObject.NotStarted)
-                        // {
-                        //     ViewModel.Dragged =
-                        //         ViewModel!.SelectedWrapper!.ControlPoints.Select((p, idx) => (point: p, index: idx))
-                        //             .Where(p => Vector2D.Distance((x, y), p.point) < 1E-01)
-                        //             .Select(p => p.index)
-                        //             .DefaultIfEmpty(-1).First();
-                        // }
-
-                        var key = ViewModel.FindWrapper((x, y));
-                        if (key == Guid.Empty) return;
-                        ViewModel.SelectedWrapper = ViewModel.Wrappers.Lookup(key).Value;
-                        ViewModel.DrawSelected(baseGraphic, key);
-                        return;
-                    }
-                }
-
-                if (!ViewModel.HaveViewableObject)
-                {
-                    _bezierObject = new((x, y), ViewModel);
-                    ViewModel.HaveViewableObject = true;
-                }
-
-                await _bezierObject!.AddPoint((x, y));
-                ViewModel.Draw(baseGraphic);
-
-                if (_bezierObject.State != StateViewableObject.Completed) return;
-                _bezierObject.Restart((x, y));
+                MousePositionX.Text = point.X.ToString("G7", CultureInfo.InvariantCulture);
+                MousePositionY.Text = point.Y.ToString("G7", CultureInfo.InvariantCulture);
             }).DisposeWith(disposables);
-
-            ViewModel.Plane.SelectedPoints.CountChanged.Where(_ => ViewModel.Mode is not Mode.Select)
-                .Subscribe(_ => ViewModel.Draw(baseGraphic)).DisposeWith(disposables);
-
-            OpenTkControl.Events().MouseMove.Subscribe(async args =>
-            {
-                var point = args.GetPosition(OpenTkControl);
-
-                var x = (float)(-1.0f + 2 * point.X / OpenTkControl.RenderSize.Width);
-                var y = (float)(1.0f - 2 * point.Y / OpenTkControl.RenderSize.Height);
-
-                MousePositionX.Text = x.ToString("G7", CultureInfo.InvariantCulture);
-                MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
-
-                if (ViewModel.Mode.HasFlag(Mode.Select))
-                {
-                    ViewModel.Plane.ClearSelected();
-                    ViewModel.DrawSelected(baseGraphic, ViewModel!.SelectedWrapper!.Guid);
-                    return;
-                }
-
-                if (ViewModel.Plane.SelectedPoints.Count == 0) return;
-                await _bezierObject!.MovePoint((x, y));
-                _bezierObject.GenerateSegment();
-                ViewModel.Draw(baseGraphic);
-            }).DisposeWith(disposables);
-
-            this.Events().KeyDown
-                .Where(x => x.Key == Key.Z && x.KeyboardDevice.IsKeyDown(Key.LeftCtrl))
-                .Subscribe(_ =>
-                {
-                    ViewModel.Cancel.Execute().Subscribe();
-                    ViewModel.Draw(baseGraphic);
-                })
-                .DisposeWith(disposables);
         });
     }
 
