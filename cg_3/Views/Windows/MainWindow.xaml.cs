@@ -44,6 +44,12 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 })
                 .DisposeWith(disposables);
 
+            this.WhenAnyValue(t => t.ViewModel!.Mode)
+                .Where(mode => mode.HasFlag(Mode.Select) && ViewModel.Wrappers.Count != 0)
+                .Subscribe(_ =>
+                    ViewModel.Wrappers.Remove(ViewModel!.SelectedWrapper!.Guid))
+                .DisposeWith(disposables); // delete last wrapper if was restart
+
             this.WhenAnyValue(t => t.ViewModel!.SelectedWrapper!.P0,
                     t => t.ViewModel!.SelectedWrapper!.P1,
                     t => t.ViewModel!.SelectedWrapper!.P2,
@@ -67,6 +73,15 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                         return;
                     case Mode.Select:
                     {
+                        // if (_bezierObject?.State == StateViewableObject.NotStarted)
+                        // {
+                        //     ViewModel.Dragged =
+                        //         ViewModel!.SelectedWrapper!.ControlPoints.Select((p, idx) => (point: p, index: idx))
+                        //             .Where(p => Vector2D.Distance((x, y), p.point) < 1E-01)
+                        //             .Select(p => p.index)
+                        //             .DefaultIfEmpty(-1).First();
+                        // }
+
                         var key = ViewModel.FindWrapper((x, y));
                         if (key == Guid.Empty) return;
                         ViewModel.SelectedWrapper = ViewModel.Wrappers.Lookup(key).Value;
@@ -89,7 +104,7 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
             }).DisposeWith(disposables);
 
             ViewModel.Plane.SelectedPoints.CountChanged.Where(_ => ViewModel.Mode is not Mode.Select)
-                .Subscribe(_ => ViewModel.Draw(baseGraphic));
+                .Subscribe(_ => ViewModel.Draw(baseGraphic)).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseMove.Subscribe(async args =>
             {
@@ -101,14 +116,14 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 MousePositionX.Text = x.ToString("G7", CultureInfo.InvariantCulture);
                 MousePositionY.Text = y.ToString("G7", CultureInfo.InvariantCulture);
 
-                if (ViewModel.Plane.SelectedPoints.Count == 0) return;
-                if (ViewModel.Mode == Mode.Select)
+                if (ViewModel.Mode.HasFlag(Mode.Select))
                 {
                     ViewModel.Plane.ClearSelected();
-                    ViewModel.Draw(baseGraphic);
+                    ViewModel.DrawSelected(baseGraphic, ViewModel!.SelectedWrapper!.Guid);
                     return;
                 }
 
+                if (ViewModel.Plane.SelectedPoints.Count == 0) return;
                 await _bezierObject!.MovePoint((x, y));
                 _bezierObject.GenerateSegment();
                 ViewModel.Draw(baseGraphic);
@@ -136,7 +151,7 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
 
     private static void PreviewMouseDownEventHandler(object sender, MouseButtonEventArgs e) => ClearFocus();
 
-    private static void WindowKeyDownHandler(object sender, System.Windows.Input.KeyEventArgs e)
+    private static void WindowKeyDownHandler(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter) ClearFocus();
     }

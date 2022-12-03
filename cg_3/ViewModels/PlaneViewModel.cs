@@ -19,6 +19,7 @@ public class PlaneViewModel : ReactiveObject, IViewable
     public Plane Plane { get; } = new();
     public SourceCache<BezierWrapper, Guid> Wrappers { get; } = new(w => w.Guid);
     public bool HaveViewableObject { get; set; }
+    public int Dragged { get; set; } = -1; // index of control point, -1 -> not hit
 
     public PlaneViewModel()
     {
@@ -60,6 +61,8 @@ public class PlaneViewModel : ReactiveObject, IViewable
         }
 
         var selected = Wrappers.Lookup(key);
+
+        if (!selected.HasValue) return;
 
         baseGraphic.Draw(selected.Value.Points, PrimitiveType.LineStrip, Color4.Coral);
         baseGraphic.DrawPoints(selected.Value.ControlPoints, color: Color4.Coral,
@@ -124,8 +127,7 @@ public class ViewableBezierObject
                 BezierWrapper.P3 = point;
                 _planeView.Plane.SelectedPoints.Add(point);
                 _step = 0;
-                _planeView.Wrappers.Lookup(BezierWrapper.Guid).Value.Points
-                    .AddRange(_planeView.Plane.SelectedSegment);
+                BezierWrapper.Points.AddRange(_planeView.Plane.SelectedSegment);
                 State = StateViewableObject.Completed;
                 break;
         }
@@ -170,6 +172,8 @@ public class ViewableBezierObject
         var points = new List<Vector2D>();
         var selected = _planeView.Wrappers.Lookup(key);
 
+        if (!selected.HasValue) return;
+
         for (int i = 0; i <= 19; i++)
         {
             var t = i / 19.0f;
@@ -181,6 +185,15 @@ public class ViewableBezierObject
         {
             var lookup = wrappers.Lookup(key);
             lookup.Value.Points = points;
+        });
+    }
+
+    public void UpdateControlPoint(Guid key, Vector2D point)
+    {
+        _planeView.Wrappers.Edit(wrappers =>
+        {
+            var lookup = wrappers.Lookup(key);
+            lookup.Value.ControlPoints[_planeView.Dragged] = point;
         });
     }
 
