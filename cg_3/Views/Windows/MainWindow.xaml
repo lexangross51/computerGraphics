@@ -18,7 +18,8 @@
                     <Label Content="X" />
                     <TextBox x:Name="MousePositionX" Margin="0, 5, 0, 5" IsReadOnly="True" />
                     <Label Content="Y" />
-                    <TextBox x:Name="MousePositionY" Margin="0, 5, 0, 5" IsReadOnly="True" />
+                    <TextBox x:Name="MousePositionY" Margin="0, 5, 0, 5" IsReadOnly="True">
+                    </TextBox>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
@@ -38,8 +39,7 @@
                     </Grid.RowDefinitions>
                     <GroupBox>
                         <StackPanel>
-                            <Button Name="DrawButton" Content="Draw" Command="{Binding CreateObject}" />
-                            <RadioButton Name="SelectButton" Content="Select" Command="{Binding SetMode}"
+                            <CheckBox Name="SelectButton" Content="Select" Command="{Binding SetMode}"
                                          CommandParameter="{Binding ElementName=SelectButton, Path=Content}" />
                         </StackPanel>
                     </GroupBox>

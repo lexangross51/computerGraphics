@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using cg_3.Extensions;
-
-namespace cg_3.Views.Windows;
+﻿namespace cg_3.Views.Windows;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
@@ -42,39 +39,23 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
         {
             observable.Subscribe(ts => baseGraphic.Render(ts)).DisposeWith(disposables);
 
-            #region Logic redraw
-
             ViewModel.Plane.SelectedPoints.Connect().OnItemAdded(_ => ViewModel.Draw(baseGraphic)).Subscribe()
                 .DisposeWith(disposables);
 
-            // ViewModel.Plane.SelectedSegments.Connect().WhenPropertyChanged(t => t.CompletedPoints.Items)
-            //     .Subscribe(_ =>
-            //     {
-            //         ViewModel.Draw(baseGraphic);
-            //         // Debug.WriteLine("Changed");
-            //     }).DisposeWith(disposables);
-
-            #endregion
-
             OpenTkControl.Events().MouseDown
                 .Select(args => (args.ToScreenCoordinates(OpenTkControl), MouseButtonState.Pressed))
-                .InvokeCommand(ViewModel, vm => vm.AddPoint).DisposeWith(disposables);
+                .Subscribe(ViewModel.RecreateObject).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseMove
                 .Select(args => (args.ToScreenCoordinates(OpenTkControl), MouseButtonState.Pressed))
                 .Subscribe(parameters =>
                 {
+                    MousePositionX.Text = parameters.Item1.X.ToString("G7", CultureInfo.InvariantCulture);
+                    MousePositionY.Text = parameters.Item1.Y.ToString("G7", CultureInfo.InvariantCulture);
+
                     ViewModel.MovePoint.Execute((parameters.Item1, parameters.Item2));
                     ViewModel.Draw(baseGraphic);
                 }).DisposeWith(disposables);
-
-            OpenTkControl.Events().MouseMove.Subscribe(args =>
-            {
-                var point = args.ToScreenCoordinates(OpenTkControl);
-
-                MousePositionX.Text = point.X.ToString("G7", CultureInfo.InvariantCulture);
-                MousePositionY.Text = point.Y.ToString("G7", CultureInfo.InvariantCulture);
-            }).DisposeWith(disposables);
         });
     }
 

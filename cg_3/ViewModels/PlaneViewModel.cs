@@ -1,22 +1,23 @@
-﻿using System.Diagnostics;
-
-namespace cg_3.ViewModels;
+﻿namespace cg_3.ViewModels;
 
 public enum Mode
 {
+    Draw, // default mode
     Select
 }
 
 public class PlaneViewModel : ReactiveObject, IViewable
 {
-    private readonly ObservableAsPropertyHelper<ViewableBezierObject>? _viewableBezierObject;
+    private ObservableAsPropertyHelper<ViewableBezierObject>? _viewableBezierObject;
     private readonly ObservableAsPropertyHelper<Mode> _mode;
+    public Subject<(Vector2D, MouseButtonState)> RecreateObject { get; }
     public Mode Mode => _mode.Value;
     public ViewableBezierObject? ViewableBezierObject => _viewableBezierObject?.Value;
     public ReactiveCommand<string, Mode> SetMode { get; }
-    public ReactiveCommand<Unit, ViewableBezierObject> CreateObject { get; }
+    public ReactiveCommand<Vector2D, ViewableBezierObject> CreateObject { get; }
     public ReactiveCommand<(Vector2D, MouseButtonState), Unit> AddPoint { get; }
     public ReactiveCommand<(Vector2D, MouseButtonState), Unit> MovePoint { get; }
+    public ReactiveCommand<Vector2D, Unit> RestartObject { get; }
     public Plane Plane { get; }
     public SourceList<BezierWrapper> Wrappers { get; }
     [Reactive] public BezierWrapper? SelectedWrapper { get; set; }
@@ -25,19 +26,35 @@ public class PlaneViewModel : ReactiveObject, IViewable
     {
         Wrappers = new();
         Plane = new();
+        RecreateObject = new();
         SetMode = ReactiveCommand.Create<string, Mode>(str => (Mode)Enum.Parse(typeof(Mode), str));
         SetMode.ToProperty(this, nameof(Mode), out _mode);
         CreateObject =
-            ReactiveCommand.Create<Unit, ViewableBezierObject>(_ => new(this, Vector2D.Zero));
-        CreateObject.ToProperty(this, nameof(ViewableBezierObject), out _viewableBezierObject);
+            ReactiveCommand.Create<Vector2D, ViewableBezierObject>(p => new(this, p));
         var canExecute = this.WhenAnyValue(
             t => t.ViewableBezierObject).Select(item => item is not null);
         AddPoint = ReactiveCommand.CreateFromTask<(Vector2D, MouseButtonState)>(
-            async p => await _viewableBezierObject.Value.AddPointImpl(p.Item1, p.Item2),
+            async p => await _viewableBezierObject!.Value.AddPointImpl(p.Item1, p.Item2),
             canExecute);
         MovePoint = ReactiveCommand.CreateFromTask<(Vector2D, MouseButtonState)>(
-            async p => await _viewableBezierObject.Value.MovePointImpl(p.Item1, p.Item2),
+            async p => await _viewableBezierObject!.Value.MovePointImpl(p.Item1, p.Item2),
             canExecute);
+        RestartObject = ReactiveCommand.Create<Vector2D>(p =>
+            _viewableBezierObject!.Value.Restart(p));
+        RecreateObject.Subscribe(p =>
+        {
+            if (ViewableBezierObject is null)
+            {
+                CreateObject.Execute(p.Item1).ToProperty(this, nameof(ViewableBezierObject), out _viewableBezierObject);
+            }
+
+            AddPoint.Execute((p.Item1, p.Item2));
+
+            if (ViewableBezierObject!.State == StateViewableObject.Completed)
+            {
+                RestartObject.Execute(p.Item1).Subscribe();
+            }
+        });
         Plane.SelectedSegments.Connect().Subscribe(_ => FindWrapper());
     }
 
@@ -48,7 +65,7 @@ public class PlaneViewModel : ReactiveObject, IViewable
 
         foreach (var curves in Plane.SelectedSegments.Items)
         {
-            baseGraphic.Draw(curves.CompletedPoints.Items, PrimitiveType.LineStrip);
+            baseGraphic.Draw(curves.CompletedPoints, PrimitiveType.LineStrip);
         }
     }
 
@@ -78,10 +95,11 @@ public enum StateViewableObject
     Completed
 }
 
-public class ViewableBezierObject
+public class ViewableBezierObject : ReactiveObject
 {
     private readonly PlaneViewModel _planeView;
-    private BezierObject? _bezierObject;
+    private BezierObject _bezierObject;
+    private BezierWrapper _wrapper;
     private byte _step;
 
     public StateViewableObject State { get; private set; } = StateViewableObject.NotStarted;
@@ -90,37 +108,35 @@ public class ViewableBezierObject
     {
         _planeView = planeView;
         _bezierObject = new(point, point, point, point);
-        BezierWrapper wrapper = new(_bezierObject);
-        _planeView.SelectedWrapper = wrapper;
-        _planeView.Wrappers.Add(wrapper);
+        _wrapper = new(_bezierObject);
+        _planeView.SelectedWrapper = _wrapper;
+        _planeView.Wrappers.Add(_wrapper);
         _planeView.Plane.SelectedSegments.AddOrUpdate(_bezierObject);
         _step = 0;
     }
 
     public Task AddPointImpl(Vector2D point, MouseButtonState mouseState)
     {
-        if (_bezierObject is null) return Task.CompletedTask;
-
         switch (_step)
         {
             case 0:
                 State = StateViewableObject.Started;
-                _bezierObject[0] = point;
+                _wrapper.P0 = point;
                 _planeView.Plane.SelectedPoints.Add(point);
                 _step++;
                 break;
             case 1:
-                _bezierObject[1] = point;
+                _wrapper.P1 = point;
                 _step++;
                 _planeView.Plane.SelectedPoints.Add(point);
                 break;
             case 2:
-                _bezierObject[2] = point;
+                _wrapper.P2 = point;
                 _step++;
                 _planeView.Plane.SelectedPoints.Add(point);
                 break;
             case 3:
-                _bezierObject[3] = point;
+                _wrapper.P3 = point;
                 _planeView.Plane.SelectedPoints.Add(point);
                 _step = 0;
                 State = StateViewableObject.Completed;
@@ -132,164 +148,41 @@ public class ViewableBezierObject
 
     public Task MovePointImpl(Vector2D point, MouseButtonState mouseState)
     {
-        if (_bezierObject is null) return Task.CompletedTask;
-
-        GenerateSegment();
+        if (_step != 0) GenerateSegment();
 
         switch (_step)
         {
             case 1:
-                _bezierObject[3] = point;
-                _bezierObject[1] = point;
+                _wrapper.P3 = point;
+                _wrapper.P1 = point;
                 break;
             case 2:
-                _bezierObject[3] = point;
-                _bezierObject[2] = point;
+                _wrapper.P3 = point;
+                _wrapper.P2 = point;
                 break;
             default:
-                _bezierObject[3] = point;
+                _wrapper.P3 = point;
                 break;
         }
 
         return Task.CompletedTask;
     }
 
-    public void GenerateSegment()
+    private void GenerateSegment()
     {
-        _bezierObject?.CompletedPoints.Clear();
-        _bezierObject?.GenCurve();
+        _bezierObject.CompletedPoints.Clear();
+        _bezierObject.GenCurve();
     }
 
     public void Restart(Vector2D point)
     {
         _bezierObject = new(point, point, point, point);
-        BezierWrapper bezierWrapper = new(_bezierObject);
-        _planeView.Wrappers.Add(bezierWrapper);
-        State = StateViewableObject.NotStarted;
+        _wrapper = new(_bezierObject);
+        _planeView.Wrappers.Add(_wrapper);
+        _planeView.Plane.SelectedSegments.AddOrUpdate(_bezierObject);
+        _planeView.Plane.SelectedPoints.Clear();
         _planeView.Plane.SelectedPoints.Add(point);
         State = StateViewableObject.Started;
         _step = 1;
     }
 }
-
-// public class ViewableBezierObject
-// {
-//     private readonly PlaneViewModel _planeView;
-//     private byte _step;
-//
-//     public BezierWrapper BezierWrapper { get; private set; }
-//     public StateViewableObject State { get; set; } = StateViewableObject.NotStarted;
-//
-//     public ViewableBezierObject(PlaneViewModel planeView)
-//     {
-//         BezierWrapper = new(point, point, point, point);
-//         _planeView = planeView;
-//         _planeView.Wrappers.AddOrUpdate(BezierWrapper);
-//         _step = 0;
-//     }
-//
-//     public Task AddPoint(Vector2D point)
-//     {
-//         switch (_step)
-//         {
-//             case 0:
-//                 State = StateViewableObject.Started;
-//                 BezierWrapper.P0 = point;
-//                 _planeView.Plane.SelectedPoints.Add(point);
-//                 _step++;
-//                 break;
-//             case 1:
-//                 BezierWrapper.P1 = point;
-//                 _step++;
-//                 _planeView.Plane.SelectedPoints.Add(point);
-//                 break;
-//             case 2:
-//                 BezierWrapper.P2 = point;
-//                 _step++;
-//                 _planeView.Plane.SelectedPoints.Add(point);
-//                 break;
-//             case 3:
-//                 BezierWrapper.P3 = point;
-//                 _planeView.Plane.SelectedPoints.Add(point);
-//                 _step = 0;
-//                 BezierWrapper.Points.AddRange(_planeView.Plane.SelectedSegment);
-//                 State = StateViewableObject.Completed;
-//                 break;
-//         }
-//
-//         return Task.CompletedTask;
-//     }
-//
-//     public Task MovePoint(Vector2D point)
-//     {
-//         switch (_step)
-//         {
-//             case 1:
-//                 BezierWrapper.P3 = point;
-//                 BezierWrapper.P1 = point;
-//                 break;
-//             case 2:
-//                 BezierWrapper.P3 = point;
-//                 BezierWrapper.P2 = BezierWrapper.P3;
-//                 break;
-//             default:
-//                 BezierWrapper.P3 = point;
-//                 break;
-//         }
-//
-//         return Task.CompletedTask;
-//     }
-//
-//     public void GenerateSegment()
-//     {
-//         _planeView.Plane.SelectedSegment.Clear();
-//
-//         for (int i = 0; i <= 19; i++)
-//         {
-//             var t = i / 19.0f;
-//
-//             _planeView.Plane.SelectedSegment.Add(BezierWrapper.GenCurve(t));
-//         }
-//     }
-//
-//     public void GenerateSegmentWithUpdate(Guid key)
-//     {
-//         var points = new List<Vector2D>();
-//         var selected = _planeView.Wrappers.Lookup(key);
-//
-//         if (!selected.HasValue) return;
-//
-//         for (int i = 0; i <= 19; i++)
-//         {
-//             var t = i / 19.0f;
-//
-//             points.Add(selected.Value.GenCurve(t));
-//         }
-//
-//         _planeView.Wrappers.Edit(wrappers =>
-//         {
-//             var lookup = wrappers.Lookup(key);
-//             lookup.Value.Points = points;
-//         });
-//     }
-//
-//     public void UpdateControlPoint(Guid key, Vector2D point)
-//     {
-//         _planeView.Wrappers.Edit(wrappers =>
-//         {
-//             var lookup = wrappers.Lookup(key);
-//             lookup.Value.ControlPoints[_planeView.Dragged] = point;
-//         });
-//     }
-//
-//     public void Restart(Vector2D point)
-//     {
-//         BezierWrapper = new(point, point, point, point);
-//         _planeView.Wrappers.AddOrUpdate(BezierWrapper);
-//         State = StateViewableObject.NotStarted;
-//         _planeView.Plane.ClearSelected();
-//         _planeView.Plane.SelectedPoints.Add(point);
-//         State = StateViewableObject.Started;
-//         _step = 1;
-//     }
-// }

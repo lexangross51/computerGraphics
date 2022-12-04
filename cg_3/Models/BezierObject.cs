@@ -1,9 +1,9 @@
 ﻿namespace cg_3.Models;
 
-public sealed class BezierObject : ReactiveObject
+public sealed class BezierObject
 {
     private readonly Vector2D[] _controlPoints = new Vector2D[4];
-    public SourceList<Vector2D> CompletedPoints { get; }
+    public List<Vector2D> CompletedPoints { get; }
 
     public Vector2D this[int idx]
     {

@@ -24,6 +24,7 @@
         <Using Include="System.Reactive" />
         <Using Include="System.Reactive.Linq" />
         <Using Include="System.Reactive.Disposables" />
+        <Using Include="System.Reactive.Subjects" />
         <Using Include="ReactiveUI" />
         <Using Include="ReactiveUI.Fody.Helpers" />
         <Using Include="DynamicData" />
@@ -35,6 +36,7 @@
         <Using Include="cg_3.Source.Camera" />
         <Using Include="cg_3.Source.Wrappers" />
         <Using Include="cg_3.ViewModels" />
+        <Using Include="cg_3.Extensions" />
         <Using Include="System.Windows.Data" />
         <Using Include="System.Globalization" />
         <Using Include="System.Runtime.InteropServices" />

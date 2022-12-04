@@ -9,6 +9,5 @@ public class Plane
     {
         SelectedSegments = new(obj => obj);
         SelectedPoints = new(); // p0, p1, p2, p3
-        SelectedPoints.CountChanged.Where(t => t == 3).Subscribe(_ => SelectedPoints.Clear());
     }
 }
