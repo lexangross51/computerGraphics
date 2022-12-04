@@ -6,7 +6,7 @@
         xmlns:control="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         xmlns:converters="clr-namespace:cg_3.Infrastructure.Converters"
         mc:Ignorable="d"
-        Title="{Binding Mode}" Height="450" Width="800"
+        Title="Bezier curves" Height="450" Width="800"
         DataContext="{Binding PlaneViewModel, Source={StaticResource Locator}}">
     <Window.Resources>
         <converters:Vector2DToStringConverter x:Key="Vector2DToStringConverter" />
@@ -39,8 +39,7 @@
                     </Grid.RowDefinitions>
                     <GroupBox>
                         <StackPanel>
-                            <CheckBox Name="SelectButton" Content="Select" Command="{Binding SetMode}"
-                                         CommandParameter="{Binding ElementName=SelectButton, Path=Content}" />
+                            <CheckBox Content="Select" IsChecked="{Binding IsSelectedMode}" />
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="Bezier segment">

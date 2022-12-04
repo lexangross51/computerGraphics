@@ -14,7 +14,7 @@ public class BezierWrapper : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
+
     public Vector2D P1
     {
         get => Curve[1];
@@ -25,7 +25,7 @@ public class BezierWrapper : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
+
     public Vector2D P2
     {
         get => Curve[2];
@@ -36,7 +36,7 @@ public class BezierWrapper : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
+
     public Vector2D P3
     {
         get => Curve[3];

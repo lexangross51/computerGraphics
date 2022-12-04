@@ -43,11 +43,11 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 .DisposeWith(disposables);
 
             OpenTkControl.Events().MouseDown
-                .Select(args => (args.ToScreenCoordinates(OpenTkControl), MouseButtonState.Pressed))
+                .Select(args => (args.ToScreenCoordinates(OpenTkControl), args))
                 .Subscribe(ViewModel.RecreateObject).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseMove
-                .Select(args => (args.ToScreenCoordinates(OpenTkControl), MouseButtonState.Pressed))
+                .Select(args => (args.ToScreenCoordinates(OpenTkControl), args))
                 .Subscribe(parameters =>
                 {
                     MousePositionX.Text = parameters.Item1.X.ToString("G7", CultureInfo.InvariantCulture);
@@ -56,6 +56,24 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                     ViewModel.MovePoint.Execute((parameters.Item1, parameters.Item2));
                     ViewModel.Draw(baseGraphic);
                 }).DisposeWith(disposables);
+
+            this.WhenAnyValue(t => t.ViewModel.Plane.SelectedSegment,
+                    t => t.ViewModel.IsSelectedMode)
+                .Subscribe(_ =>
+                {
+                    ViewModel.FindWrapper();
+                    ViewModel.Draw(baseGraphic);
+                    ViewModel.DrawSelected(baseGraphic);
+                }).DisposeWith(disposables);
+            this.WhenAnyValue(t => t.ViewModel.SelectedWrapper!.P0, // edit control points
+                t => t.ViewModel.SelectedWrapper!.P1,
+                t => t.ViewModel.SelectedWrapper!.P2,
+                t => t.ViewModel.SelectedWrapper!.P3).Subscribe(_ =>
+            {
+                ViewModel.SelectedWrapper!.Curve.CompletedPoints.Clear();
+                ViewModel.SelectedWrapper!.Curve.GenCurve();
+                ViewModel.DrawSelected(baseGraphic);
+            }).DisposeWith(disposables);
         });
     }
 
