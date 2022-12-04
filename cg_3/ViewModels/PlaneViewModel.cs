@@ -61,12 +61,16 @@ public class PlaneViewModel : ReactiveObject, IViewable
     public void Draw(IBaseGraphic baseGraphic)
     {
         baseGraphic.Clear();
-        baseGraphic.DrawPoints(Plane.SelectedPoints.Items, 6);
+        baseGraphic.DrawPoints(Plane.SelectedPoints.Items, 6, Color4.Coral);
 
-        foreach (var curves in Plane.SelectedSegments.Items)
+        foreach (var curves in Plane.SelectedSegments.Items.SkipLast(1))
         {
             baseGraphic.Draw(curves.CompletedPoints, PrimitiveType.LineStrip);
         }
+
+        var selected = Plane.SelectedSegments.Items.LastOrDefault();
+        if (selected is null) return;
+        baseGraphic.Draw(selected.CompletedPoints, PrimitiveType.LineStrip, Color4.Coral);
     }
 
     public void DrawSelected(IBaseGraphic baseGraphic)
