@@ -53,7 +53,7 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                     MousePositionX.Text = parameters.Item1.X.ToString("G7", CultureInfo.InvariantCulture);
                     MousePositionY.Text = parameters.Item1.Y.ToString("G7", CultureInfo.InvariantCulture);
 
-                    ViewModel.MovePoint.Execute((parameters.Item1, parameters.Item2));
+                    ViewModel.MoveAndDrag.OnNext((parameters.Item1, parameters.Item2));
                     ViewModel.Draw(baseGraphic);
                 }).DisposeWith(disposables);
 

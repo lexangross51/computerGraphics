@@ -6,6 +6,7 @@ public class PlaneViewModel : ReactiveObject, IViewable
     public ViewableBezierObject? ViewableBezierObject => _viewableBezierObject?.Value;
     public ReactiveCommand<Vector2D, ViewableBezierObject> CreateObject { get; }
     public Subject<(Vector2D, MouseButtonEventArgs)> RecreateObject { get; }
+    public Subject<(Vector2D, MouseEventArgs)> MoveAndDrag { get; }
     public ReactiveCommand<(Vector2D, MouseButtonEventArgs), Unit> AddPoint { get; }
     public ReactiveCommand<(Vector2D, MouseEventArgs), Unit> MovePoint { get; }
     public ReactiveCommand<Vector2D, Unit> RestartObject { get; }
@@ -13,12 +14,15 @@ public class PlaneViewModel : ReactiveObject, IViewable
     public SourceList<BezierWrapper> Wrappers { get; }
     [Reactive] public BezierWrapper? SelectedWrapper { get; set; }
     [Reactive] public bool IsSelectedMode { get; set; }
+    public Dragger Dragger { get; }
 
     public PlaneViewModel()
     {
         Wrappers = new();
         Plane = new();
         RecreateObject = new();
+        MoveAndDrag = new();
+        Dragger = new();
         CreateObject =
             ReactiveCommand.Create<Vector2D, ViewableBezierObject>(p => new(this, p));
         var canExecute = this.WhenAnyValue(
@@ -39,9 +43,11 @@ public class PlaneViewModel : ReactiveObject, IViewable
                 {
                     if (!segment.CompletedPoints.Any(point => Vector2D.Distance(p.Item1, point) < 1E-01)) continue;
                     Plane.SelectedSegment = segment;
-                    this.RaisePropertyChanged(nameof(Plane.SelectedSegment));
                     break;
                 }
+
+                Dragger.Wrapper = SelectedWrapper;
+                Dragger.FindPoint(p.Item2, p.Item1);
 
                 return;
             }
@@ -59,11 +65,16 @@ public class PlaneViewModel : ReactiveObject, IViewable
                 RestartObject.Execute(p.Item1).Subscribe();
             }
         });
+        MoveAndDrag.Subscribe(p =>
+        {
+            MovePoint.Execute((p.Item1, p.Item2));
+            Dragger.DragPoint(p.Item1, p.Item2);
+        });
         this.WhenAnyValue(t => t.IsSelectedMode).Where(value => value).Subscribe(_ =>
         {
             if (ViewableBezierObject?.Wrapper is null) return;
             Plane.SelectedSegments.RemoveKey(ViewableBezierObject.Wrapper.Curve);
-            Wrappers.Remove(SelectedWrapper);
+            Wrappers!.Remove(SelectedWrapper);
             Plane.SelectedPoints.Clear();
             ViewableBezierObject?.Dispose();
             FindWrapper();
@@ -220,5 +231,32 @@ public class ViewableBezierObject : ReactiveObject, IDisposable
     {
         _bezierObject = null;
         Wrapper = null;
+    }
+}
+
+public class Dragger
+{
+    public BezierWrapper? Wrapper { get; set; }
+    public int Point { get; private set; }
+
+    public void FindPoint(MouseEventArgs mouseState, Vector2D point)
+    {
+        if (mouseState.LeftButton != MouseButtonState.Pressed || Wrapper is null)
+        {
+            Point = -1;
+            return;
+        }
+
+        Point = Wrapper.Curve.ControlPoints.Select((p, idx) => (point: p, index: idx))
+            .Where(p => Vector2D.Distance(point, p.point) < 1E-01)
+            .Select(p => p.index)
+            .DefaultIfEmpty(-1).First();
+    }
+
+    public void DragPoint(Vector2D point, MouseEventArgs mouseState)
+    {
+        if (Wrapper is null || Point == -1) return;
+        if (mouseState.LeftButton != MouseButtonState.Pressed) return;
+        Wrapper.SetPoint(Point, point);
     }
 }

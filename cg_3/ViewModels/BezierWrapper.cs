@@ -49,4 +49,23 @@ public class BezierWrapper : ReactiveObject
     }
 
     public BezierWrapper(BezierObject curve) => Curve = curve;
+
+    public void SetPoint(int idx, Vector2D point)
+    {
+        switch (idx)
+        {
+            case 0:
+                P0 = point;
+                break;
+            case 1:
+                P1 = point;
+                break;
+            case 2:
+                P2 = point;
+                break;
+            case 3:
+                P3 = point;
+                break;
+        }
+    }
 }
