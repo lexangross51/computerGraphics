@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +24,7 @@ public partial class MainWindow
     private Vector2 _fulcrum;
     private OpenGL _glContext;
     private float _xGridSplits, _yGridSplits;
+    private int _segmentsCount;
     private readonly List<(int, int)> _pairCurvePoint = new();
 
     public MainWindow()
@@ -154,9 +154,9 @@ public partial class MainWindow
                 
                 _bezierPoints[icurve].Clear();
                 
-                for (int j = 0; j <= 20; j++)
+                for (int j = 0; j <= _segmentsCount; j++)
                 {
-                    var t = j / 20.0f;
+                    var t = (float)j / _segmentsCount;
                 
                     _bezierPoints[icurve].Add(bezierCurve.CurveGen(t));
                 }
@@ -175,9 +175,9 @@ public partial class MainWindow
                 
                 _bezierPoints[_currentCurve].Clear();
                 
-                for (int i = 0; i <= 20; i++)
+                for (int i = 0; i <= _segmentsCount; i++)
                 {
-                    var t = i / 20.0f;
+                    var t = (float)i / _segmentsCount;
                 
                     _bezierPoints[_currentCurve].Add(bezierCurve.CurveGen(t));
                 }
@@ -267,18 +267,21 @@ public partial class MainWindow
 
     private void OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_step > 1 && _isDrawingMode)
+        _canNavigate = true;
+        var cursorPosition = e.GetPosition(this);
+        float xPos = (float)cursorPosition.X;
+        float yPos = (float)cursorPosition.Y;
+        _fulcrum = _ortho.ToProjectionCoordinate(xPos, yPos, _glContext.RenderContextProvider);
+    }
+    
+    private void OnMiddleMouseButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Middle)
         {
-            _bezierCurves[_currentCurve].DeleteControlPoint(_step--);
-        }
-
-        if (!_isDrawingMode)
-        {
-            _canNavigate = true;
-            var cursorPosition = e.GetPosition(this);
-            float xPos = (float)cursorPosition.X;
-            float yPos = (float)cursorPosition.Y;
-            _fulcrum = _ortho.ToProjectionCoordinate(xPos, yPos, _glContext.RenderContextProvider);
+            if (_step > 1 && _isDrawingMode)
+            {
+                _bezierCurves[_currentCurve].DeleteControlPoint(_step--);
+            }
         }
     }
 
@@ -331,6 +334,28 @@ public partial class MainWindow
 
     private void EditMode_OnChecked(object sender, RoutedEventArgs e)
         => _isEditable = (bool)(sender as CheckBox)!.IsChecked!;
+    
+    private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        => _isAbleToMovePoint = false;
+
+    private void SegmentsCount_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+        _segmentsCount = (int)(sender as IntegerUpDown)!.Value!;
+
+        for (int i = 0; i < _bezierPoints.Count; i++)
+        {
+            var curve = _bezierCurves[i];
+            
+            _bezierPoints[i].Clear();
+            
+            for (int j = 0; j <= _segmentsCount; j++)
+            {
+                var t = (float)j / _segmentsCount;
+
+                _bezierPoints[i].Add(curve.CurveGen(t));
+            }      
+        }
+    }
 
     #endregion
 
@@ -411,44 +436,11 @@ public partial class MainWindow
         float yStep = Math.Abs(pivot.Y * (scale - 1.0f));
 
         // Scale axes
-        // var newLeft = (pivot.X - _ortho.Left) / scale;
-        // var newRight = (_ortho.Right - pivot.X) / scale;
-        // var newBottom = (pivot.Y - _ortho.Bottom) / scale;
-        // var newTop = (_ortho.Top - pivot.Y) / scale;
-        
-        // _ortho.Left = pivot.X - newLeft;
-        // _ortho.Right = pivot.X + newRight;
-        // _ortho.Bottom = pivot.Y - newBottom;
-        // _ortho.Top = pivot.Y + newTop;
-
         _ortho.Left = _ortho.Left * 1.0f / scale + Math.Sign(_ortho.Left) * xStep; 
         _ortho.Right = _ortho.Right * 1.0f / scale + Math.Sign(_ortho.Right) * xStep; 
         _ortho.Bottom = _ortho.Bottom * 1.0f / scale + Math.Sign(_ortho.Bottom) * yStep; 
-        _ortho.Top = _ortho.Top * 1.0f / scale + Math.Sign(_ortho.Top) * yStep; 
-        
-        // _xGridSplits /= scale;
-        // _yGridSplits /= scale;
-
-        // var hx = (double)(_ortho.Width / _xGridSplits);
-        // var hy = (double)(_ortho.Height / _yGridSplits);
-        //
-        // if (_isDrawingMode) return;
-        
-        // Scale curves points
-        // foreach (var t in _bezierPoints)
-        // {
-        //     for (int j = 0; j < t.Count; j++)
-        //     {
-        //         var x = t[j].X * scale - xStep;
-        //         var y = t[j].Y * scale - yStep;
-        //
-        //         t[j] = new Vector2(x, y);
-        //     }
-        // }
+        _ortho.Top = _ortho.Top * 1.0f / scale + Math.Sign(_ortho.Top) * yStep;
     }
     
-    private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        => _isAbleToMovePoint = false;
-
     #endregion
 }

@@ -23,6 +23,7 @@
                                    BorderBrush="Black" BorderThickness="2, 0, 0, 2"
                                    OpenGLDraw="OnOpenGLDraw"
                                    OpenGLInitialized="OnOpenGLInitialized"
+                                   MouseDown="OnMiddleMouseButtonDown"
                                    MouseLeftButtonDown="OnMouseLeftButtonDown"
                                    MouseRightButtonDown="OnMouseRightButtonDown"
                                    MouseLeftButtonUp="OnMouseLeftButtonUp"
@@ -58,6 +59,15 @@
                                               Width="41"
                                               Margin="21, 0, 0, 0"
                                               SelectedColorChanged="ColorPicker_OnSelectedColorChanged"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Число сегментов: "/>
+                            <xctk:IntegerUpDown x:Name="SegmentsCount"
+                                              Width="41"
+                                              Margin="1.3, 0, 0, 0"
+                                              Minimum="5" Maximum="30" Value="20"
+                                              ValueChanged="SegmentsCount_OnValueChanged"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
