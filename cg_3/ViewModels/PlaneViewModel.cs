@@ -2,40 +2,33 @@
 
 public class PlaneViewModel : ReactiveObject, IViewable
 {
-    private ObservableAsPropertyHelper<ViewableBezierObject>? _viewableBezierObject;
-    public ViewableBezierObject? ViewableBezierObject => _viewableBezierObject?.Value;
-    public ReactiveCommand<Vector2D, ViewableBezierObject> CreateObject { get; }
-    public Subject<(Vector2D, MouseButtonEventArgs)> RecreateObject { get; }
+    private ViewableBezierObject? ViewableBezierObject { get; set; }
+    
+    public Subject<(Vector2D, MouseButtonEventArgs)> DrawAndSelect { get; }
     public Subject<(Vector2D, MouseEventArgs)> MoveAndDrag { get; }
     public ReactiveCommand<(Vector2D, MouseButtonEventArgs), Unit> AddPoint { get; }
     public ReactiveCommand<(Vector2D, MouseEventArgs), Unit> MovePoint { get; }
-    public ReactiveCommand<Vector2D, Unit> RestartObject { get; }
     public Plane Plane { get; }
     public SourceList<BezierWrapper> Wrappers { get; }
     [Reactive] public BezierWrapper? SelectedWrapper { get; set; }
     [Reactive] public bool IsSelectedMode { get; set; }
-    public Dragger Dragger { get; }
 
     public PlaneViewModel()
     {
         Wrappers = new();
         Plane = new();
-        RecreateObject = new();
+        DrawAndSelect = new();
         MoveAndDrag = new();
-        Dragger = new();
-        CreateObject =
-            ReactiveCommand.Create<Vector2D, ViewableBezierObject>(p => new(this, p));
+        Dragger dragger = new();
         var canExecute = this.WhenAnyValue(
             t => t.ViewableBezierObject).Select(item => item is not null);
         AddPoint = ReactiveCommand.CreateFromTask<(Vector2D, MouseButtonEventArgs)>(
-            async p => await _viewableBezierObject!.Value.AddPointImpl(p.Item1, p.Item2),
+            async p => await ViewableBezierObject!.AddPointImpl(p.Item1, p.Item2),
             canExecute);
         MovePoint = ReactiveCommand.CreateFromTask<(Vector2D, MouseEventArgs)>(
-            async p => await _viewableBezierObject!.Value.MovePointImpl(p.Item1, p.Item2),
+            async p => await ViewableBezierObject!.MovePointImpl(p.Item1, p.Item2),
             canExecute);
-        RestartObject = ReactiveCommand.Create<Vector2D>(p =>
-            _viewableBezierObject!.Value.Restart(p));
-        RecreateObject.Subscribe(p =>
+        DrawAndSelect.Subscribe(p =>
         {
             if (IsSelectedMode)
             {
@@ -46,29 +39,20 @@ public class PlaneViewModel : ReactiveObject, IViewable
                     break;
                 }
 
-                Dragger.Wrapper = SelectedWrapper;
-                Dragger.FindPoint(p.Item2, p.Item1);
+                dragger.Wrapper = SelectedWrapper;
+                dragger.FindPoint(p.Item2, p.Item1);
 
                 return;
             }
 
-            if (ViewableBezierObject?.Wrapper is null)
-            {
-                CreateObject.Execute(p.Item1)
-                    .ToProperty(this, nameof(ViewableBezierObject), out _viewableBezierObject);
-            }
-
+            if (ViewableBezierObject?.Wrapper is null) ViewableBezierObject = new(this, p.Item1);
             AddPoint.Execute((p.Item1, p.Item2));
-
-            if (ViewableBezierObject!.State == StateViewableObject.Completed)
-            {
-                RestartObject.Execute(p.Item1).Subscribe();
-            }
+            if (ViewableBezierObject.State == StateViewableObject.Completed) ViewableBezierObject.Restart(p.Item1);
         });
         MoveAndDrag.Subscribe(p =>
         {
             MovePoint.Execute((p.Item1, p.Item2));
-            Dragger.DragPoint(p.Item1, p.Item2);
+            dragger.DragPoint(p.Item1, p.Item2);
         });
         this.WhenAnyValue(t => t.IsSelectedMode).Where(value => value).Subscribe(_ =>
         {
@@ -236,18 +220,18 @@ public class ViewableBezierObject : ReactiveObject, IDisposable
 
 public class Dragger
 {
+    private int _pointIndex;
     public BezierWrapper? Wrapper { get; set; }
-    public int Point { get; private set; }
 
     public void FindPoint(MouseEventArgs mouseState, Vector2D point)
     {
         if (mouseState.LeftButton != MouseButtonState.Pressed || Wrapper is null)
         {
-            Point = -1;
+            _pointIndex = -1;
             return;
         }
 
-        Point = Wrapper.Curve.ControlPoints.Select((p, idx) => (point: p, index: idx))
+        _pointIndex = Wrapper.Curve.ControlPoints.Select((p, idx) => (point: p, index: idx))
             .Where(p => Vector2D.Distance(point, p.point) < 1E-01)
             .Select(p => p.index)
             .DefaultIfEmpty(-1).First();
@@ -255,8 +239,8 @@ public class Dragger
 
     public void DragPoint(Vector2D point, MouseEventArgs mouseState)
     {
-        if (Wrapper is null || Point == -1) return;
+        if (Wrapper is null || _pointIndex == -1) return;
         if (mouseState.LeftButton != MouseButtonState.Pressed) return;
-        Wrapper.SetPoint(Point, point);
+        Wrapper.SetPoint(_pointIndex, point);
     }
 }

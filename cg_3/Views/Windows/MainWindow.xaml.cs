@@ -44,7 +44,7 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
 
             OpenTkControl.Events().MouseDown
                 .Select(args => (args.ToScreenCoordinates(OpenTkControl), args))
-                .Subscribe(ViewModel.RecreateObject).DisposeWith(disposables);
+                .Subscribe(ViewModel.DrawAndSelect).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseMove
                 .Select(args => (args.ToScreenCoordinates(OpenTkControl), args))
