@@ -43,11 +43,11 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 .DisposeWith(disposables);
 
             OpenTkControl.Events().MouseDown
-                .Select(args => (args.ToScreenCoordinates(OpenTkControl), args))
+                .Select(args => (args.ToScreenCoordinates(OpenTkControl, baseGraphic.Projection), args))
                 .Subscribe(ViewModel.DrawAndSelect).DisposeWith(disposables);
 
             OpenTkControl.Events().MouseMove
-                .Select(args => (args.ToScreenCoordinates(OpenTkControl), args))
+                .Select(args => (args.ToScreenCoordinates(OpenTkControl, baseGraphic.Projection), args))
                 .Subscribe(parameters =>
                 {
                     MousePositionX.Text = parameters.Item1.X.ToString("G7", CultureInfo.InvariantCulture);
@@ -62,7 +62,6 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
                 .Subscribe(_ =>
                 {
                     ViewModel.FindWrapper();
-                    ViewModel.Draw(baseGraphic);
                     ViewModel.DrawSelected(baseGraphic);
                 }).DisposeWith(disposables);
             this.WhenAnyValue(t => t.ViewModel.SelectedWrapper!.P0, // edit control points

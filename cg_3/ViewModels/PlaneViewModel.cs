@@ -34,7 +34,7 @@ public class PlaneViewModel : ReactiveObject, IViewable
             {
                 foreach (var segment in Plane.SelectedSegments.Items)
                 {
-                    if (!segment.CompletedPoints.Any(point => Vector2D.Distance(p.Item1, point) < 1E-01)) continue;
+                    if (!segment.CompletedPoints.Any(point => Vector2D.Distance(p.Item1, point) < 0.35)) continue;
                     Plane.SelectedSegment = segment;
                     break;
                 }
@@ -122,7 +122,7 @@ public class ViewableBezierObject : ReactiveObject, IDisposable
     private BezierObject? _bezierObject;
     private byte _step;
 
-    public BezierWrapper? Wrapper { get; set; }
+    public BezierWrapper? Wrapper { get; private set; }
     public StateViewableObject State { get; private set; } = StateViewableObject.NotStarted;
 
     public ViewableBezierObject(PlaneViewModel planeView, Vector2D point)
@@ -192,12 +192,6 @@ public class ViewableBezierObject : ReactiveObject, IDisposable
         return Task.CompletedTask;
     }
 
-    private void GenerateSegment()
-    {
-        _bezierObject?.CompletedPoints.Clear();
-        _bezierObject?.GenCurve();
-    }
-
     public void Restart(Vector2D point)
     {
         _bezierObject = new(point, point, point, point);
@@ -216,6 +210,12 @@ public class ViewableBezierObject : ReactiveObject, IDisposable
         _bezierObject = null;
         Wrapper = null;
     }
+    
+    private void GenerateSegment()
+    {
+        _bezierObject?.CompletedPoints.Clear();
+        _bezierObject?.GenCurve();
+    }
 }
 
 public class Dragger
@@ -232,7 +232,7 @@ public class Dragger
         }
 
         _pointIndex = Wrapper.Curve.ControlPoints.Select((p, idx) => (point: p, index: idx))
-            .Where(p => Vector2D.Distance(point, p.point) < 1E-01)
+            .Where(p => Vector2D.Distance(point, p.point) < 0.35)
             .Select(p => p.index)
             .DefaultIfEmpty(-1).First();
     }
