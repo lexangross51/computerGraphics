@@ -96,7 +96,13 @@ public readonly record struct Vector2D([field: FieldOffset(0)] float X, [field: 
     public static Vector2D operator -(Vector2D vector)
         => new(-vector.X, -vector.Y);
 
-    public static implicit operator Vector2D((float X, float Y) tuple) 
+    public static Vector2D operator +(Vector2D vector, (float, float) value)
+        => new(vector.X + value.Item1, vector.Y + value.Item2);
+    
+    public static Vector2D operator -(Vector2D vector, (float, float) value)
+        => new(vector.X - value.Item1, vector.Y - value.Item2);
+
+    public static implicit operator Vector2D((float X, float Y) tuple)
         => new(tuple.X, tuple.Y);
 
     #endregion

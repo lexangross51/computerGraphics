@@ -5,11 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:control="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         xmlns:converters="clr-namespace:cg_3.Infrastructure.Converters"
+        xmlns:viewModels="clr-namespace:cg_3.ViewModels"
         mc:Ignorable="d"
         Title="Bezier curves" Height="450" Width="800"
         DataContext="{Binding PlaneViewModel, Source={StaticResource Locator}}">
     <Window.Resources>
         <converters:Vector2DToStringConverter x:Key="Vector2DToStringConverter" />
+        <DataTemplate DataType="{x:Type viewModels:BezierWrapper}">
+            <GroupBox Header="Bezier segment">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label Content="BeginPoint" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                                 Text="{Binding P0, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                        <Label Grid.Column="0" Grid.Row="1" Content="P1" />
+                        <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
+                                 Text="{Binding P1, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                        <Label Grid.Column="0" Grid.Row="2" Content="P2" />
+                        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                 Text="{Binding P2, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                        <Label Grid.Row="3" Grid.Column="0" Content="EndPoint" />
+                        <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                                 Text="{Binding P3, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+        </DataTemplate>
     </Window.Resources>
     <DockPanel Background="LavenderBlush">
         <StatusBar DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch">
@@ -42,39 +74,7 @@
                             <CheckBox Content="Select" IsChecked="{Binding IsSelectedMode}" />
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Header="Bezier segment">
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Label Content="BeginPoint" />
-                                <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
-                                         Text="{Binding SelectedWrapper.P0, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" 
-                                         IsEnabled="{Binding IsSelectedMode}"/>
-                                <Label Grid.Column="0" Grid.Row="1" Content="P1" />
-                                <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
-                                         Text="{Binding SelectedWrapper.P1, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" 
-                                         IsEnabled="{Binding IsSelectedMode}"/>
-                                <Label Grid.Column="0" Grid.Row="2" Content="P2" />
-                                <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-                                         Text="{Binding SelectedWrapper.P2, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" 
-                                         IsEnabled="{Binding IsSelectedMode}"/>
-                                <Label Grid.Row="3" Grid.Column="0" Content="EndPoint" />
-                                <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
-                                         Text="{Binding SelectedWrapper.P3, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}"
-                                         IsEnabled="{Binding IsSelectedMode}" />
-                            </Grid>
-                        </StackPanel>
-                    </GroupBox>
+                    <ContentControl Grid.Row="1" Content="{Binding SelectedWrapper }" />
                 </Grid>
             </Border>
         </Grid>

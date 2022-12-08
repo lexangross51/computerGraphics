@@ -1,9 +1,11 @@
-﻿namespace cg_3.ViewModels;
+﻿using System.Reactive.Joins;
+
+namespace cg_3.ViewModels;
 
 public class PlaneViewModel : ReactiveObject, IViewable
 {
     private ViewableBezierObject? ViewableBezierObject { get; set; }
-    
+
     public Subject<(Vector2D, MouseButtonEventArgs)> DrawAndSelect { get; }
     public Subject<(Vector2D, MouseEventArgs)> MoveAndDrag { get; }
     public ReactiveCommand<(Vector2D, MouseButtonEventArgs), Unit> AddPoint { get; }
@@ -54,21 +56,29 @@ public class PlaneViewModel : ReactiveObject, IViewable
             MovePoint.Execute((p.Item1, p.Item2));
             dragger.DragPoint(p.Item1, p.Item2);
         });
-        this.WhenAnyValue(t => t.IsSelectedMode).Where(value => value).Subscribe(_ =>
+        this.WhenAnyValue(t => t.IsSelectedMode).Subscribe(_ =>
         {
-            if (ViewableBezierObject?.Wrapper is null) return;
-            Plane.SelectedSegments.RemoveKey(ViewableBezierObject.Wrapper.Curve);
-            Wrappers!.Remove(SelectedWrapper);
-            Plane.SelectedPoints.Clear();
-            ViewableBezierObject?.Dispose();
-            FindWrapper();
+            if (IsSelectedMode)
+            {
+                if (ViewableBezierObject?.Wrapper is null) return;
+                Plane.SelectedSegments.RemoveKey(ViewableBezierObject.Wrapper.Curve);
+                Wrappers!.Remove(SelectedWrapper);
+                Plane.SelectedPoints.Clear();
+                ViewableBezierObject?.Dispose();
+                SelectedWrapper = null;
+                FindWrapper();
+            }
+            else
+            {
+                SelectedWrapper = null;
+                Plane.SelectedSegment = null;
+            }
         });
     }
 
     public void Draw(IBaseGraphic baseGraphic)
     {
         if (IsSelectedMode) return;
-        Plane.SelectedSegment = null;
 
         baseGraphic.Clear();
         baseGraphic.DrawPoints(Plane.SelectedPoints.Items, 6);
@@ -210,7 +220,7 @@ public class ViewableBezierObject : ReactiveObject, IDisposable
         _bezierObject = null;
         Wrapper = null;
     }
-    
+
     private void GenerateSegment()
     {
         _bezierObject?.CompletedPoints.Clear();

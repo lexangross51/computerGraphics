@@ -59,10 +59,17 @@ public partial class MainWindow : IViewFor<PlaneViewModel>
 
             this.WhenAnyValue(t => t.ViewModel.Plane.SelectedSegment,
                     t => t.ViewModel.IsSelectedMode)
-                .Subscribe(_ =>
+                .Subscribe(p =>
                 {
                     ViewModel.FindWrapper();
-                    ViewModel.DrawSelected(baseGraphic);
+                    if (p.Item2)
+                    {
+                        ViewModel.DrawSelected(baseGraphic);
+                    }
+                    else
+                    {
+                        ViewModel.Draw(baseGraphic);
+                    }
                 }).DisposeWith(disposables);
             this.WhenAnyValue(t => t.ViewModel.SelectedWrapper!.P0, // edit control points
                 t => t.ViewModel.SelectedWrapper!.P1,

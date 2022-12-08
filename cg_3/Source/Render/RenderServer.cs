@@ -1,6 +1,4 @@
-﻿using System.Drawing.Drawing2D;
-
-namespace cg_3.Source.Render;
+﻿namespace cg_3.Source.Render;
 
 public interface IBaseGraphic
 {
@@ -30,7 +28,6 @@ public class RenderServer : ReactiveObject, IBaseGraphic
     public RenderServer(MainCamera? camera = null)
     {
         GL.ClearColor(Color4.WhiteSmoke);
-        GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.ProgramPointSize);
         GL.Enable(EnableCap.LineSmooth);
         Camera ??= new(CameraMode.Perspective);
@@ -122,30 +119,106 @@ public class RenderServer : ReactiveObject, IBaseGraphic
     private void RedrawAxes()
     {
         const float offset = 0.2f;
+        const int partitions = 20;
 
         _planeContext.Clear();
-        var points = new Vector2D[]
+
+        var stepX = Projection.Width / partitions;
+        var stepY = Projection.Height / partitions;
+
+        var bottomPoints = new Vector2D[partitions];
+        var topPoints = new Vector2D[partitions];
+        var leftPoints = new Vector2D[partitions];
+        var rightPoints = new Vector2D[partitions];
+
+        bottomPoints[0] = (Projection.Left + offset + stepX, Projection.Bottom + offset);
+        topPoints[0] = (Projection.Left + offset + stepX, Projection.Top);
+        leftPoints[0] = (Projection.Left + offset, Projection.Bottom + offset + stepY);
+        rightPoints[0] = (Projection.Right, Projection.Bottom + offset + stepY);
+
+        for (int i = 1; i < partitions; i++)
+        {
+            bottomPoints[i] = bottomPoints[i - 1] + (stepX, 0.0f);
+            topPoints[i] = topPoints[i - 1] + (stepX, 0.0f);
+            leftPoints[i] = leftPoints[i - 1] + (0.0f, stepY);
+            rightPoints[i] = rightPoints[i - 1] + (0.0f, stepY);
+        }
+
+        var linesOrdinatePoints = new Vector2D[bottomPoints.Length + topPoints.Length + 1];
+        var linesAbscissaPoints = new Vector2D[leftPoints.Length + rightPoints.Length + 1];
+        int k = 0;
+        int j = 0;
+
+        for (int i = 0; i < bottomPoints.Length; i++)
+        {
+            linesOrdinatePoints[k++] = bottomPoints[i];
+            linesOrdinatePoints[k++] = topPoints[i];
+            linesAbscissaPoints[j++] = leftPoints[i];
+            linesAbscissaPoints[j++] = rightPoints[i];
+        }
+
+        var linesPoints = new Vector2D[]
         {
             (Projection.Left + offset, Projection.Bottom + offset), (Projection.Left + offset, Projection.Top),
             (Projection.Left + offset, Projection.Bottom + offset), (Projection.Right, Projection.Bottom + offset),
         };
 
-        RenderUnit @object = new RenderObject(primitiveType: PrimitiveType.Lines, uniformContexts: new IUniformContext[]
-        {
-            new Transformation
+        RenderUnit fstObject = new RenderObject(primitiveType: PrimitiveType.Lines,
+            uniformContexts: new IUniformContext[]
             {
-                View = (Matrix4.Identity, "view"),
-                Projection = (
-                    Matrix4.CreateOrthographicOffCenter(Projection.Left, Projection.Right, Projection.Bottom,
-                        Projection.Top, -1.0f, 1.0f), "projection"),
-                Model = (Matrix4.Identity, "model")
-            },
-            new ColorUniform
+                new Transformation
+                {
+                    View = (Matrix4.Identity, "view"),
+                    Projection = (
+                        Matrix4.CreateOrthographicOffCenter(Projection.Left, Projection.Right, Projection.Bottom,
+                            Projection.Top, -1.0f, 1.0f), "projection"),
+                    Model = (Matrix4.Identity, "model")
+                },
+                new ColorUniform
+                {
+                    Context = (Color4.Black, "color")
+                }
+            });
+        fstObject.Initialize(linesPoints);
+
+        RenderUnit sndObject = new RenderObject(primitiveType: PrimitiveType.Lines,
+            uniformContexts: new IUniformContext[]
             {
-                Context = (Color4.Black, "color")
-            }
-        });
-        @object.Initialize(points);
-        _planeContext.Add(@object);
+                new Transformation
+                {
+                    View = (Matrix4.Identity, "view"),
+                    Projection = (
+                        Matrix4.CreateOrthographicOffCenter(Projection.Left, Projection.Right, Projection.Bottom,
+                            Projection.Top, -1.0f, 1.0f), "projection"),
+                    Model = (Matrix4.Identity, "model")
+                },
+                new ColorUniform
+                {
+                    Context = (Color4.LightGray, "color")
+                }
+            });
+        sndObject.Initialize(linesOrdinatePoints);
+        
+        RenderUnit thdObject = new RenderObject(primitiveType: PrimitiveType.Lines,
+            uniformContexts: new IUniformContext[]
+            {
+                new Transformation
+                {
+                    View = (Matrix4.Identity, "view"),
+                    Projection = (
+                        Matrix4.CreateOrthographicOffCenter(Projection.Left, Projection.Right, Projection.Bottom,
+                            Projection.Top, -1.0f, 1.0f), "projection"),
+                    Model = (Matrix4.Identity, "model")
+                },
+                new ColorUniform
+                {
+                    Context = (Color4.LightGray, "color")
+                }
+            });
+        thdObject.Initialize(linesAbscissaPoints);
+
+        _planeContext.Add(thdObject);
+        _planeContext.Add(sndObject);
+        _planeContext.Add(fstObject);
     }
 }
