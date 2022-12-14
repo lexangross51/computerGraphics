@@ -28,16 +28,16 @@
                         </Grid.RowDefinitions>
                         <Label Content="BeginPoint" />
                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
-                                 Text="{Binding P0, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                                 Text="{Binding P0, Converter={StaticResource Vector2DToStringConverter}}" />
                         <Label Grid.Column="0" Grid.Row="1" Content="P1" />
                         <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
-                                 Text="{Binding P1, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                                 Text="{Binding P1, Converter={StaticResource Vector2DToStringConverter}}" />
                         <Label Grid.Column="0" Grid.Row="2" Content="P2" />
                         <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-                                 Text="{Binding P2, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                                 Text="{Binding P2, Converter={StaticResource Vector2DToStringConverter}}" />
                         <Label Grid.Row="3" Grid.Column="0" Content="EndPoint" />
                         <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
-                                 Text="{Binding P3, Converter={StaticResource Vector2DToStringConverter}, FallbackValue=0.0}" />
+                                 Text="{Binding P3, Converter={StaticResource Vector2DToStringConverter}}" />
                     </Grid>
                 </StackPanel>
             </GroupBox>
