@@ -24,7 +24,7 @@ public partial class MainWindow
     private Vector2 _fulcrum;
     private OpenGL _glContext;
     private float _xGridSplits, _yGridSplits;
-    private int _segmentsCount;
+    private readonly List<int> _segmentsCount = new();
     private readonly List<(int, int)> _pairCurvePoint = new();
 
     public MainWindow()
@@ -154,9 +154,9 @@ public partial class MainWindow
                 
                 _bezierPoints[icurve].Clear();
                 
-                for (int j = 0; j <= _segmentsCount; j++)
+                for (int j = 0; j <= _segmentsCount[icurve]; j++)
                 {
-                    var t = (float)j / _segmentsCount;
+                    var t = (float)j / _segmentsCount[icurve];
                 
                     _bezierPoints[icurve].Add(bezierCurve.CurveGen(t));
                 }
@@ -175,9 +175,9 @@ public partial class MainWindow
                 
                 _bezierPoints[_currentCurve].Clear();
                 
-                for (int i = 0; i <= _segmentsCount; i++)
+                for (int i = 0; i <= _segmentsCount[_currentCurve]; i++)
                 {
-                    var t = (float)i / _segmentsCount;
+                    var t = (float)i / _segmentsCount[_currentCurve];
                 
                     _bezierPoints[_currentCurve].Add(bezierCurve.CurveGen(t));
                 }
@@ -210,6 +210,12 @@ public partial class MainWindow
             
             for (int i = 0; i < _bezierCurves.Count; i++)
             {
+                if (_bezierCurves[i].IsSmoothed)
+                {
+                    _isAbleToMovePoint = false;
+                    continue;
+                }
+                
                 var points = _bezierCurves[i].ControlPoints;
             
                 for (int j = 0; j < points.Length; j++)
@@ -218,6 +224,7 @@ public partial class MainWindow
                     
                     if (Math.Abs(screenPoint.X - point.X) < 1 && Math.Abs(screenPoint.Y - point.Y) < 1)
                     {
+                        _isAbleToMovePoint = true;
                         _pairCurvePoint.Add((i, j));
 
                         if (_pairCurvePoint.Count == 2) return;
@@ -235,6 +242,7 @@ public partial class MainWindow
             _bezierCurves.Add(new BezierObject());
             _bezierPoints.Add(new List<Vector2>());
             _bezierColors.Add(Color.FromRgb(0, 0, 0));
+            _segmentsCount.Add(20);
             _currentCurve = (int)CurrentCurve.Maximum! + 1;
             
             _bezierCurves[_currentCurve].AddControlPoint(new Vector2(screenPoint.X, screenPoint.Y));
@@ -261,6 +269,7 @@ public partial class MainWindow
 
             currentBezierCurve.AddControlPoint(previousBezierCurve.ControlPoints[^1]);
             currentBezierCurve.AddControlPoint(previousBezierCurve.ControlPoints[^1]);
+            _segmentsCount.Add(20);
             _step = 1;
         }
     }
@@ -315,6 +324,7 @@ public partial class MainWindow
                 _step = 0;
                 _bezierCurves.RemoveAt(_currentCurve);
                 _bezierPoints.RemoveAt(_currentCurve);
+                _segmentsCount.RemoveAt(_currentCurve);
                 _currentCurve--;
             }
         }
@@ -340,23 +350,99 @@ public partial class MainWindow
 
     private void SegmentsCount_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        _segmentsCount = (int)(sender as IntegerUpDown)!.Value!;
+        if (_bezierCurves.IsEmpty()) return;
+        
+        _segmentsCount[_currentCurve] = (int)(sender as IntegerUpDown)!.Value!;
 
-        for (int i = 0; i < _bezierPoints.Count; i++)
+        var curve = _bezierCurves[_currentCurve];
+
+        _bezierPoints[_currentCurve].Clear();
+
+        for (int j = 0; j <= _segmentsCount[_currentCurve]; j++)
         {
-            var curve = _bezierCurves[i];
-            
-            _bezierPoints[i].Clear();
-            
-            for (int j = 0; j <= _segmentsCount; j++)
-            {
-                var t = (float)j / _segmentsCount;
+            var t = (float)j / _segmentsCount[_currentCurve];
 
-                _bezierPoints[i].Add(curve.CurveGen(t));
-            }      
-        }
+            _bezierPoints[_currentCurve].Add(curve.CurveGen(t));
+        }      
     }
 
+    private void SmoothConnectBtn_OnClick(object sender, RoutedEventArgs e)
+    {
+        List<Vector2> allControlPoints = new();
+
+        for (int i = 0; i < _bezierCurves.Count; i++)
+        {
+            if (_bezierCurves[i].IsSmoothed) continue;
+            
+            var points = _bezierCurves[i].ControlPoints;
+
+            for (int j = 0; j < points.Length - 1; j++)
+            {
+                allControlPoints.Add(points[j]);
+            }
+
+            if (i == _bezierCurves.Count - 1)
+            {
+                allControlPoints.Add(points[^1]);
+            }
+        }
+
+        for (int i = 0; i < allControlPoints.Count; i += 3)
+        {
+            if (i == allControlPoints.Count - 1)
+            {
+                break;
+            }
+
+            Vector2 point3;
+            
+            if (i + 2 >= allControlPoints.Count)
+            {
+                allControlPoints.Add(allControlPoints[^1]);
+                point3 = allControlPoints[^1];
+            }
+            else
+            {
+                point3 = allControlPoints[i + 2];
+            }
+            
+            var point4 = i + 3 >= allControlPoints.Count ? allControlPoints[^1] : allControlPoints[i + 3];
+            
+            var newPoint = new Vector2((point3.X + point4.X) / 2.0f, (point3.Y + point4.Y) / 2.0f);
+            allControlPoints.Insert(i + 3, newPoint);
+        }
+        
+        _bezierCurves.Clear();
+        _bezierColors.Clear();
+        _segmentsCount.Clear();
+        _bezierPoints.Clear();
+
+        for (int i = 0; i < allControlPoints.Count - 3; i += 3)
+        {
+            var p0 = allControlPoints[i];
+            var p1 = allControlPoints[i + 1];
+            var p2 = allControlPoints[i + 2];
+            var p3 = allControlPoints[i + 3];
+        
+            _bezierCurves.Add(new BezierObject(p0, p1, p2, p3, true));
+            _bezierPoints.Add(new List<Vector2>());
+            _bezierColors.Add(Color.FromRgb(0, 0, 0));
+            _segmentsCount.Add(20);
+        }
+
+        for (int icurve = 0; icurve < _bezierCurves.Count; icurve++)
+        {
+            var bezierCurve = _bezierCurves[icurve];
+
+            for (int i = 0; i <= _segmentsCount[icurve]; i++)
+            {
+                var t = (float)i / _segmentsCount[icurve];
+
+                _bezierPoints[icurve].Add(bezierCurve.CurveGen(t));
+            }
+        }
+    }
+    
     #endregion
 
     #region Additional functions
@@ -441,6 +527,6 @@ public partial class MainWindow
         _ortho.Bottom = _ortho.Bottom * 1.0f / scale + Math.Sign(_ortho.Bottom) * yStep; 
         _ortho.Top = _ortho.Top * 1.0f / scale + Math.Sign(_ortho.Top) * yStep;
     }
-    
+
     #endregion
 }

@@ -8,12 +8,24 @@ namespace cg_3.Source;
 public class BezierObject : ICloneable
 {
     private readonly List<Vector2> _controlPoints = new(4);
-
+    
     public ImmutableArray<Vector2> ControlPoints => _controlPoints.ToImmutableArray();
 
-    public Vector2 this[int idx] => _controlPoints[idx];
+    public bool IsSmoothed { get; set; } = false;
+
+    public BezierObject() { }
+
+    public BezierObject(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, bool isSmoothed = false)
+    {
+        _controlPoints.Add(p0);
+        _controlPoints.Add(p1);
+        _controlPoints.Add(p2);
+        _controlPoints.Add(p3);
+        IsSmoothed = isSmoothed;
+    }
 
     public void AddControlPoint(Vector2 point) => _controlPoints.Add(point);
+    public void AddControlPoint(int idx, Vector2 point) => _controlPoints.Insert(idx, point);
 
     public void DeleteControlPoint(int idx) => _controlPoints.RemoveAt(idx);
     
@@ -35,20 +47,6 @@ public class BezierObject : ICloneable
                  t * t * t * _controlPoints[3],
             _ => throw new ArgumentOutOfRangeException()
         };
-    }
-
-    public void Scale(Vector2 pivot, float scale)
-    {
-        float xStep = pivot.X * scale - pivot.X;
-        float yStep = pivot.Y * scale - pivot.Y;
-        
-        for (int i = 0; i < _controlPoints.Count; i++)
-        {
-            var x = _controlPoints[i].X * scale - xStep;
-            var y = _controlPoints[i].Y * scale - yStep;
-
-            _controlPoints[i] = new Vector2(x, y);
-        }
     }
 
     public object Clone() => MemberwiseClone();

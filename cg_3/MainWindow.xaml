@@ -38,6 +38,11 @@
                         <CheckBox x:Name="EditMode" Content="Редактировать"
                                   Checked="EditMode_OnChecked"
                                   Unchecked="EditMode_OnChecked"/>
+                        
+                        <Button x:Name="SmoothConnectBtn" 
+                                Width="90" HorizontalAlignment="Left"
+                                Content="Гладкое сшивание" 
+                                Click="SmoothConnectBtn_OnClick"/> 
                     </StackPanel>
                 </GroupBox>
                 
