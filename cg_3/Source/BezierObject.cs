@@ -8,16 +8,15 @@ namespace cg_3.Source;
 public class BezierObject : ICloneable
 {
     private readonly List<Vector2> _controlPoints = new(4);
-
+    
     public ImmutableArray<Vector2> ControlPoints => _controlPoints.ToImmutableArray();
+
     public Rectangle BoundingBox { get; private set; }
 
     public bool IsSmoothed { get; set; }
     public bool IsWasCalculatedBoundingBox { get; set; }
 
-    public BezierObject()
-    {
-    }
+    public BezierObject() { }
 
     public BezierObject(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, bool isSmoothed = false)
     {
@@ -32,7 +31,7 @@ public class BezierObject : ICloneable
     public void AddControlPoint(int idx, Vector2 point) => _controlPoints.Insert(idx, point);
 
     public void DeleteControlPoint(int idx) => _controlPoints.RemoveAt(idx);
-
+    
     public void UpdateControlPoint(int pointIdx, Vector2 newPoint)
         => _controlPoints[pointIdx] = newPoint;
 
@@ -54,7 +53,7 @@ public class BezierObject : ICloneable
     }
 
     public object Clone() => MemberwiseClone();
-
+    
     public void CalculateBoundingBox() // TODO -> make it easier and avoid code repetition
     {
         (float? solX1, float? solX2) = SolveQuadratic(_controlPoints[0].X, _controlPoints[1].X, _controlPoints[2].X,
@@ -137,4 +136,4 @@ public class BezierObject : ICloneable
                3.0f * oneMinusT * t * t * p2 +
                t * t * t * p3;
     }
-}
+}    
