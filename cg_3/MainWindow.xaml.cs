@@ -56,6 +56,7 @@ public partial class MainWindow
 
         CurrentCurve.Maximum = _bezierCurves.Count - 1;
         CurrentCurve.Text = _currentCurve.ToString();
+        SegmentsCount.Value = _currentCurve == -1 ? 20 : _segmentsCount[_currentCurve]; 
 
         #endregion
         
@@ -582,14 +583,15 @@ public partial class MainWindow
 
     private void Scale(Vector2 pivot, float scale)
     {
-        float xStep = Math.Abs(pivot.X * (scale - 1.0f));
-        float yStep = Math.Abs(pivot.Y * (scale - 1.0f));
+        var pL = (pivot.X - _ortho.Left) / scale;
+        var pR = (_ortho.Right - pivot.X) / scale;
+        var pB = (pivot.Y - _ortho.Bottom) / scale;
+        var pT = (_ortho.Top - pivot.Y) / scale;
 
-        // Scale axes
-        _ortho.Left = _ortho.Left * 1.0f / scale + Math.Sign(_ortho.Left) * xStep; 
-        _ortho.Right = _ortho.Right * 1.0f / scale + Math.Sign(_ortho.Right) * xStep; 
-        _ortho.Bottom = _ortho.Bottom * 1.0f / scale + Math.Sign(_ortho.Bottom) * yStep; 
-        _ortho.Top = _ortho.Top * 1.0f / scale + Math.Sign(_ortho.Top) * yStep;
+        _ortho.Left = pivot.X - pL;
+        _ortho.Right = pivot.X + pR;
+        _ortho.Bottom = pivot.Y - pB;
+        _ortho.Top = pivot.Y + pT;
     }
 
     private void IsShowBoundingBox_OnChecked(object sender, RoutedEventArgs e)
