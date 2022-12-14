@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,7 +16,7 @@ namespace cg_3;
 public partial class MainWindow
 {
     private Projection _ortho = new(-20, 20, -20, 20);
-    private readonly List<BezierObject> _bezierCurves = new ();
+    private readonly List<BezierObject> _bezierCurves = new();
     private readonly List<List<Vector2>> _bezierPoints = new();
     private readonly List<Color> _bezierColors = new();
     private int _currentCurve = -1;
@@ -61,7 +62,7 @@ public partial class MainWindow
         CurrentCurve.Text = _currentCurve.ToString();
 
         #endregion
-        
+
         _glContext.Clear(OpenGL.GL_COLOR_BUFFER_BIT);
         _glContext.Enable(OpenGL.GL_POINT_SMOOTH);
         _glContext.MatrixMode(OpenGL.GL_PROJECTION);
@@ -69,19 +70,21 @@ public partial class MainWindow
         _glContext.Ortho2D(_ortho.Left, _ortho.Right, _ortho.Bottom, _ortho.Top);
         _glContext.MatrixMode(OpenGL.GL_MODELVIEW);
         _glContext.LoadIdentity();
-        
+
         DrawGrid(_ortho.Width / _xGridSplits, _ortho.Height / _yGridSplits);
         DrawAxes(_ortho.Width / _xGridSplits, _ortho.Height / _yGridSplits);
+
+        if (IsShowBoundingBox.IsChecked!.Value) IsShowBoundingBox_OnChecked(sender, args);
 
         // Control points
         for (int i = 0; i < _bezierCurves.Count; i++)
         {
             var color = _bezierColors[i];
-            
+
             _glContext.PointSize(5);
             _glContext.Color(color.R, color.G, color.B);
             _glContext.Begin(OpenGL.GL_POINTS);
-            
+
             if (_step != 4 && i == _currentCurve)
             {
                 foreach (var point in _bezierCurves[i].ControlPoints)
@@ -93,11 +96,11 @@ public partial class MainWindow
             {
                 var first = _bezierCurves[i].ControlPoints[0];
                 var last = _bezierCurves[i].ControlPoints[^1];
-                
+
                 _glContext.Vertex(first.X, first.Y);
                 _glContext.Vertex(last.X, last.Y);
             }
-            
+
             _glContext.End();
         }
 
@@ -107,18 +110,18 @@ public partial class MainWindow
             var color = _bezierColors[i];
             _glContext.Color(color.R, color.G, color.B);
             _glContext.LineWidth(i == _currentCurve ? 5 : 1);
-            
+
             _glContext.Begin(OpenGL.GL_LINE_STRIP);
 
             foreach (var point in _bezierPoints[i])
             {
                 _glContext.Vertex(point.X, point.Y);
             }
-                
+
             _glContext.End();
             _glContext.LineWidth(1);
         }
-        
+
         _glContext.Finish();
     }
 
@@ -141,47 +144,47 @@ public partial class MainWindow
             for (int i = 0; i < _pairCurvePoint.Count; i++)
             {
                 var icurve = _pairCurvePoint[i].Item1;
-                var ipoint = _pairCurvePoint[i].Item2; 
+                var ipoint = _pairCurvePoint[i].Item2;
                 var bezierCurve = _bezierCurves[icurve];
-                
                 bezierCurve.UpdateControlPoint(ipoint, screenPoint);
+                bezierCurve.IsWasCalculatedBoundingBox = false;
             }
-            
+
             for (int i = 0; i < _pairCurvePoint.Count; i++)
             {
                 var icurve = _pairCurvePoint[i].Item1;
                 var bezierCurve = _bezierCurves[icurve];
-                
+
                 _bezierPoints[icurve].Clear();
-                
+
                 for (int j = 0; j <= _segmentsCount[icurve]; j++)
                 {
                     var t = (float)j / _segmentsCount[icurve];
-                
+
                     _bezierPoints[icurve].Add(bezierCurve.CurveGen(t));
                 }
             }
-            
+
             return;
         }
 
         if (!_bezierCurves.IsEmpty() && _isDrawingMode)
         {
             BezierObject bezierCurve = _bezierCurves[_currentCurve];
-            
+
             if (bezierCurve.ControlPoints.Length != 0)
             {
                 bezierCurve.UpdateControlPoint(_step, new Vector2(screenPoint.X, screenPoint.Y));
-                
+
                 _bezierPoints[_currentCurve].Clear();
-                
+
                 for (int i = 0; i <= _segmentsCount[_currentCurve]; i++)
                 {
                     var t = (float)i / _segmentsCount[_currentCurve];
-                
+
                     _bezierPoints[_currentCurve].Add(bezierCurve.CurveGen(t));
                 }
-            }   
+            }
         }
 
         if (_canNavigate)
@@ -207,7 +210,7 @@ public partial class MainWindow
         {
             _isAbleToMovePoint = true;
             _pairCurvePoint.Clear();
-            
+
             for (int i = 0; i < _bezierCurves.Count; i++)
             {
                 if (_bezierCurves[i].IsSmoothed)
@@ -215,13 +218,13 @@ public partial class MainWindow
                     _isAbleToMovePoint = false;
                     continue;
                 }
-                
+
                 var points = _bezierCurves[i].ControlPoints;
-            
+
                 for (int j = 0; j < points.Length; j++)
                 {
                     var point = points[j];
-                    
+
                     if (Math.Abs(screenPoint.X - point.X) < 1 && Math.Abs(screenPoint.Y - point.Y) < 1)
                     {
                         _isAbleToMovePoint = true;
@@ -234,7 +237,9 @@ public partial class MainWindow
 
             return;
         }
-        
+
+        if (IsShowBoundingBox.IsChecked!.Value) return;
+
         _isDrawingMode = true;
 
         if (_step == 0)
@@ -244,7 +249,7 @@ public partial class MainWindow
             _bezierColors.Add(Color.FromRgb(0, 0, 0));
             _segmentsCount.Add(20);
             _currentCurve = (int)CurrentCurve.Maximum! + 1;
-            
+
             _bezierCurves[_currentCurve].AddControlPoint(new Vector2(screenPoint.X, screenPoint.Y));
             _bezierCurves[_currentCurve].AddControlPoint(new Vector2(screenPoint.X, screenPoint.Y));
             _step++;
@@ -252,7 +257,7 @@ public partial class MainWindow
         else
         {
             _bezierCurves[_currentCurve].AddControlPoint(new Vector2(screenPoint.X, screenPoint.Y));
-            _step++;   
+            _step++;
         }
 
         if (_step == 4)
@@ -282,7 +287,7 @@ public partial class MainWindow
         float yPos = (float)cursorPosition.Y;
         _fulcrum = _ortho.ToProjectionCoordinate(xPos, yPos, _glContext.RenderContextProvider);
     }
-    
+
     private void OnMiddleMouseButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Middle)
@@ -313,7 +318,7 @@ public partial class MainWindow
             Scale(screenPoint, 1.0f / 1.1f);
         }
     }
-    
+
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
@@ -335,7 +340,7 @@ public partial class MainWindow
 
     private void YGridSplitSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         => _yGridSplits = (float)(sender as Slider)!.Value;
-    
+
     private void CurrentCurve_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         => _currentCurve = (int)(sender as IntegerUpDown)!.Value!;
 
@@ -344,14 +349,14 @@ public partial class MainWindow
 
     private void EditMode_OnChecked(object sender, RoutedEventArgs e)
         => _isEditable = (bool)(sender as CheckBox)!.IsChecked!;
-    
+
     private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         => _isAbleToMovePoint = false;
 
     private void SegmentsCount_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         if (_bezierCurves.IsEmpty()) return;
-        
+
         _segmentsCount[_currentCurve] = (int)(sender as IntegerUpDown)!.Value!;
 
         var curve = _bezierCurves[_currentCurve];
@@ -363,17 +368,19 @@ public partial class MainWindow
             var t = (float)j / _segmentsCount[_currentCurve];
 
             _bezierPoints[_currentCurve].Add(curve.CurveGen(t));
-        }      
+        }
     }
 
     private void SmoothConnectBtn_OnClick(object sender, RoutedEventArgs e)
     {
+        if (_isDrawingMode) return;
+
         List<Vector2> allControlPoints = new();
 
         for (int i = 0; i < _bezierCurves.Count; i++)
         {
             if (_bezierCurves[i].IsSmoothed) continue;
-            
+
             var points = _bezierCurves[i].ControlPoints;
 
             for (int j = 0; j < points.Length - 1; j++)
@@ -395,7 +402,7 @@ public partial class MainWindow
             }
 
             Vector2 point3;
-            
+
             if (i + 2 >= allControlPoints.Count)
             {
                 allControlPoints.Add(allControlPoints[^1]);
@@ -405,13 +412,13 @@ public partial class MainWindow
             {
                 point3 = allControlPoints[i + 2];
             }
-            
+
             var point4 = i + 3 >= allControlPoints.Count ? allControlPoints[^1] : allControlPoints[i + 3];
-            
+
             var newPoint = new Vector2((point3.X + point4.X) / 2.0f, (point3.Y + point4.Y) / 2.0f);
             allControlPoints.Insert(i + 3, newPoint);
         }
-        
+
         _bezierCurves.Clear();
         _bezierColors.Clear();
         _segmentsCount.Clear();
@@ -423,7 +430,7 @@ public partial class MainWindow
             var p1 = allControlPoints[i + 1];
             var p2 = allControlPoints[i + 2];
             var p3 = allControlPoints[i + 3];
-        
+
             _bezierCurves.Add(new BezierObject(p0, p1, p2, p3, true));
             _bezierPoints.Add(new List<Vector2>());
             _bezierColors.Add(Color.FromRgb(0, 0, 0));
@@ -442,7 +449,7 @@ public partial class MainWindow
             }
         }
     }
-    
+
     #endregion
 
     #region Additional functions
@@ -453,13 +460,13 @@ public partial class MainWindow
         _glContext.LineStipple(1, 0x0101);
         _glContext.Color(0.41f, 0.41f, 0.41f);
         _glContext.Begin(OpenGL.GL_LINES);
-        
-        for (float axis = _ortho.Left ; axis < _ortho.Right; axis += xGridStep)
+
+        for (float axis = _ortho.Left; axis < _ortho.Right; axis += xGridStep)
         {
             _glContext.Vertex(axis, _ortho.Bottom);
             _glContext.Vertex(axis, _ortho.Top);
         }
-        
+
         for (float axis = _ortho.Bottom; axis < _ortho.Top; axis += yGridStep)
         {
             _glContext.Vertex(_ortho.Left, axis);
@@ -472,7 +479,7 @@ public partial class MainWindow
 
     private void DrawAxes(float xGridStep, float yGridStep)
     {
-        var xLineLength = _ortho.Width * 0.005f;  // 0.5% of the width
+        var xLineLength = _ortho.Width * 0.005f; // 0.5% of the width
         var yLineLength = _ortho.Height * 0.008f; // 0.8% of the height
 
         _glContext.Color(0, 0, 0);
@@ -483,17 +490,17 @@ public partial class MainWindow
             _glContext.Vertex(xAxis, _ortho.Bottom);
             _glContext.Vertex(xAxis, _ortho.Bottom + yLineLength);
         }
-        
-        for (float yAxis = _ortho.Bottom; yAxis <  _ortho.Top; yAxis += yGridStep)
+
+        for (float yAxis = _ortho.Bottom; yAxis < _ortho.Top; yAxis += yGridStep)
         {
             _glContext.Vertex(_ortho.Left, yAxis);
             _glContext.Vertex(_ortho.Left + xLineLength, yAxis);
         }
-        
+
         _glContext.End();
-                
+
         // Axes legends
-        for (float axis = _ortho.Left + xGridStep; axis < _ortho.Right; axis += xGridStep) 
+        for (float axis = _ortho.Left + xGridStep; axis < _ortho.Right; axis += xGridStep)
         {
             var scr = _ortho.ToScreenCoordinates(axis, _ortho.Bottom, _glContext.RenderContextProvider);
             string axisText = axis.ToString("0.0");
@@ -522,11 +529,46 @@ public partial class MainWindow
         float yStep = Math.Abs(pivot.Y * (scale - 1.0f));
 
         // Scale axes
-        _ortho.Left = _ortho.Left * 1.0f / scale + Math.Sign(_ortho.Left) * xStep; 
-        _ortho.Right = _ortho.Right * 1.0f / scale + Math.Sign(_ortho.Right) * xStep; 
-        _ortho.Bottom = _ortho.Bottom * 1.0f / scale + Math.Sign(_ortho.Bottom) * yStep; 
+        _ortho.Left = _ortho.Left * 1.0f / scale + Math.Sign(_ortho.Left) * xStep;
+        _ortho.Right = _ortho.Right * 1.0f / scale + Math.Sign(_ortho.Right) * xStep;
+        _ortho.Bottom = _ortho.Bottom * 1.0f / scale + Math.Sign(_ortho.Bottom) * yStep;
         _ortho.Top = _ortho.Top * 1.0f / scale + Math.Sign(_ortho.Top) * yStep;
     }
 
     #endregion
+
+    private void IsShowBoundingBox_OnChecked(object sender, RoutedEventArgs e)
+    {
+        if (!_bezierCurves[_currentCurve].IsWasCalculatedBoundingBox)
+        {
+            _bezierCurves[_currentCurve].CalculateBoundingBox();
+            _bezierCurves[_currentCurve].IsWasCalculatedBoundingBox = true;
+        }
+
+        _glContext.Enable(OpenGL.GL_LINE_STIPPLE);
+        _glContext.LineStipple(1, 0x1C47);
+        _glContext.Color(1.0f, 0.5f, 0.0f);
+        _glContext.LineWidth(2);
+        _glContext.Begin(OpenGL.GL_LINES);
+
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.LeftBottom.X,
+            _bezierCurves[_currentCurve].BoundingBox.LeftBottom.Y);
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.RightBottom.X,
+            _bezierCurves[_currentCurve].BoundingBox.RightBottom.Y);
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.LeftBottom.X,
+            _bezierCurves[_currentCurve].BoundingBox.LeftBottom.Y);
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.LeftTop.X,
+            _bezierCurves[_currentCurve].BoundingBox.LeftTop.Y);
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.LeftTop.X,
+            _bezierCurves[_currentCurve].BoundingBox.LeftTop.Y);
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.RightTop.X,
+            _bezierCurves[_currentCurve].BoundingBox.RightTop.Y);
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.RightTop.X,
+            _bezierCurves[_currentCurve].BoundingBox.RightTop.Y);
+        _glContext.Vertex(_bezierCurves[_currentCurve].BoundingBox.RightBottom.X,
+            _bezierCurves[_currentCurve].BoundingBox.RightBottom.Y);
+
+        _glContext.End();
+        _glContext.Disable(OpenGL.GL_LINE_STIPPLE);
+    }
 }

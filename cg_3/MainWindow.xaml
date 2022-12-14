@@ -74,6 +74,10 @@
                                               Minimum="5" Maximum="30" Value="20"
                                               ValueChanged="SegmentsCount_OnValueChanged"/>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Внешняя оболочка" />
+                            <CheckBox x:Name="IsShowBoundingBox" Margin="0, 4, 0, 0" Checked="IsShowBoundingBox_OnChecked"/>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
                 
